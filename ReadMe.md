@@ -66,3 +66,19 @@ commands. Individual reports can also be deleted if required.
     it will copy instead of move.
 
 * Join/Leave responses - The bot greets people as they come, and wishes them well as they leave. Will be automatically sent to the server's system message channel
+
+* Message all new arrivals with a server introduction and prompt to introduce themselves in the appropriate channel
+
+
+
+Future planned features:
+(In sorted priority)
+
+1. auto assign roles passed on words contained in introduction within #if-you-are-new-click-here
+2. Switch from Json to sqlite3
+3. xkcd
+4. rpg quotes (random selection)
+5. reddit programming related post curation (I have the code sitting in a side project, just need to migrate/link it into the bot)
+6.  DM people who are leaving, in addition to the message post in welcome which already occurs
+7. Stale/Inactive user tracking/action
+8. (Optional future feature) -- a text based rpg/mud
