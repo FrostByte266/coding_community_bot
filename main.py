@@ -91,7 +91,7 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_guild_join(guild):
-	config = json.loads(open('config.json', 'r').read())
+	config = json.loads(open('assets/config.json', 'r').read())
 	# Create configuration dict to store in JSON
 	config[str(guild.id)] = {
 		"verification_channel": None,
@@ -100,14 +100,14 @@ async def on_guild_join(guild):
 		"reports": {}
 	}
 	# Save to config file
-	json.dump(config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+	json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 
 @bot.event
 async def on_guild_remove(guild):
 	config = json.loads(open('assets/config.json', 'r').read())
 	config.pop(str(guild.id))
-	json.dump(config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+	json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 
 if __name__ == '__main__':
