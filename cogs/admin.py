@@ -58,7 +58,9 @@ class Admin(commands.Cog):
 		if pull == "pull":
 			cmd = Popen(["git", "pull"], stdout=PIPE)
 			out, _ = cmd.communicate()
-			await ctx.send(f"Attempted to pull files from github.\n{out}")
+			if out == b'Already up to date.\n':
+				return await ctx.send("I'm already up to date.")
+			await ctx.send(f"Pulling files from github...\n{out}")
 
 		await self.load_cogs()
 		await ctx.send("Reloaded")
