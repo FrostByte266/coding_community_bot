@@ -12,7 +12,7 @@ class Verification(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.config_full = json.loads(open('config.json').read())
+		self.config_full = json.loads(open('assets/config.json').read())
 		self.word_list_refresh_rate = 99
 		self.word_cache_size = 1000
 
@@ -25,14 +25,14 @@ class Verification(commands.Cog):
 			channel = await ctx.message.guild.create_text_channel(name="Verification")
 			role = await ctx.message.guild.create_role(name="Unverified")
 			config.update(verification_channel=channel.id, verification_role=role.id)
-			json.dump(self.config_full, open('config.json', 'w'), indent=2, separators=(',', ': '))
+			json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 		elif state is False and config["verification_channel"] is not None:
 			channel = get(ctx.message.guild.text_channels, id=config["verification_channel"])
 			role = get(ctx.message.guild.roles, id=config["verification_role"])
 			await channel.delete()
 			await role.delete()
 			config.update(verification_channel=None, verification_role=None)
-			json.dump(self.config_full, open('config.json', 'w'), indent=2, separators=(',', ': '))
+			json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 	@commands.command()
 	async def verify(self, ctx):
@@ -91,7 +91,7 @@ class Verification(commands.Cog):
 		await self.bot.wait_for("message", timeout=30, check=lambda message: message.content == expected_answer)
 		await ctx.message.author.send("Verification complete 👍")
 		# If they pass, remove the unverified role
-		config = json.loads(open('config.json', 'r').read())
+		config = json.loads(open('assets/config.json', 'r').read())
 		role = get(ctx.guild.roles, id=config[str(ctx.guild.id)]["verification_role"])
 		await ctx.message.author.remove_roles(role)
 
