@@ -44,15 +44,14 @@ async def on_message(message,ctx,member):
 			await message.author.send(
 				"You have not verified your account, please type 'b!verify' in your server's verification channel")
 
-		if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
-			word_set = set(message.content.split())
-			roles = {role.name:role.name for role in ctx.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
+	if message.author != bot.user and str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
+		word_set = set(message.content.split())
+		roles = {role.name:role.name for role in ctx.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
 
-			member_roles = [word for word in word_set if roles.get(word,0)!=0]
-			for role in member_roles:
-				member.add_roles(role)
+		member_roles = [word for word in word_set if roles.get(word,0)!=0]
+		await member.add_roles(member_roles)
 
-	await bot.process_commands(message)
+		await bot.process_commands(message)
 
 
 @bot.event
