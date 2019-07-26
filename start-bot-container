@@ -1,8 +1,8 @@
 #!/bin/bash
 if [ -f "./assets/config.json" ]; then
-  sudo docker run --rm -v $PWD/assets:/assets hackweek-bot
+  sudo docker run --rm -v -d $PWD/assets:/assets hackweek-bot
 elif [ ! -f "./assets/config.json" ] && [ -z $1 ]; then
   echo "Missing required variable: please enter your bot token as the first argument"
 else
-  sudo docker run --rm -e BOT_TOKEN=$1 -v $PWD/assets/:/assets hackweek-bot
+  sudo docker run --rm -d -e BOT_TOKEN=$1 -v $PWD/assets/:/assets hackweek-bot
 fi
