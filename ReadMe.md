@@ -46,9 +46,11 @@ Discord, Bot, Python, Moderation
   * Run the bot and follow setup prompts
   ```bash
   python main.py
+ 
   ```
-
-**Features**
+  
+  <p>____________________</p>
+<b>Features</b>
 
 * Role statistics -
     - b!plot - Generate a plot of how many people are assigned to each role in the server     
