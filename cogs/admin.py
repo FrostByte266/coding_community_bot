@@ -27,7 +27,7 @@ class Admin(commands.Cog):
 	async def poweroff(self, ctx):
 		f"""
 		Turns the bot off.
-		
+
 		Examples:
 			Turn the bot off
 			{self.bot.command_prefix}poweroff
@@ -106,3 +106,4 @@ class Admin(commands.Cog):
 
 def setup(bot):
 	bot.add_cog(Admin(bot))
+
