@@ -28,14 +28,16 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(message,ctx,member):
+async def on_message(message):
 	if message.guild is None:
-		await bot.process_commands(message)
+		return await bot.process_commands(message)
+	elif message.author == bot.user: 
 		return
+
 	config_full = json.loads(open('assets/config.json', 'r').read())
 	config = config_full[str(message.guild.id)]
 	verification_enabled = True if config["verification_channel"] is not None else False
-	if message.author != bot.user and verification_enabled:
+	if verification_enabled:
 		# Check if the user is attempting to verify, if not then delete the message and send them a notice in DM
 		verify_channel = config['verification_channel']
 		unverified_role = get(message.author.guild.roles, name="Unverified")
@@ -44,14 +46,14 @@ async def on_message(message,ctx,member):
 			await message.author.send(
 				"You have not verified your account, please type 'b!verify' in your server's verification channel")
 
-	if message.author != bot.user and str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
+	if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
 		word_set = set(message.content.split())
-		roles = {role.name:role.name for role in ctx.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
+		roles = {role.name:role.name for role in message.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
 
 		member_roles = [word for word in word_set if roles.get(word,0)!=0]
-		await member.add_roles(member_roles)
+		await message.guild.member.add_roles(member_roles)
 
-		await bot.process_commands(message)
+	await bot.process_commands(message)
 
 
 @bot.event
