@@ -12,7 +12,7 @@ bot = commands.Bot(command_prefix="b!")
 @bot.event
 async def on_ready():
 	print("Ready")
-	config = json.loads(open('config.json', 'r').read())
+	config = json.loads(open('assets/config.json', 'r').read())
 	# Check if there are any new servers the bot does not have configs for
 	for server in bot.guilds:
 		if str(server.id) not in config:
@@ -24,7 +24,7 @@ async def on_ready():
 									"reports": {}
 								}
 			# Save to config file
-			json.dump(config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+			json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 
 @bot.event
@@ -32,7 +32,7 @@ async def on_message(message):
 	if message.guild is None:
 		await bot.process_commands(message)
 		return
-	config_full = json.loads(open('config.json', 'r').read())
+	config_full = json.loads(open('assets/config.json', 'r').read())
 	config = config_full[str(message.guild.id)]
 	verification_enabled = True if config["verification_channel"] is not None else False
 	if message.author != bot.user and verification_enabled:
@@ -48,7 +48,7 @@ async def on_message(message):
 
 @bot.event
 async def on_member_join(member):
-	config_full = json.loads(open('config.json', 'r').read())
+	config_full = json.loads(open('assets/config.json', 'r').read())
 	config = config_full[str(member.guild.id)]
 	verification_enabled = True if config["verification_channel"] is not None else False
 	if verification_enabled and not member.bot:
@@ -91,7 +91,7 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_guild_join(guild):
-	config = json.loads(open('config.json', 'r').read())
+	config = json.loads(open('assets/config.json', 'r').read())
 	# Create configuration dict to store in JSON
 	config[str(guild.id)] = {
 		"verification_channel": None,
@@ -100,26 +100,28 @@ async def on_guild_join(guild):
 		"reports": {}
 	}
 	# Save to config file
-	json.dump(config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+	json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 
 @bot.event
 async def on_guild_remove(guild):
-	config = json.loads(open('config.json', 'r').read())
+	config = json.loads(open('assets/config.json', 'r').read())
 	config.pop(str(guild.id))
-	json.dump(config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+	json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 
 if __name__ == '__main__':
 	token = None
 	try:
 		# Attempt to fetch the token from config.json
-		token = json.loads(open('config.json', 'r').read())['token']
+		token = json.loads(open('assets/config.json', 'r').read())['token']
 	except FileNotFoundError:
 		# If config.json does not exist, it must be the first time starting the bot, run through configuration
-		token = input('It appears this is the first time running the bot. Please enter your bot\'s token: ')
+		# If we are running from a docker container, fetch the token through an environment variable, otherwise, prompt the user to enter it
+		environment = os.environ.get('BOT_TOKEN', None)
+		token = environment if environment is not None else input('It appears this is the first time running the bot. Please enter your bot\'s token: ')
 		initial_config = {"token": token}
-		json.dump(initial_config, open('config.json', 'w'), indent=2, separators=(',', ': '))
+		json.dump(initial_config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 		os.mkdir('./assets/network_charts')
 		os.mkdir('./assets/role_charts')
 	finally:
