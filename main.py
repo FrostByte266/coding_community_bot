@@ -31,7 +31,7 @@ async def on_ready():
 async def on_message(message):
 	if message.guild is None:
 		return await bot.process_commands(message)
-	elif message.author == bot.user: 
+	elif message.author == bot.user:
 		return
 
 	config_full = json.loads(open('assets/config.json', 'r').read())
@@ -48,10 +48,10 @@ async def on_message(message):
 
 	if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
 		word_set = set(message.content.split())
-		roles = {role.name:role.name for role in message.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
+		roles = {role.name:role for role in message.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
 
 		member_roles = [word for word in word_set if roles.get(word,0)!=0]
-		await message.guild.member.add_roles(member_roles)
+		[await message.author.add_roles(roles[role]) for role in member_roles]
 
 	await bot.process_commands(message)
 
