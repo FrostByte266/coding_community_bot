@@ -50,8 +50,8 @@ async def on_message(message):
 		word_set = set(message.content.split())
 		roles = {role.name:role for role in message.guild.roles if role.name != '@everyone' and role.name !='Admin' and role.name != 'Moderator'}
 
-		member_roles = [word for word in word_set if roles.get(word,0)!=0]
-		[await message.author.add_roles(roles[role]) for role in member_roles]
+		member_roles = [roles(word, 0) for word in word_set if roles.get(word,0)!=0]
+		[await message.author.send(member_roles) for role in member_roles]
 
 	await bot.process_commands(message)
 
