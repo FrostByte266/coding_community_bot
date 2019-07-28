@@ -71,7 +71,11 @@ async def on_member_join(member):
 	# Prepare welcome embed
 	embed = Embed(
 					color=0x9370DB,
-					description=f'Welcome to the server! You are member number {len(list(member.guild.members))}'
+					description=f'Welcome to the server! Please remember to view the #readme  and introduce yourself over in'\
+                                                        ' #if-you-are-new-click-here. We like to make sure everyone has assigned languages roles. It is one '\
+                                                        'of the core features of the server and it only works if people participate. This is what allows you t'\
+                                                        'o say @ Javascript , @ Python, etc. and then ask a question to receive help from those proficient with the language.'\
+                                                        ' Those without roles get removed fairly regularly by the Moderation Team.'
 				)
 	embed.set_thumbnail(url=member.avatar_url)
 	embed.set_author(name=member.name, icon_url=member.avatar_url)
