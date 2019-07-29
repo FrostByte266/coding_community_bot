@@ -1,11 +1,13 @@
 """
-All commands in this cog are assumed to require administrator level permissions to run. These commands are intended
-to make administration of the bot itself easier.
+All commands in this cog are assumed to require administrator level permissions
+to run. These commands are intended to make administration of the bot itself
+easier.
 
-Commands contained in this Cog
+Commands provided by this Cog
 
-	- poweroff : Turns the bot off
-	- reload   : Reloads the bot configuration from local files OR pulls from github and then reloads.
+    - poweroff : Turns the bot off
+    - reload   : Reloads the bot configuration from local files OR pulls from
+                 github and then reloads.
 
 """
 
@@ -106,4 +108,3 @@ class Admin(commands.Cog):
 
 def setup(bot):
 	bot.add_cog(Admin(bot))
-

@@ -1,3 +1,10 @@
+"""
+Commands provided by this cog.
+
+    reporting : Enables or disables the reporting feature
+
+"""
+
 import json
 
 from discord.utils import get
