@@ -1,3 +1,10 @@
+"""
+Commands provided by this cog.
+
+    networkplot : Prots connections between user roles on the server
+    plot : Gives a graph of role usage in the server
+"""
+
 from discord.ext import commands
 from discord import File
 from pandas import DataFrame

@@ -1,3 +1,11 @@
+"""
+Commands provided by this cog.
+
+    verification : Enable or disable the verification setting for the bot.
+    verify : User verification. Removes the unverified role if successful.
+
+"""
+
 import aiohttp
 import json
 from random import choice, choices, randint, sample
