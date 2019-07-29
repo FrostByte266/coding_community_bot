@@ -1,3 +1,10 @@
+"""
+Commands provided by this cog.
+
+    purge : Deletes messages. Requires permission to manage messages.
+    move  : Moves messages between channels. Manage Messages permissions.
+"""
+
 from asyncio import sleep
 
 from discord import Embed, TextChannel, User
