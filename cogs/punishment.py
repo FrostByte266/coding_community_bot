@@ -1,3 +1,15 @@
+"""
+Commands provided by this cog.
+
+    kick : Kicks a user. A message is sent to the kicking user and kicked.
+    ban  : Bans a user. A message is sent to the banning user and the banned.
+    hackban : Bans someone who is not in the guild.
+    unban : Unbans a user. A message is sent the the issuer and the recipient.
+    report : Reports a user. A message is sent to the issuer and the recipient.
+    lookup : Looks up a report by user or incident id.
+    recall : Clears a single report. Requires an incident id.
+"""
+
 from datetime import datetime
 import json
 
