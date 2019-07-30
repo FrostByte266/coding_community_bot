@@ -17,8 +17,7 @@ async def on_ready():
     for server in bot.guilds:
         if str(server.id) not in config:
             # Add empty config to JSON + initialize all win/loss stats for users
-            config[server.id] = {
-                "verification_channel": None,
+            config[str(server.id)] = {
                 "verification_role": None,
                 "reporting_channel": None,
                 "reports": {}
@@ -36,16 +35,8 @@ async def on_message(message):
 
     config_full = json.loads(open('assets/config.json', 'r').read())
     config = config_full[str(message.guild.id)]
-    verification_enabled = True if config["verification_channel"] is not None else False
-    if verification_enabled:
-        # Check if the user is attempting to verify, if not then delete the message and send them a notice in DM
-        verify_channel = config['verification_channel']
-        unverified_role = get(message.author.guild.roles, name="Unverified")
-        if unverified_role in message.author.roles and (
-                message.channel.id != verify_channel and message.content != "b!verify"):
-            await message.channel.purge(limit=1)
-            await message.author.send(
-                "You have not verified your account, please type 'b!verify' in your server's verification channel")
+    verification_enabled = True if config["verification_role"] is not None else False
+    unverified_role = get(message.author.guild.roles, name="Unverified")
 
     if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
         word_set = set(message.content.split())
@@ -66,7 +57,11 @@ async def on_message(message):
             'If you believe you are missing some roles or have received roles that do not apply to you, '
             'please feel free to contact the moderation team'
         )
-
+        if verification_enabled:
+            await message.author.remove_roles(unverified_role)
+    elif verification_enabled and str(message.channel) != 'if-you-are-new-click-here' and unverified_role in message.author.roles:
+        await message.author.send("Before you can send messages, please introduce yourself in #if-you-are-new-click-here")
+        await message.delete()
     await bot.process_commands(message)
 
 
@@ -74,7 +69,7 @@ async def on_message(message):
 async def on_member_join(member):
     config_full = json.loads(open('assets/config.json', 'r').read())
     config = config_full[str(member.guild.id)]
-    verification_enabled = True if config["verification_channel"] is not None else False
+    verification_enabled = True if config["verification_role"] is not None else False
     if verification_enabled and not member.bot:
         role = get(member.guild.roles, id=config["verification_role"])
         await member.add_roles(role)
@@ -118,7 +113,6 @@ async def on_guild_join(guild):
     config = json.loads(open('assets/config.json', 'r').read())
     # Create configuration dict to store in JSON
     config[str(guild.id)] = {
-        "verification_channel": None,
         "verification_role": None,
         "reporting_channel": None,
         "reports": {}
