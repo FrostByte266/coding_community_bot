@@ -46,8 +46,8 @@ async def on_message(message):
                          'Merit Badge (lvl - Admin)',
                          'Merit Badge (lvl - Owner)']
 
-        roles = {role.name: role for role in message.guild.roles if role.name not in ignored_roles}
-        member_roles = [roles.get(word, 0) for word in word_set if roles.get(word, 0) != 0]
+        roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
+        member_roles = [roles.get(word.lower(), 0) for word in word_set if roles.get(word.lower(), 0) != 0]
         await message.author.add_roles(*member_roles)
 
         newline = '\n'
