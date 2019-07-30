@@ -6,7 +6,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.utils import get
 
-bot = commands.Bot(command_prefix="b!")
+bot = commands.Bot(command_prefix="!")
 
 
 @bot.event
