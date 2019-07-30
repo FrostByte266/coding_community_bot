@@ -37,7 +37,6 @@ async def on_message(message):
     config = config_full[str(message.guild.id)]
     verification_enabled = True if config["verification_role"] is not None else False
     unverified_role = get(message.author.guild.roles, name="Unverified")
-    verified_role = get(message.author.guild.roles, name="verified")
 
     if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
         word_set = set(message.content.split())
@@ -53,14 +52,13 @@ async def on_message(message):
 
         newline = '\n'
         await message.author.send(
-            f'Hello, based on your introduction, you have automatically been assigned the following roles: \n\n'
-            f'{newline.join([role.name for role in member_roles])} \n\n'
+            f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
+            f'{newline.join([role.name for role in member_roles])} \n'
             'If you believe you are missing some roles or have received roles that do not apply to you, '
             'please feel free to contact the moderation team'
         )
         if verification_enabled:
             await message.author.remove_roles(unverified_role)
-            await message.author.add_roles(verified_role)
     elif verification_enabled and str(message.channel) != 'if-you-are-new-click-here' and unverified_role in message.author.roles:
         await message.author.send("Before you can send messages, please introduce yourself in #if-you-are-new-click-here")
         await message.delete()
