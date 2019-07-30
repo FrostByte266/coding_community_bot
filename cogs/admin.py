@@ -12,6 +12,7 @@ Commands provided by this Cog
 """
 
 import os
+import sys
 import traceback
 
 from discord.ext import commands
@@ -40,7 +41,7 @@ class Admin(commands.Cog):
 		await client.Client.logout(self.bot)
 
 	@commands.command(hidden=True, description="Reloads bot cogs")
-	@commands.has_permissions(administrator=True)
+	@commands.has_permissions(manage_messages=True)
 	async def reload(self, ctx, pull=None):
 		f"""
 		Reloads all bot cogs so updates can be performed while the bot is
