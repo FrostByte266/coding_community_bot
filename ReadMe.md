@@ -102,12 +102,11 @@ commands. Individual reports can also be deleted if required.
 
 * Message all new arrivals with a server introduction and prompt to introduce themselves in the appropriate channel
 
-
+* auto assign roles passed on words contained in introduction within #if-you-are-new-click-here
 
 Future planned features:
 (In sorted priority)
 
-1. auto assign roles passed on words contained in introduction within #if-you-are-new-click-here
 2. Switch from Json to sqlite3
 3. xkcd
 4. rpg quotes (random selection)
