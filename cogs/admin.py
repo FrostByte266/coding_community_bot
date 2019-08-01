@@ -45,7 +45,7 @@ class Admin(commands.Cog):
 
 	@commands.command(hidden=True,
 					  description="Reboots the bot")
-	@commands.has_permissions(administrator=True)
+	@commands.has_permissions(manage_messages=True)
 	async def reboot(self, ctx):
 		f"""
 		Reboots the bot so all files can be reloaded.
