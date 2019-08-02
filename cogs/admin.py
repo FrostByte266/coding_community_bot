@@ -5,9 +5,9 @@ easier.
 
 Commands provided by this Cog
 
-    - poweroff : Turns the bot off
-    - reload   : Reloads the bot configuration from local files OR pulls from
-                 github and then reloads.
+	- poweroff : Turns the bot off
+	- reload   : Reloads the bot configuration from local files OR pulls from
+				 github and then reloads.
 
 """
 
@@ -36,8 +36,31 @@ class Admin(commands.Cog):
 			{self.bot.command_prefix}poweroff
 		"""
 
+		with open("poweroff", 'w') as f:
+			f.write("Bot is stopping")
+
 		shutdown_message = "Bot is being desummoned."
 		await ctx.send(shutdown_message)
+		await client.Client.logout(self.bot)
+
+	@commands.command(hidden=True,
+					  description="Reboots the bot")
+	@commands.has_permissions(manage_messages=True)
+	async def reboot(self, ctx):
+		f"""
+		Reboots the bot so all files can be reloaded.
+		Requires administrator permissions.
+
+		usage: {self.bot.command_prefix}reboot
+		"""
+
+		cmd = Popen(["git", "pull"], stdout=PIPE)
+		out, _ = cmd.communicate()
+		out = out.decode()
+		if "+" in out:
+			await ctx.send(f"Updated:\n{out}")
+
+		await ctx.send(f"rebooting....")
 		await client.Client.logout(self.bot)
 
 	@commands.command(hidden=True, description="Reloads bot cogs")
