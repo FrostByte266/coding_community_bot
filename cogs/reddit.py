@@ -98,7 +98,7 @@ class Reddit(commands.Cog):
                 self.get_reddit.learning, self.get_reddit.language,
                 self.get_reddit.cstopics, self.get_reddit.ai
             ]
-            period = sample(['year', 'month', 'week', 'day'])
+            period = sample(['year', 'month', 'week', 'day'],1)
             await ctx.send(readings_fetch(self.get_reddit.categories[2], period, mode))
 
     @get_reddit.error
