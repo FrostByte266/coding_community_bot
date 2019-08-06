@@ -24,7 +24,7 @@ def topinxperiod(subreddit, period='year', return_quantity=3):
 
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
     anchors = soup.find_all(class_="SQnoC3ObvgnGjWt90zD9Z")
-    links = ['reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
+    links = ['https://www.reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
 
     return links[:return_quantity - 1]
 
@@ -37,10 +37,13 @@ def readings_fetch(subreddits_list, period='year', mode='top'):
     else:
         links_per_sub = 3
 
+    subreddits_list = sample(subreddits_list,3)
+
     for subreddit in subreddits_list:
         top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
 
-        shuffle(top_links_in_period)
+    shuffle(top_links_in_period)
+    top_links_in_period = sample(top_links_in_period,5)
     while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
         top_links_in_period.pop(-1)
 
