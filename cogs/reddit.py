@@ -101,6 +101,10 @@ class Reddit(commands.Cog):
 			period = sample(['year', 'month', 'week', 'day'])
 			await ctx.send(readings_fetch(self.get_reddit.categories[2], period, mode))
 
+    @get_reddit.error()
+    async def get_reddit_error(self, ctx, error):
+        await ctx.send(f'Encountered an error: {error}')
+
 
 def setup(bot):
 	bot.add_cog(Reddit(bot))
