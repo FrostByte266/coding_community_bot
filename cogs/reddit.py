@@ -66,7 +66,7 @@ class Reddit(commands.Cog):
 	@commands.command()
 	async def get_reddit(self,ctx,mode='assorted'):
 		try:
-			await ctx.send(await readings_fetch(get_reddit.categories[2], 'year', mode))
+			await ctx.send(await readings_fetch(self.get_reddit.categories[2], 'year', mode))
 		except Exception as E:
 			self.get_reddit.learning = ['learnprogramming',
 										'learnpython',
