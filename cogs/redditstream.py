@@ -1,6 +1,7 @@
 from random import shuffle
 
 from bs4 import BeautifulSoup
+from discord.ext import commands
 import requests
 
 headers = {
@@ -14,7 +15,7 @@ headers = {
 }
 
 
-def topinxperiod(subreddit,period='year',return_quantity=3):
+async def topinxperiod(subreddit,period='year',return_quantity=3):
 	if return_quantity > 7:
 		return_quantity = 7
 	if period =='year':
@@ -37,7 +38,7 @@ def topinxperiod(subreddit,period='year',return_quantity=3):
 	return links[:return_quantity-1]
 
 
-def readings_fetch(subreddits_list,period='year',mode='top'):
+async def readings_fetch(subreddits_list,period='year',mode='top'):
 	top_links_in_period = []
 
 	if mode == 'assorted':
@@ -48,7 +49,7 @@ def readings_fetch(subreddits_list,period='year',mode='top'):
 	for subreddit in subreddits_list:
 		top_links_in_period.extend(topinxperiod(subreddit, period,links_per_sub))
 
-	shuffle(top_links_in_period)
+		top_links_in_period = shuffle(top_links_in_period)
 	while len('\n'.join([str(x) for x in top_links_in_period]))>2000:
 		top_links_in_period.pop(-1)
 
@@ -63,36 +64,38 @@ def test_top_readings(list_of_lists):
 			top_links_in_period.extend(topinxperiod(subreddit, period))
 		print(len(''.join(top_links_in_period)))
 
+@commands.command
+async def get_reddit(self,ctx,mode='assorted'):
+	try:
+		await ctx.send(readings_fetch(get_reddit.categories[2], 'year', mode))
+	except Exception as E:
+		get_reddit.learning = ['learnprogramming',
+									'learnpython',
+									'learnlisp',
+									'learngolang',
+									'learnjava',
+									'cscareerquestions']
 
-def get_reddit(mode='assorted'):
-	subreddit_learning = ['learnprogramming',
-								'learnpython',
-								'learnlisp',
-								'learngolang',
-								'learnjava',
-								'cscareerquestions']
+		get_reddit.ai = ['neuralnetworks',
+							 'deeplearning',
+							 'machinelearning',
+							 'statistics']
 
-	subreddit_ai = ['neuralnetworks',
-						 'deeplearning',
-						 'machinelearning',
-						 'statistics']
+		get_reddit.language = ['python',
+								   'sql',
+								   'julia',
+								   'lisp',
+								   'rlanguage',
+								   'golang',
+								   'rust',
+								   'java']
 
-	subreddit_language = ['python',
-							   'sql',
-							   'julia',
-							   'lisp',
-							   'rlanguage',
-							   'golang',
-							   'rust',
-							   'java']
+		get_reddit.cstopics = ['programming',
+								   'compsci',
+								   'proceduralgeneration',
+								   'crypto',
+								   'demoscene']
 
-	subreddit_cstopics = ['programming',
-							   'compsci',
-							   'proceduralgeneration',
-							   'crypto',
-							   'demoscene']
+		get_reddit.categories = [get_reddit.learning,get_reddit.language,get_reddit.cstopics,get_reddit.ai]
 
-	subreddit_categories = [subreddit_learning,subreddit_language,subreddit_cstopics,subreddit_ai]
-
-
-	print(readings_fetch(subreddit_categories[2],'year',mode))
+		await ctx.send(readings_fetch(get_reddit.categories[2],'year',mode))
