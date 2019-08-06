@@ -95,7 +95,7 @@ class Reddit(commands.Cog):
                                         'demoscene']
 
             self.get_reddit.categories = [self.get_reddit.learning, self.get_reddit.language, self.get_reddit.cstopics,
-                                          get_reddit.ai]
+                                          self.get_reddit.ai]
             period = sample(['year', 'month', 'week', 'day'])
             await ctx.send(readings_fetch(self.get_reddit.categories[2], period, mode))
 
