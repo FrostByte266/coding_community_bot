@@ -1,7 +1,7 @@
-from random import shuffle
-
 from bs4 import BeautifulSoup
 from discord.ext import commands
+from random import sample, shuffle
+
 import requests
 
 headers = {
@@ -18,22 +18,15 @@ headers = {
 async def topinxperiod(subreddit,period='year',return_quantity=3):
 	if return_quantity > 7:
 		return_quantity = 7
-	if period =='year':
-		response = requests.get('https://www.reddit.com/r/' + subreddit + '/top/?t=year', headers=headers)
-	elif period == 'month':
-		response = requests.get('https://www.reddit.com/r/' + subreddit + '/top/?t=month', headers=headers)
-	elif period == 'week':
-		response = requests.get('https://www.reddit.com/r/' + subreddit + '/top/?t=week', headers=headers)
-	elif period == 'day':
-		response = requests.get('https://www.reddit.com/r/' + subreddit + '/top/?t=day', headers=headers)
-	else:
-		response = requests.get('https://www.reddit.com/r/' + subreddit + '/top/?t=year', headers=headers)
+
+	response = requests.get(f'https://www.reddit.com/r/{subreddit}/top/?t={period}', headers=headers)
+
 
 	soup = BeautifulSoup(response.text, features="html.parser")
 
 	# SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
 	anchors = soup.find_all(class_="SQnoC3ObvgnGjWt90zD9Z")
-	links = ['reddit.com' + x[x.find('href="') + 6:x.rfind('/"><h2 ') - 1] for x in [str(x) for x in anchors]]
+	links = ['reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
 
 	return links[:return_quantity-1]
 
@@ -49,13 +42,13 @@ async def readings_fetch(subreddits_list,period='year',mode='top'):
 	for subreddit in subreddits_list:
 		top_links_in_period.extend(topinxperiod(subreddit, period,links_per_sub))
 
-		top_links_in_period = shuffle(top_links_in_period)
+		shuffle(top_links_in_period)
 	while len('\n'.join([str(x) for x in top_links_in_period]))>2000:
 		top_links_in_period.pop(-1)
 
 	return '\n'.join([str(x) for x in top_links_in_period])
 
-def test_top_readings(list_of_lists):
+async def test_top_readings(list_of_lists):
 	periods = ['day', 'week', 'month', 'year']
 
 	for period in periods:
@@ -64,38 +57,47 @@ def test_top_readings(list_of_lists):
 			top_links_in_period.extend(topinxperiod(subreddit, period))
 		print(len(''.join(top_links_in_period)))
 
-@commands.command
-async def get_reddit(self,ctx,mode='assorted'):
-	try:
-		await ctx.send(readings_fetch(get_reddit.categories[2], 'year', mode))
-	except Exception as E:
-		get_reddit.learning = ['learnprogramming',
-									'learnpython',
-									'learnlisp',
-									'learngolang',
-									'learnjava',
-									'cscareerquestions']
 
-		get_reddit.ai = ['neuralnetworks',
-							 'deeplearning',
-							 'machinelearning',
-							 'statistics']
+class Reddit(commands.Cog):
 
-		get_reddit.language = ['python',
-								   'sql',
-								   'julia',
-								   'lisp',
-								   'rlanguage',
-								   'golang',
-								   'rust',
-								   'java']
+	def __init__(self, bot):
+		self.bot = bot
 
-		get_reddit.cstopics = ['programming',
-								   'compsci',
-								   'proceduralgeneration',
-								   'crypto',
-								   'demoscene']
+	@commands.command()
+	async def get_reddit(self,ctx,mode='assorted'):
+		try:
+			await ctx.send(await readings_fetch(get_reddit.categories[2], 'year', mode))
+		except Exception as E:
+			self.get_reddit.learning = ['learnprogramming',
+										'learnpython',
+										'learnlisp',
+										'learngolang',
+										'learnjava',
+										'cscareerquestions']
 
-		get_reddit.categories = [get_reddit.learning,get_reddit.language,get_reddit.cstopics,get_reddit.ai]
+			self.get_reddit.ai = ['neuralnetworks',
+								 'deeplearning',
+								 'machinelearning',
+								 'statistics']
 
-		await ctx.send(readings_fetch(get_reddit.categories[2],'year',mode))
+			self.get_reddit.language = ['python',
+									   'sql',
+									   'julia',
+									   'lisp',
+									   'rlanguage',
+									   'golang',
+									   'rust',
+									   'java']
+
+			self.get_reddit.cstopics = ['programming',
+									   'compsci',
+									   'proceduralgeneration',
+									   'crypto',
+									   'demoscene']
+
+			self.get_reddit.categories = [self.get_reddit.learning,self.get_reddit.language,self.get_reddit.cstopics,get_reddit.ai]
+			period = sample(['year','month','week','day'])
+			await ctx.send(await readings_fetch(self.get_reddit.categories[2],period,mode))
+
+def setup(bot):
+    bot.add_cog(Reddit(bot))
