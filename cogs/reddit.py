@@ -51,7 +51,7 @@ def readings_fetch(subreddits_list, period='year', mode='top'):
 
 
 def test_top_readings(list_of_lists):
-    periods = ['day', 'week', 'month', 'year']
+    periods = ['week', 'month', 'year']
 
     for period in periods:
         top_links_in_period = []
@@ -73,7 +73,7 @@ class Reddit(commands.Cog):
             category = sample(self.get_reddit.sub_reddit_composite, 3)
             await ctx.send(readings_fetch(category, period, mode))
         except Exception as E:
-            self.get_reddit.timeframes= ['year', 'month', 'week', 'day']
+            self.get_reddit.timeframes= ['year', 'month']
             self.get_reddit.learning = ['learnprogramming',
                                         'learnpython',
                                         'learnlisp',
