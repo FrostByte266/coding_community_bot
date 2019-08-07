@@ -15,7 +15,7 @@ headers = {
 }
 
 
-async def topinxperiod(ctx,subreddit, period='year', return_quantity=3):
+async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
@@ -30,7 +30,7 @@ async def topinxperiod(ctx,subreddit, period='year', return_quantity=3):
     return links[:return_quantity - 1]
 
 
-async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
+async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
     top_links_in_period = []
 
     if mode == 'assorted':
@@ -43,7 +43,7 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
 
     await ctx.send(str(subreddits_list))
     for subreddit in subreddits_list:
-        top_links_in_period.extend(ctx,await topinxperiod(subreddit, period, links_per_sub))
+        top_links_in_period.extend(ctx, await topinxperiod(ctx, subreddit, period, links_per_sub))
 
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
