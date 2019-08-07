@@ -17,7 +17,7 @@ headers = {
 }
 
 
-async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
+async def topinxperiod(subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
