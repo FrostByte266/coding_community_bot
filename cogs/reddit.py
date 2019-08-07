@@ -124,15 +124,20 @@ class Reddit(commands.Cog):
                                              ]
 
             self.get_reddit.categories = [
-                self.get_reddit.learning, self.get_reddit.language,
-                self.get_reddit.cstopics, self.get_reddit.ai
-            ]
+                                            self.get_reddit.learning,
+                                            self.get_reddit.language,
+                                            self.get_reddit.cstopics,
+                                            self.get_reddit.ai,
+                                            self.get_reddit.industry,
+                                            self.get_reddit.entertainment
+                                        ]
 
             #initilization for horrible abuse of the python language
             self.get_reddit.sub_reddit_composite = []
 
             #horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
             [self.get_reddit.sub_reddit_composite.extend(x) for x in self.get_reddit.categories]
+            ctx.send(len(self.get_reddit.sub_reddit_composite))
 
             #category is a list of subreddit names to be concatenated after r/
             category = sample(self.get_reddit.sub_reddit_composite,3)
