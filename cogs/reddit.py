@@ -34,7 +34,7 @@ async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
                          password='')
 
     #converts from string of subreddit name to subreddit instance
-    subreddit = reddit.subreddit(subreddit)
+    subreddit = reddit.subreddit(subreddit[0])
 
     # relevant documentation https://praw.readthedocs.io/en/latest/code_overview/models/subreddit.html
 
@@ -54,7 +54,7 @@ async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
 
     await ctx.send(str(subreddits_list))
     for subreddit in subreddits_list:
-        top_links_in_period.extend(await topinxperiod(subreddit[0], period, links_per_sub))
+        top_links_in_period.extend(await topinxperiod(subreddit, period, links_per_sub))
 
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
