@@ -29,7 +29,7 @@ def topinxperiod(subreddit, period='year', return_quantity=3):
     return links[:return_quantity - 1]
 
 
-def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
+async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
     top_links_in_period = []
 
     if mode == 'assorted':
@@ -148,7 +148,7 @@ class Reddit(commands.Cog):
 
 
             period = sample(self.get_reddit.timeframes, 1)
-            await ctx.send(readings_fetch(ctx,category, period, mode))
+            await ctx.send( await readings_fetch(ctx,category, period, mode))
 
     @get_reddit.error
     async def get_reddit_error(self, ctx, error):
