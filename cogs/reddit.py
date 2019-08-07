@@ -29,21 +29,25 @@ def topinxperiod(subreddit, period='year', return_quantity=3):
     return links[:return_quantity - 1]
 
 
-def readings_fetch(subreddits_list, period='year', mode='top'):
+def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
     top_links_in_period = []
 
     if mode == 'assorted':
-        links_per_sub = 5
-    else:
         links_per_sub = 3
+    else:
+        links_per_sub = 5
 
-    subreddits_list = sample(subreddits_list,3)
+
+    subreddits_list = sample(subreddits_list,5)
+    await ctx.send('composite: ' + str(len(subreddits_list)))
 
     for subreddit in subreddits_list:
         top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
 
     shuffle(top_links_in_period)
     top_links_in_period = sample(top_links_in_period,5)
+    await ctx.send('composite: ' + str(len(top_links_in_period)))
+
     while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
         top_links_in_period.pop(-1)
 
@@ -137,14 +141,14 @@ class Reddit(commands.Cog):
 
             #horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
             [self.get_reddit.sub_reddit_composite.extend(x) for x in self.get_reddit.categories]
-            await ctx.send('composite: '+str(len(self.get_reddit.sub_reddit_composite)))
+
 
             #category is a list of subreddit names to be concatenated after r/
             category = sample(self.get_reddit.sub_reddit_composite,3)
 
-            await ctx.send('timeframes: '+ str(len(self.get_reddit.timeframes)))
+
             period = sample(self.get_reddit.timeframes, 1)
-            await ctx.send(readings_fetch(category, period, mode))
+            await ctx.send(readings_fetch(ctx,category, period, mode))
 
     @get_reddit.error
     async def get_reddit_error(self, ctx, error):
