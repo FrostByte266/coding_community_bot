@@ -15,7 +15,7 @@ headers = {
 }
 
 
-def topinxperiod(subreddit, period='year', return_quantity=3):
+async def topinxperiod(ctx,subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
@@ -24,6 +24,7 @@ def topinxperiod(subreddit, period='year', return_quantity=3):
 
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
     anchors = soup.find_all(class_="SQnoC3ObvgnGjWt90zD9Z")
+    await ctx.send('anchors: '+str(len(anchors)))
     links = ['https://www.reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
 
     return links[:return_quantity - 1]
@@ -37,12 +38,12 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
     else:
         links_per_sub = 5
 
-    await ctx.send('composite: ' + str(len(subreddits_list)))
+
+
+
     await ctx.send(str(subreddits_list))
-
-
     for subreddit in subreddits_list:
-        top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
+        top_links_in_period.extend(ctx,await topinxperiod(subreddit, period, links_per_sub))
 
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
