@@ -43,7 +43,7 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
     for subreddit in subreddits_list:
         top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
 
-    shuffle(top_links_in_period)
+    
     await ctx.send('composite: ' + str(len(top_links_in_period)))
     top_links_in_period = sample(top_links_in_period,5)
 
