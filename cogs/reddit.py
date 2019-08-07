@@ -54,7 +54,7 @@ async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
 
     await ctx.send(str(subreddits_list))
     for subreddit in subreddits_list:
-        top_links_in_period.extend(await topinxperiod(subreddit, period, links_per_sub))
+        top_links_in_period.extend(await topinxperiod(subreddit[0], period, links_per_sub))
 
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
@@ -124,7 +124,7 @@ class Reddit(commands.Cog):
                                         ]
 
             self.get_reddit.industry = ['devops',
-                                        'TechnicalDebt',
+                                        'technicaldebt',
                                         'webdev',
                                         'coding',
                                         'datasets']
@@ -132,7 +132,7 @@ class Reddit(commands.Cog):
             self.get_reddit.entertainment = ['softwaregore',
                                              'programmerhumor',
                                              'ImaginaryFeels',
-                                             'Awww',
+                                             'awww',
                                              'ultrahdwallpapers',
                                              'wallpapers',
                                              'minimalwallpaper',
