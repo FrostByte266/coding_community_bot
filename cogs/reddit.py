@@ -143,7 +143,7 @@ class Reddit(commands.Cog):
 
 
             #category is a list of subreddit names to be concatenated after r/
-            category = sample(self.get_reddit.sub_reddit_composite,3)
+            category = sample(self.get_reddit.sub_reddit_composite,7)
 
 
             period = sample(self.get_reddit.timeframes, 1)
