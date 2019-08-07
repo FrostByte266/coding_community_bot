@@ -17,7 +17,7 @@ headers = {
 }
 
 
-async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
+async def topinxperiod(subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
@@ -38,7 +38,7 @@ async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
 
     # relevant documentation https://praw.readthedocs.io/en/latest/code_overview/models/subreddit.html
 
-    return [submission.url for submission in subreddit.top(period[0])[return_quantity]]
+    return [submission.url for submission in subreddit.top(period)[return_quantity]]
 
 
 async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
@@ -86,7 +86,7 @@ class Reddit(commands.Cog):
     async def get_reddit(self, ctx, mode='assorted'):
 
         try:
-            period = sample(self.get_reddit.timeframes, 1)
+            period = sample(self.get_reddit.timeframes, 1)[0]
             category = sample(self.get_reddit.sub_reddit_composite, 5)
             await ctx.send(await readings_fetch(category, period, mode))
         except Exception as E:
@@ -160,8 +160,8 @@ class Reddit(commands.Cog):
             category = sample(self.get_reddit.sub_reddit_composite,7)
 
 
-            period = sample(self.get_reddit.timeframes, 1)
-            await ctx.send( await readings_fetch(ctx, category, period, mode))
+            period = sample(self.get_reddit.timeframes, 1)[0]
+            await ctx.send( await readings_fetch(category, period, mode))
 
     # @get_reddit.error
     # async def get_reddit_error(self, ctx, error):
