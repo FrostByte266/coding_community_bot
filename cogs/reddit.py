@@ -137,12 +137,12 @@ class Reddit(commands.Cog):
 
             #horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
             [self.get_reddit.sub_reddit_composite.extend(x) for x in self.get_reddit.categories]
-            await ctx.send('composite: '+len(self.get_reddit.sub_reddit_composite))
+            await ctx.send('composite: '+str(len(self.get_reddit.sub_reddit_composite)))
 
             #category is a list of subreddit names to be concatenated after r/
             category = sample(self.get_reddit.sub_reddit_composite,3)
 
-            await ctx.send('timeframes: '+ len(self.timeframes))
+            await ctx.send('timeframes: '+ str(len(self.timeframes)))
             period = sample(self.get_reddit.timeframes, 1)
             await ctx.send(readings_fetch(category, period, mode))
 
