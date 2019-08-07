@@ -142,7 +142,7 @@ class Reddit(commands.Cog):
             #category is a list of subreddit names to be concatenated after r/
             category = sample(self.get_reddit.sub_reddit_composite,3)
 
-            await ctx.send('timeframes: '+ str(len(self.timeframes)))
+            await ctx.send('timeframes: '+ str(len(self.get_reddit.timeframes)))
             period = sample(self.get_reddit.timeframes, 1)
             await ctx.send(readings_fetch(category, period, mode))
 
