@@ -67,9 +67,13 @@ class Reddit(commands.Cog):
 
     @commands.command()
     async def get_reddit(self, ctx, mode='assorted'):
+
         try:
-            await ctx.send(readings_fetch(self.get_reddit.categories[2], 'year', mode))
+            period = sample(self.get_reddit.timeframes, 1)
+            category = sample(self.get_reddit.sub_reddit_composite, 3)
+            await ctx.send(readings_fetch(category, period, mode))
         except Exception as E:
+            self.get_reddit.timeframes= ['year', 'month', 'week', 'day']
             self.get_reddit.learning = ['learnprogramming',
                                         'learnpython',
                                         'learnlisp',
@@ -89,20 +93,51 @@ class Reddit(commands.Cog):
                                         'rlanguage',
                                         'golang',
                                         'rust',
-                                        'java']
+                                        'java',
+                                        'javascript',
+                                        'haskell',
+                                        'cpp',
+                                        'scala']
 
             self.get_reddit.cstopics = ['programming',
                                         'compsci',
                                         'proceduralgeneration',
                                         'crypto',
-                                        'demoscene']
+                                        'demoscene'
+                                        ]
+
+            self.get_reddit.industry = ['devops',
+                                        'TechnicalDebt',
+                                        'webdev',
+                                        'coding',
+                                        'datasets']
+
+            self.get_reddit.entertainment = ['softwaregore',
+                                             'ProgrammerHumor',
+                                             'ImaginaryFeels',
+                                             'Awww',
+                                             'ultrahdwallpapers',
+                                             'wallpapers',
+                                             'MinimalWallpaper',
+                                             'DnDGreentext',
+                                             'ShitDwarfFortressSays''
+                                             ]
 
             self.get_reddit.categories = [
                 self.get_reddit.learning, self.get_reddit.language,
                 self.get_reddit.cstopics, self.get_reddit.ai
             ]
-            period = sample(['year', 'month', 'week', 'day'],1)
-            await ctx.send(readings_fetch(self.get_reddit.categories[2], period, mode))
+
+            #initilization for horrible abuse of the python language
+            self.get_reddit.sub_reddit_composite = []
+
+            #horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
+            [self.get_reddit.sub_reddit_composite.extend(x) for x in self.get_reddit.categories]
+
+            #category is a list of subreddit names to be concatenated after r/
+            category = sample(self.get_reddit.sub_reddit_composite,3)
+            period = sample(self.get_reddit.timeframes, 1)
+            await ctx.send(readings_fetch(category, period, mode))
 
     @get_reddit.error
     async def get_reddit_error(self, ctx, error):
