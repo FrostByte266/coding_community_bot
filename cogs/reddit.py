@@ -38,7 +38,6 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
         links_per_sub = 5
 
     await ctx.send('composite: ' + str(len(subreddits_list)))
-    subreddits_list = sample(subreddits_list,5)
 
 
     for subreddit in subreddits_list:
@@ -144,7 +143,7 @@ class Reddit(commands.Cog):
 
 
             #category is a list of subreddit names to be concatenated after r/
-            category = sample(self.get_reddit.sub_reddit_composite,5)
+            category = sample(self.get_reddit.sub_reddit_composite,3)
 
 
             period = sample(self.get_reddit.timeframes, 1)
