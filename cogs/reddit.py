@@ -120,7 +120,7 @@ class Reddit(commands.Cog):
                                              'wallpapers',
                                              'MinimalWallpaper',
                                              'DnDGreentext',
-                                             'ShitDwarfFortressSays''
+                                             'ShitDwarfFortressSays'
                                              ]
 
             self.get_reddit.categories = [
