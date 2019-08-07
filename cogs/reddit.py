@@ -19,19 +19,23 @@ async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
-    response = requests.get(f'https://www.reddit.com/r/{subreddit}/top/?t={period}', headers=headers)
-    soup = BeautifulSoup(response.text, features="html.parser")
 
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
-    pre_soup = soup.find_all('href')
-    pre_soup = [x for x in pre_soup if x[0:2] == '/r/']
+
+    import praw
 
 
-    anchors = pre_soup
-    await ctx.send('anchors: '+str(len(anchors)))
-    links = ['https://www.reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
+    reddit = praw.Reddit(client_id='my client id',
+                         client_secret='',
+                         user_agent='',
+                         username='',
+                         password='')
 
-    return links[:return_quantity - 1]
+    #converts from string of subreddit name to subreddit instance
+    subreddit = reddit.subreddit(subreddit)
+
+    # relevant documentation https://praw.readthedocs.io/en/latest/code_overview/models/subreddit.html
+    return [submission.url for submission in subreddit.top(period)[return_quantity]]
 
 
 async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
@@ -83,7 +87,7 @@ class Reddit(commands.Cog):
             category = sample(self.get_reddit.sub_reddit_composite, 5)
             await ctx.send(readings_fetch(category, period, mode))
         except Exception as E:
-            self.get_reddit.timeframes = ['year', 'month']
+            self.get_reddit.timeframes = ['all', 'year', 'month']
             self.get_reddit.learning = ['learnprogramming',
                                         'learnpython',
                                         'learnlisp',
