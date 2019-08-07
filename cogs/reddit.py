@@ -23,7 +23,11 @@ async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
     soup = BeautifulSoup(response.text, features="html.parser")
 
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
-    anchors = soup.find_all(class_="SQnoC3ObvgnGjWt90zD9Z")
+    pre_soup = soup.find_all('href')
+    pre_soup = [x for x in pre_soup if x[0:2] == '/r/']
+
+
+    anchors = pre_soup
     await ctx.send('anchors: '+str(len(anchors)))
     links = ['https://www.reddit.com' + x[x.find('href="') + 6:x.find('"><div')] for x in [str(x) for x in anchors]]
 
