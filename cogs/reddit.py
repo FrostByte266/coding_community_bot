@@ -44,8 +44,9 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
         top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
 
     shuffle(top_links_in_period)
-    top_links_in_period = sample(top_links_in_period,5)
     await ctx.send('composite: ' + str(len(top_links_in_period)))
+    top_links_in_period = sample(top_links_in_period,5)
+
 
     while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
         top_links_in_period.pop(-1)
