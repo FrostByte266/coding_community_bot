@@ -88,7 +88,7 @@ class Reddit(commands.Cog):
         try:
             period = sample(self.get_reddit.timeframes, 1)
             category = sample(self.get_reddit.sub_reddit_composite, 5)
-            await ctx.send(readings_fetch(category, period, mode))
+            await ctx.send(await readings_fetch(category, period, mode))
         except Exception as E:
             self.get_reddit.timeframes = ['all', 'year', 'month']
             self.get_reddit.learning = ['learnprogramming',
@@ -130,14 +130,14 @@ class Reddit(commands.Cog):
                                         'datasets']
 
             self.get_reddit.entertainment = ['softwaregore',
-                                             'ProgrammerHumor',
+                                             'programmerhumor',
                                              'ImaginaryFeels',
                                              'Awww',
                                              'ultrahdwallpapers',
                                              'wallpapers',
-                                             'MinimalWallpaper',
+                                             'minimalwallpaper',
                                              'DnDGreentext',
-                                             'ShitDwarfFortressSays'
+                                             'shitdwarffortresssays'
                                              ]
 
             self.get_reddit.categories = [
@@ -161,7 +161,7 @@ class Reddit(commands.Cog):
 
 
             period = sample(self.get_reddit.timeframes, 1)
-            await ctx.send( await readings_fetch(ctx,category, period, mode))
+            await ctx.send( await readings_fetch(ctx, category, period, mode))
 
     @get_reddit.error
     async def get_reddit_error(self, ctx, error):
