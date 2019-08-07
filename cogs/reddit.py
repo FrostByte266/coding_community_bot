@@ -17,7 +17,7 @@ headers = {
 }
 
 
-async def topinxperiod(subreddit, period='year', return_quantity=3):
+async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
@@ -88,7 +88,7 @@ class Reddit(commands.Cog):
         try:
             period = sample(self.get_reddit.timeframes, 1)[0]
             category = sample(self.get_reddit.sub_reddit_composite, 5)
-            await ctx.send(await readings_fetch(category, period, mode))
+            await ctx.send(await readings_fetch(ctx,category, period, mode))
         except Exception as E:
             self.get_reddit.timeframes = ['all', 'year', 'month']
             self.get_reddit.learning = ['learnprogramming',
@@ -161,7 +161,7 @@ class Reddit(commands.Cog):
 
 
             period = sample(self.get_reddit.timeframes, 1)[0]
-            await ctx.send( await readings_fetch(category, period, mode))
+            await ctx.send( await readings_fetch(ctx, category, period, mode))
 
     # @get_reddit.error
     # async def get_reddit_error(self, ctx, error):
