@@ -163,9 +163,9 @@ class Reddit(commands.Cog):
             period = sample(self.get_reddit.timeframes, 1)
             await ctx.send( await readings_fetch(ctx, category, period, mode))
 
-    @get_reddit.error
-    async def get_reddit_error(self, ctx, error):
-        await ctx.send(f'Encountered an error: {error}')
+    # @get_reddit.error
+    # async def get_reddit_error(self, ctx, error):
+    #     await ctx.send(f'Encountered an error: {error}')
 
 
 def setup(bot):
