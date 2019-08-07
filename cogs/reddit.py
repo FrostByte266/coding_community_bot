@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from random import sample, shuffle
 
+import praw
+
 import requests
 
 headers = {
@@ -22,7 +24,7 @@ async def topinxperiod(ctx, subreddit, period='year', return_quantity=3):
 
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
 
-    import praw
+
 
 
     reddit = praw.Reddit(client_id='my client id',
@@ -52,7 +54,7 @@ async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
 
     await ctx.send(str(subreddits_list))
     for subreddit in subreddits_list:
-        top_links_in_period.extend(await topinxperiod(ctx, subreddit, period, links_per_sub))
+        top_links_in_period.extend(await topinxperiod(subreddit, period, links_per_sub))
 
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
