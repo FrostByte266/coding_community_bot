@@ -37,9 +37,9 @@ async def readings_fetch(ctx,subreddits_list, period='year', mode='top'):
     else:
         links_per_sub = 5
 
-
-    subreddits_list = sample(subreddits_list,5)
     await ctx.send('composite: ' + str(len(subreddits_list)))
+    subreddits_list = sample(subreddits_list,5)
+
 
     for subreddit in subreddits_list:
         top_links_in_period.extend(topinxperiod(subreddit, period, links_per_sub))
@@ -74,7 +74,7 @@ class Reddit(commands.Cog):
 
         try:
             period = sample(self.get_reddit.timeframes, 1)
-            category = sample(self.get_reddit.sub_reddit_composite, 3)
+            category = sample(self.get_reddit.sub_reddit_composite, 5)
             await ctx.send(readings_fetch(category, period, mode))
         except Exception as E:
             self.get_reddit.timeframes = ['year', 'month']
@@ -144,8 +144,7 @@ class Reddit(commands.Cog):
 
 
             #category is a list of subreddit names to be concatenated after r/
-            #category = sample(self.get_reddit.sub_reddit_composite,3)
-            category = sample(self.get_reddit.categories,3)
+            category = sample(self.get_reddit.sub_reddit_composite,5)
 
 
             period = sample(self.get_reddit.timeframes, 1)
