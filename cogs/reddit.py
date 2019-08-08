@@ -27,7 +27,7 @@ async def topinxperiod(subreddit, period='year', return_quantity=3):
 
 
 
-    reddit = praw.Reddit(client_id='my client id',
+    reddit = praw.Reddit(client_id='',
                          client_secret='',
                          user_agent='',
                          username='',
