@@ -43,9 +43,8 @@ def build_bot(prefix="!"):
 			words_split = message.content.split()
 			word_group = list(re.sub("(,|\.|:)$", "", word) for word in words_split)
 			word_group.extend(words_split)
-			
-			#forces unique words list by running through set as a filter
-			word_set = list(set(word_group))
+
+
 
 
 			ignored_roles = ['@everyone', 'Admin', 'Moderator',
@@ -54,7 +53,7 @@ def build_bot(prefix="!"):
 							 'Merit Badge (lvl - Owner)','BOT', 'little fox familiar']
 
 			roles = {role.name.lower():role for role in message.guild.roles if role.name not in ignored_roles}
-			member_roles = [roles.get(word.lower(), 0) for word in word_set if roles.get(word.lower(), 0) != 0]
+			member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
 			await message.author.add_roles(*member_roles)
 
 			newline = '\n'
