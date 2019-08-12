@@ -44,6 +44,9 @@ def build_bot(prefix="!"):
 			word_group = list(re.sub("(,|\.|:)$", "", word) for word in words_split)
 			word_group.extend(words_split)
 
+			#run word_group through set as a filter to force unique words
+			word_group = list(set(word_group))
+
 
 
 
