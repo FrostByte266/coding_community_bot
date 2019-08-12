@@ -44,6 +44,8 @@ class XkcdFetcher(commands.Cog):
 				xkcd_num = int(command[0])
 				if xkcd_num > latest["num"]:
 					xkcd_num = latest["num"]
+				elif xkcd_num < 1:
+					xkcd_num = 1
 			except ValueError:
 				await ctx.send("I don't know what to do with that. I'll give "
 							   "you a random comic for now. If you're "
