@@ -40,13 +40,13 @@ def build_bot(prefix="!"):
 		unverified_role = get(message.author.guild.roles, name="Unverified")
 
 		if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
-			word_set = list(re.sub("(,|.|:)$", "", word) for word in message.content.split())
+			word_set = list(re.sub("(,|.|\:)$", "", word) for word in message.content.split())
 
 
 			ignored_roles = ['@everyone', 'Admin', 'Moderator',
 							 'Merit Badge (lvl - Moderator)',
 							 'Merit Badge (lvl - Admin)',
-							 'Merit Badge (lvl - Owner)']
+							 'Merit Badge (lvl - Owner)','BOT', 'little fox familiar']
 
 			roles = {role.name.lower():role for role in message.guild.roles if role.name not in ignored_roles}
 			member_roles = [roles.get(word.lower(), 0) for word in word_set if roles.get(word.lower(), 0) != 0]
