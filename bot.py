@@ -40,7 +40,12 @@ def build_bot(prefix="!"):
 		unverified_role = get(message.author.guild.roles, name="Unverified")
 
 		if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
-			word_set = list(re.sub("(,|\.|:)$", "", word) for word in message.content.split())
+			words_split = message.content.split()
+			word_group = list(re.sub("(,|\.|:)$", "", word) for word in words_split)
+			word_group.extend(words_split)
+			
+			#forces unique words list by running through set as a filter
+			word_set = list(set(word_group))
 
 
 			ignored_roles = ['@everyone', 'Admin', 'Moderator',
