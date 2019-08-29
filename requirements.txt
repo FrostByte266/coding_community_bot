@@ -1,0 +1,8 @@
+discord.py
+aiohttp
+networkx
+pandas
+matplotlib
+bs4
+requests
+praw
