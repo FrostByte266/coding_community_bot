@@ -50,7 +50,7 @@ class XkcdFetcher(commands.Cog):
 				await ctx.send("I don't know what to do with that. I'll give "
 							   "you a random comic for now. If you're "
 							   "unsure of how to use this command, run\n"
-							   "```.help xkcd```")
+							   f"```{self.prefix}help xkcd```")
 				xkcd_num = random.randint(1, latest["num"])
 		else:
 			xkcd_num = random.randint(1, latest["num"])
