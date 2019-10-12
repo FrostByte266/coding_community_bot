@@ -259,7 +259,7 @@ class Punishment(commands.Cog):
 				await ctx.send('No reports found with the user provided')
 		else:
 			# Looking up by ID as no users were mentioned
-			report = reports.get(args, None)
+			report = reports.get(str(args), None)
 			if report is not None:
 				embed = Embed(
 								title='Incident Report', description=f'Case Number: {report["report_id"]}',
