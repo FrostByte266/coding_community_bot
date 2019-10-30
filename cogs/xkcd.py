@@ -34,14 +34,14 @@ class XkcdFetcher(commands.Cog):
 		"""
 
 		command = ctx.message.content.split(" ")
-		command = command[1:]
+		command = "".join(command[1:])
 
 		latest = await self.get_quote("https://xkcd.com/info.0.json")
 		latest = json.loads(latest)
 
 		if command:
 			try:
-				xkcd_num = int(command[0])
+				xkcd_num = int(command)
 				if xkcd_num > latest["num"]:
 					xkcd_num = latest["num"]
 				elif xkcd_num < 1:
