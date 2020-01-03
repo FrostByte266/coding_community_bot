@@ -15,7 +15,6 @@ def build_bot(prefix="!"):
 	async def on_ready():
 		print("Ready")
 		config = json.loads(open('assets/config.json', 'r').read())
-		print("Gettin thi things going")
 		bot.reddit_config = config["reddit_config"]
 		# Check if there are any new servers the bot does not have configs for
 		for server in bot.guilds:
@@ -131,8 +130,20 @@ def build_bot(prefix="!"):
 		config.pop(str(guild.id))
 		json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
+	return bot
+
+def load_cogs(bot):
+	for file in os.listdir('./cogs'):
+		if file.endswith('.py'):
+			try:
+				bot.load_extension(f'cogs.{file[:-3]}')
+			except Exception as e:
+				print(f"Failed to load cog {file}")
+				print(f"Error:\n{e}")
+"""
 	for file in os.listdir('./cogs'):
 		if file.endswith('.py'):
 			bot.load_extension(f'cogs.{file[:-3]}')
 
 	return bot
+"""
