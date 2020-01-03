@@ -21,24 +21,16 @@ async def topinxperiod(subreddit, period='year', return_quantity=3):
     if return_quantity > 7:
         return_quantity = 7
 
-
     # SQnoC3ObvgnGjWt90zD9Z is the div class on reddit that containts the center panes list
 
-
-
-
-    reddit = praw.Reddit(client_id='',
-                         client_secret='',
-                         user_agent='',
-                         username='',
-                         password='')
-
-    #converts from string of subreddit name to subreddit instance
-    subreddit = reddit.subreddit(subreddit[0])
+    reddit = praw.Reddit(
+                            client_id='my client id',
+                            client_secret='my client secret',
+                            user_agent='my user agent'
+                        )
 
     # relevant documentation https://praw.readthedocs.io/en/latest/code_overview/models/subreddit.html
-
-    return [submission.url for submission in subreddit.top(period,limit=return_quantity)]
+    return [submission.url for submission in reddit.subreddit(subreddit[0]).top(period,limit=return_quantity)]
 
 
 async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
@@ -49,13 +41,9 @@ async def readings_fetch(ctx, subreddits_list, period='year', mode='top'):
     else:
         links_per_sub = 5
 
-
-
-
     await ctx.send(str(subreddits_list))
     for subreddit in subreddits_list:
         top_links_in_period.extend(await topinxperiod(subreddit, period, links_per_sub))
-
 
     await ctx.send('top links: ' + str(len(top_links_in_period)))
     top_links_in_period = sample(top_links_in_period,5)
