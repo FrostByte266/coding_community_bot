@@ -74,24 +74,24 @@ class Reddit(commands.Cog):
     async def get_reddit(self, ctx, mode='assorted'):
 
         try:
-            period = sample(self.get_reddit.timeframes, 1)[0]
-            category = sample(self.get_reddit.sub_reddit_composite, 5)
+            period = sample(Reddit.timeframes, 1)[0]
+            category = sample(Reddit.sub_reddit_composite, 5)
             await ctx.send(await readings_fetch(ctx,category, period, mode))
         except Exception as E:
-            self.get_reddit.timeframes = ['all', 'year', 'month']
-            self.get_reddit.learning = ['learnprogramming',
+            Reddit.timeframes = ['all', 'year', 'month']
+            Reddit.learning = ['learnprogramming',
                                         'learnpython',
                                         'learnlisp',
                                         'learngolang',
                                         'learnjava',
                                         'cscareerquestions']
 
-            self.get_reddit.ai = ['neuralnetworks',
+            Reddit.ai = ['neuralnetworks',
                                   'deeplearning',
                                   'machinelearning',
                                   'statistics']
 
-            self.get_reddit.language = ['python',
+            Reddit.language = ['python',
                                         'sql',
                                         'julia',
                                         'lisp',
@@ -104,20 +104,20 @@ class Reddit(commands.Cog):
                                         'cpp',
                                         'scala']
 
-            self.get_reddit.cstopics = ['programming',
+            Reddit.cstopics = ['programming',
                                         'compsci',
                                         'proceduralgeneration',
                                         'crypto',
                                         'demoscene'
                                         ]
 
-            self.get_reddit.industry = ['devops',
+            Reddit.industry = ['devops',
                                         'technicaldebt',
                                         'webdev',
                                         'coding',
                                         'datasets']
 
-            self.get_reddit.entertainment = ['softwaregore',
+            Reddit.entertainment = ['softwaregore',
                                              'programmerhumor',
                                              'ImaginaryFeels',
                                              'awww',
@@ -128,28 +128,28 @@ class Reddit(commands.Cog):
                                              'shitdwarffortresssays'
                                              ]
 
-            self.get_reddit.categories = [
-                                            self.get_reddit.learning,
-                                            self.get_reddit.language,
-                                            self.get_reddit.cstopics,
-                                            self.get_reddit.ai,
-                                            self.get_reddit.industry,
-                                            self.get_reddit.entertainment
+            Reddit.categories = [
+                                            Reddit.learning,
+                                            Reddit.language,
+                                            Reddit.cstopics,
+                                            Reddit.ai,
+                                            Reddit.industry,
+                                            Reddit.entertainment
                                         ]
 
             #initilization for horrible abuse of the python language
-            self.get_reddit.sub_reddit_composite = []
+            Reddit.sub_reddit_composite = []
 
             #horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
-            [self.get_reddit.sub_reddit_composite.extend(x) for x in self.get_reddit.categories]
+            [Reddit.sub_reddit_composite.extend(x) for x in Reddit.categories]
 
 
             #category is a list of subreddit names to be concatenated after r/
-            category = sample(self.get_reddit.sub_reddit_composite,7)
+            category = sample(Reddit.sub_reddit_composite,7)
 
 
-            period = sample(self.get_reddit.timeframes, 1)[0]
-            await ctx.send( await readings_fetch(ctx, category, period, mode))
+            period = sample(Reddit.timeframes, 1)[0]
+            await ctx.send( await readings_fetch(ctx, category))
 
     # @get_reddit.error
     # async def get_reddit_error(self, ctx, error):
