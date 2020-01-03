@@ -51,6 +51,7 @@ if __name__ == "__main__":
 
 	while not os.path.exists("poweroff"):
 		Bot = bot.build_bot()
+		bot.load_cogs(Bot)
 		run_client(Bot, token)
 		importlib.reload(bot)
 
