@@ -77,23 +77,23 @@ class Reddit(commands.Cog):
 
 
         try:
-            Reddit.reddit.init
+            Reddit.init
         except Exception as e:
-            Reddit.reddit.init = True
-            Reddit.reddit.timeframes = ['all', 'year', 'month']
-            Reddit.reddit.learning = ['learnprogramming',
+            Reddit.init = True
+            Reddit.timeframes = ['all', 'year', 'month']
+            Reddit.learning = ['learnprogramming',
                                    'learnpython',
                                    'learnlisp',
                                    'learngolang',
                                    'learnjava',
                                    'cscareerquestions']
 
-            Reddit.reddit.ai = ['neuralnetworks',
+            Reddit.ai = ['neuralnetworks',
                              'deeplearning',
                              'machinelearning',
                              'statistics']
 
-            Reddit.reddit.language = ['python',
+            Reddit.language = ['python',
                                    'sql',
                                    'julia',
                                    'lisp',
@@ -106,20 +106,20 @@ class Reddit(commands.Cog):
                                    'cpp',
                                    'scala']
 
-            Reddit.reddit.cstopics = ['programming',
+            Reddit.cstopics = ['programming',
                                    'compsci',
                                    'proceduralgeneration',
                                    'crypto',
                                    'demoscene'
                                    ]
 
-            Reddit.reddit.industry = ['devops',
+            Reddit.industry = ['devops',
                                    'technicaldebt',
                                    'webdev',
                                    'coding',
                                    'datasets']
 
-            Reddit.reddit.entertainment = ['softwaregore',
+            Reddit.entertainment = ['softwaregore',
                                         'programmerhumor',
                                         'ImaginaryFeels',
                                         'awww',
@@ -130,25 +130,25 @@ class Reddit(commands.Cog):
                                         'shitdwarffortresssays'
                                         ]
 
-            Reddit.reddit.categories = [
-                Reddit.reddit.learning,
-                Reddit.reddit.language,
-                Reddit.reddit.cstopics,
-                Reddit.reddit.ai,
-                Reddit.reddit.industry,
-                Reddit.reddit.entertainment
+            Reddit.categories = [
+                Reddit.learning,
+                Reddit.language,
+                Reddit.cstopics,
+                Reddit.ai,
+                Reddit.industry,
+                Reddit.entertainment
             ]
 
             # initilization for horrible abuse of the python language
-            Reddit.reddit.sub_reddit_composite = []
+            Reddit.sub_reddit_composite = []
 
             # horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
-            [Reddit.reddit.sub_reddit_composite.extend(x) for x in Reddit.reddit.categories]
+            [Reddit.sub_reddit_composite.extend(x) for x in Reddit.categories]
         try:
-            period = sample(Reddit.reddit.timeframes, 1)[0]
+            period = sample(Reddit.timeframes, 1)[0]
 
             # category is a list of subreddit names to be concatenated after r/
-            category = sample(Reddit.reddit.sub_reddit_composite, 5)
+            category = sample(Reddit.sub_reddit_composite, 5)
             await ctx.send(readings_fetch(category, period, mode))
 
         except Exception as e:
