@@ -3,17 +3,24 @@ from random import sample
 
 import praw
 
+def __init__(self,bot):
+    self.bot = bot
+    self.reddit_config = self.bot.reddit_config
+
 async def reddit_bot():
+    bot = commands.Bot()
+
+    bot.reddit_stuffzz = bot.config_full['reddit things']
     try:
-        reddit_bot.init
+        bot.reddit_init
     except Exception as e:
-        reddit_bot.init = True
-        reddit_bot.reddit = praw.Reddit(
-            client_id='O59DAVYqBJvTtA',
-            client_secret='placeholder',
-            user_agent='placeholder',
-            username='placeholder',
-            password='placeholder'
+        bot.init = True
+        bot.reddit = praw.Reddit(
+            client_id=bot.reddit_config['client_id'],
+            client_secret=bot.reddit_config['client_secret'],
+            user_agent=bot.reddit_config['user_agent'],
+            username=bot.reddit_config['username'],
+            password=bot.reddit_config['password']
         )
 
 async def topinxperiod(subreddit, period='year', return_quantity=3):
@@ -154,3 +161,4 @@ class Reddit(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Reddit(bot))
+
