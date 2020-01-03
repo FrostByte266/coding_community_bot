@@ -153,7 +153,7 @@ class Reddit(commands.Cog):
 
             # category is a list of subreddit names to be concatenated after r/
             category = sample(Reddit.reddit.sub_reddit_composite, 5)
-            ctx.send(readings_fetch(category, period, mode))
+            await ctx.send( await readings_fetch(ctx, category))
 
         except Exception as e:
             print(e)
