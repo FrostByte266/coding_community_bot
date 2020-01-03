@@ -15,6 +15,7 @@ def build_bot(prefix="!"):
 	async def on_ready():
 		print("Ready")
 		config = json.loads(open('assets/config.json', 'r').read())
+		bot.reddit_config = config["reddit_config"]
 		# Check if there are any new servers the bot does not have configs for
 		for server in bot.guilds:
 			if str(server.id) not in config:
