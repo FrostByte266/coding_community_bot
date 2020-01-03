@@ -12,7 +12,6 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import networkx as nx
 
-
 class Metrics(commands.Cog):
 
 	def __init__(self, bot):
@@ -151,4 +150,7 @@ class Metrics(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(Metrics(bot))
+	try:
+		bot.add_cog(Metrics(bot))
+	except Exception as squawk:
+		print(squawk)
