@@ -9,19 +9,14 @@ def __init__(self,bot):
 
 async def reddit_bot():
     bot = commands.Bot()
-
-    bot.reddit_stuffzz = bot.config_full['reddit things']
-    try:
-        bot.reddit_init
-    except Exception as e:
-        bot.init = True
-        bot.reddit = praw.Reddit(
-            client_id=bot.reddit_config['client_id'],
-            client_secret=bot.reddit_config['client_secret'],
-            user_agent=bot.reddit_config['user_agent'],
-            username=bot.reddit_config['username'],
-            password=bot.reddit_config['password']
-        )
+    bot.init = True
+    bot.reddit = praw.Reddit(
+        client_id=bot.reddit_config['client_id'],
+        client_secret=bot.reddit_config['client_secret'],
+        user_agent=bot.reddit_config['user_agent'],
+        username=bot.reddit_config['username'],
+        password=bot.reddit_config['password']
+    )
 
 async def topinxperiod(subreddit, period='year', return_quantity=3):
 
@@ -75,10 +70,11 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.Reddit.reddit = await reddit_bot()
 
     @commands.command()
     async def get_reddit(self, ctx, mode='assorted'):
-        Reddit.reddit = await reddit_bot.reddit
+
 
         try:
             Reddit.reddit.init
