@@ -35,7 +35,6 @@ def load_config():
 	finally:
 		return token
 
-
 def run_client(client, *args, **kwargs):
 	loop = asyncio.get_event_loop()
 	try:
@@ -44,13 +43,12 @@ def run_client(client, *args, **kwargs):
 		print("Error", e)
 	print("Restarting...")
 
-
 if __name__ == "__main__":
 
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
-		Bot = bot.build_bot()
+		Bot = bot.build_bot(prefix=':')
 		bot.load_cogs(Bot)
 		run_client(Bot, token)
 		importlib.reload(bot)
