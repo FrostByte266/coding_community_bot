@@ -7,7 +7,7 @@ def __init__(self,bot):
     self.bot = bot
     self.reddit_config = self.bot.reddit_config
 
-async def reddit_bot():
+def reddit_bot():
     bot = commands.Bot()
     bot.init = True
     bot.reddit = praw.Reddit(
@@ -70,7 +70,7 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.Reddit.reddit = await reddit_bot()
+        self.Reddit.reddit = reddit_bot()
 
     @commands.command()
     async def get_reddit(self, ctx, mode='assorted'):
