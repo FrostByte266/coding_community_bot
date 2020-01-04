@@ -88,41 +88,30 @@ class Reddit(commands.Cog):
             Reddit.timeframes = ['all', 'year', 'month']
             Reddit.learning = ['learnprogramming',
                                    'learnpython',
-                                   'learnlisp',
-                                   'learngolang',
-                                   'learnjava',
-                                   'cscareerquestions']
+                                   'learngolang']
 
-            Reddit.ai = ['neuralnetworks',
-                             'deeplearning',
-                             'machinelearning',
-                             'statistics']
+            Reddit.ai = ['neuralnetworks','statistics']
 
-            Reddit.language = ['python',
-                                   'sql',
-                                   'julia',
-                                   'lisp',
-                                   'rlanguage',
-                                   'golang',
-                                   'rust',
-                                   'java',
-                                   'javascript',
-                                   'haskell',
-                                   'cpp',
-                                   'scala']
+            Reddit.language = [
+                                'python',
+                                'sql',
+                                'julia',
+                                'rlanguage',
+                                'golang',
+                                'cpp'
+                                ]
 
-            Reddit.cstopics = ['programming',
-                                   'compsci',
-                                   'proceduralgeneration',
-                                   'crypto',
-                                   'demoscene'
-                                   ]
+            Reddit.cstopics = [
+                                'programming',
+                                'proceduralgeneration',
+                                'demoscene'
+                            ]
 
             Reddit.industry = ['devops',
-                                   'technicaldebt',
-                                   'webdev',
-                                   'coding',
-                                   'datasets']
+                                'webdev',
+                                'coding',
+                                'datasets'
+                                ]
 
             Reddit.entertainment = ['softwaregore',
                                         'programmerhumor',
