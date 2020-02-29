@@ -46,7 +46,7 @@ def build_bot(prefix="!"):
 			#run word_group through set as a filter to force unique words
 			word_group = list(set(word_group))
 
-			ignored_roles = ['@everyone', 'Admin', 'Moderator',
+			ignored_roles = ['@everyone', 'Admin', 'Spartan Mod','Moderator', 'Owner', 'Staff',
 							 'Merit Badge (lvl - Moderator)',
 							 'Merit Badge (lvl - Admin)',
 							 'Merit Badge (lvl - Owner)','BOT', 'little fox familiar']
