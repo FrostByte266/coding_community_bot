@@ -3,4 +3,7 @@
 /assets/network_charts/*.png
 venv/
 .idea/
+.vscode/
+__pycache__
 cogs/__pycache__
+utils/__pycache__
