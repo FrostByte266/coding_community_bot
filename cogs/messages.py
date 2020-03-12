@@ -64,8 +64,8 @@ class Messages(commands.Cog):
 
     @commands.command()
     async def question(self, ctx):
-        await ctx.send("When asking a question please remember to include any relevant information, code snippets, and error messages." +
-                       "If you are asking a SQL question, please also include the type of SQL server you have (MySQL, Postgres, Oracle, etc)." +
+        await ctx.send("When asking a question please remember to include any relevant information, code snippets, and error messages. " +
+                       "If you are asking a SQL question, please also include the type of SQL server you have (MySQL, Postgres, Oracle, etc). " +
                        "This ensures that all members of the community are able to provide quick and accurate advice in response to your question."
                        )
 
