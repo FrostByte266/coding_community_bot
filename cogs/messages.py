@@ -42,7 +42,8 @@ class Messages(commands.Cog):
         messages = []
         async for message in ctx.message.channel.history(limit=count):
             embed = Embed(description=message.content)
-            embed.set_author(name=message.author.name, icon_url=message.author.avatar_url)
+            embed.set_author(name=message.author.name,
+                             icon_url=message.author.avatar_url)
             embed.timestamp = message.created_at
             messages.append(embed)
             if not copy:
@@ -60,6 +61,13 @@ class Messages(commands.Cog):
             temp = await ctx.send("Error! Missing one or more of the following arguments: count, target")
             await sleep(3)
             await temp.delete()
+
+    @commands.command()
+    async def question(self, ctx):
+        await ctx.send("When asking a question please remember to include any relevant information, code snippets, and error messages.",
+                       "If you are asking a SQL question, please also include the type of SQL server you have (MySQL, Postgres, Oracle, etc).",
+                       "This ensures that all members of the community are able to provide quick and accurate advice in response to your question.",
+                       )
 
 
 def setup(bot):
