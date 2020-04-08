@@ -38,21 +38,22 @@ class Messages(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def move(self, ctx, count: int, target: TextChannel, copy: bool = False):
         """Move/copy specified amount of messages to target channel"""
-        await ctx.message.delete()
-        messages = []
-        async for message in ctx.message.channel.history(limit=count):
-            embed = Embed(description=message.content)
-            embed.set_author(name=message.author.name,
-                             icon_url=message.author.avatar_url)
-            embed.timestamp = message.created_at
-            messages.append(embed)
-            if not copy:
-                await message.delete()
+        async with ctx.message.channel.typing():
+            await ctx.message.delete()
+            messages = []
+            async for message in ctx.message.channel.history(limit=count):
+                embed = Embed(description=message.content)
+                embed.set_author(name=message.author.name,
+                                icon_url=message.author.avatar_url)
+                embed.timestamp = message.created_at
+                messages.append(embed)
+                if not copy:
+                    await message.delete()
 
-        await target.send(f'Moved from {ctx.message.channel.mention}:')
+            await target.send(f'Moved from {ctx.message.channel.mention}:')
 
-        for embed in reversed(messages):
-            await target.send(embed=embed)
+            for embed in reversed(messages):
+                await target.send(embed=embed)
 
     @move.error
     async def move_error(self, ctx, error):
