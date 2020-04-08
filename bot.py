@@ -65,7 +65,10 @@ def build_bot(prefix="!"):
 			if verification_enabled:
 				await message.author.remove_roles(unverified_role)
 		elif verification_enabled and str(message.channel) != 'if-you-are-new-click-here' and unverified_role in message.author.roles:
-			await message.author.send("Before you can send messages, please introduce yourself in #if-you-are-new-click-here")
+			await message.author.send("Before you can send messages you need to introduce yourself in #if-you-are-new-click-here."\
+									  " Please state any programming languages you have used, as well as whether you are a"\
+									  "Beginner, Novice, Advanced, or Professional. You can review earlier introductions in "\
+									  "the #if-you-are-new-click-here channel for examples.")
 			await message.delete()
 		await bot.process_commands(message)
 
