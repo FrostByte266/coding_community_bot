@@ -32,15 +32,18 @@ def build_bot(prefix="!"):
 
 	async def kick_unverified_task():
 		while True:
+			guild_id_to_monitor = 697292778215833652
+			guild = bot.get_guild(guild_id_to_monitor)
+			guild_members = guild.members
 			if datetime.today().weekday() !=6:
-				for member in ctx.guild.members:
+				for member in guild_members:
 					if 'Unverified' in (role.name for role in member.roles):
 						await member.send(
 											"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
 											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
 										)
 			else:
-				for member in ctx.guild.members:
+				for member in guild_members:
 					if 'Unverified' in (role.name for role in member.roles):
 						await member.send(
 											"Automated Sunday Kick Warning: You will be kicked in 5 minutes if you do not " \
@@ -50,9 +53,9 @@ def build_bot(prefix="!"):
 				await asyncio.sleep(300)
 
 				reason = "Automated weekly kick due to not introducing yourself in the #if-you-are-new-click-here channel"
-				for member in ctx.guild.members:
+				for member in guild_members:
 					if 'Unverified' in (role.name for role in member.roles):
-						await ctx.message.guild.kick(member, reason=reason)
+						await guild.kick(member, reason=reason)
 
 				await asyncio.sleep(86400)
 
