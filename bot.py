@@ -14,6 +14,10 @@ def build_bot(prefix="!"):
 	async def on_ready():
 		print("Ready")
 		config = json.loads(open('assets/config.json', 'r').read())
+
+		#schedules the routine 'Kick unverified members' task
+		bot.loop.create_task(kick_unverified_task())
+
 		# Check if there are any new servers the bot does not have configs for
 		for server in bot.guilds:
 			if str(server.id) not in config:
@@ -25,6 +29,40 @@ def build_bot(prefix="!"):
 				}
 				# Save to config file
 				json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+
+	async def kick_unverified_task():
+		while True:
+			if datetime.datetime.today().weekday() !=6:
+				for member in ctx.guild.members:
+					if 'Unverified' in member.roles:
+						await member.send(
+											"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
+											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+										)
+
+			if datetime.datetime.today().weekday() == 6:
+
+				for member in ctx.guild.members:
+					if 'Unverified' in member.roles:
+						await member.send(
+											"Automated Sunday Kick Warning: You will be kicked in 5 minutes if you do not " \
+											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+										)
+
+				await asyncio.sleep(300)
+
+				reason = "Automated weekly kick due to not introducing yourself in the #if-you-are-new-click-here channel"
+				for member in ctx.guild.members:
+					if 'Unverified' in member.roles:
+						await ctx.message.guild.kick(member, reason=reason)
+
+				await asyncio.sleep(86400)
+
+
+	@test_bot.event
+	async def on_ready():
+		...
+
 
 	@bot.event
 	async def on_message(message):
