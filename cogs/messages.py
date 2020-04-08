@@ -51,8 +51,9 @@ class Messages(commands.Cog):
                                     icon_url=message.author.avatar_url)
                     embed.timestamp = message.created_at
                     messages.append(embed)
-                    if not copy:
-                        await message.delete()
+                    
+                if not copy:
+                    await message.delete()
 
             await target.send(f'Moved from {ctx.message.channel.mention}:')
 
