@@ -1,7 +1,20 @@
-Welcome to our server! Please take the time to go through the #readme  and speak up in #if-you-are-new-click-here  to have roles assigned to you, and to be able to access the rest of this server.
+Welcome to our server! Take the time to go through the #readme.
 
-For those of you who are above beginner and don't want to be identified because you do not wish to help, please voluntarily leave and make the mod team's life easier. A culture of mentoring, tutoring, and sharing is fostered here, and if you do not wish to even identify what you have some level of proficiency in, this is likely the wrong server for you.
+Before you can send messages you need to introduce yourself in #if-you-are-new-click-here.
 
-To beginners, please don't be shy about it, a lot of us here would love to help you, and having the roles just makes it easier to assist you at whatever level you may be at, in the categories you are interested in. You may also like to check out #village-of-beginnings  :smiley: .
+Please state any programming languages you have used, as well as whether you are a
+Beginner, Novice, Advanced, or Professional. You can review earlier introductions in
+the #if-you-are-new-click-here channel for examples.
+
+This will assign roles to you, and enable you to be able to access the rest of this server.
+
+For those of you who are above beginner and don't want to be identified because you do not wish to help,
+please voluntarily leave and make the mod team's life easier. A culture of mentoring, tutoring,
+and sharing is fostered here. If you do not wish to even identify what you have some level of proficiency in,
+this is the wrong server for you.
+
+To beginners, please don't be shy about it, a lot of us here would love to help you
+and having the roles just makes it easier to assist you at whatever level you may be at,
+in the categories you are interested in. You may also like to check out #village-of-beginnings  :smiley: .
 
 Thank you -- ~{The Moderations team}~
