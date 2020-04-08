@@ -39,8 +39,7 @@ def build_bot(prefix="!"):
 											"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
 											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
 										)
-
-			if datetime.datetime.today().weekday() == 6:
+			else:
 
 				for member in ctx.guild.members:
 					if 'Unverified' in member.roles:
