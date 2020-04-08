@@ -41,14 +41,18 @@ class Messages(commands.Cog):
         async with target.typing():
             await ctx.message.delete()
             messages = []
+            zero_width_space = u'\u200B'
             async for message in ctx.message.channel.history(limit=count):
-                embed = Embed(description=message.content)
-                embed.set_author(name=message.author.name,
-                                icon_url=message.author.avatar_url)
-                embed.timestamp = message.created_at
-                messages.append(embed)
-                if not copy:
-                    await message.delete()
+                if any([emb.description.startswith(zero_width_space) for emb in message.embeds]):
+                    messages.extend(message.embeds)
+                else:
+                    embed = Embed(description=f'{zero_width_space}{message.content}')
+                    embed.set_author(name=message.author.name,
+                                    icon_url=message.author.avatar_url)
+                    embed.timestamp = message.created_at
+                    messages.append(embed)
+                    if not copy:
+                        await message.delete()
 
             await target.send(f'Moved from {ctx.message.channel.mention}:')
 
