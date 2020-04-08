@@ -32,7 +32,7 @@ def build_bot(prefix="!"):
 
 	async def kick_unverified_task():
 		while True:
-			if datetime.datetime.today().weekday() !=6:
+			if datetime.today().weekday() !=6:
 				for member in ctx.guild.members:
 					if 'Unverified' in (role.name for role in member.roles):
 						await member.send(
