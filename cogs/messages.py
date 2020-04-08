@@ -38,7 +38,7 @@ class Messages(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def move(self, ctx, count: int, target: TextChannel, copy: bool = False):
         """Move/copy specified amount of messages to target channel"""
-        async with ctx.message.channel.typing():
+        async with target.typing():
             await ctx.message.delete()
             messages = []
             async for message in ctx.message.channel.history(limit=count):
