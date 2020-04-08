@@ -58,12 +58,6 @@ def build_bot(prefix="!"):
 
 				await asyncio.sleep(86400)
 
-
-	@test_bot.event
-	async def on_ready():
-		...
-
-
 	@bot.event
 	async def on_message(message):
 		if message.guild is None:
