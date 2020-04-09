@@ -57,9 +57,8 @@ def build_bot(prefix="!"):
 				await asyncio.sleep(300)
 
 				reason = "Automated weekly kick due to not introducing yourself in the #if-you-are-new-click-here channel"
-				for member in guild_members:
-					if 'Unverified' in (role.name for role in member.roles):
-						await guild.kick(member, reason=reason)
+				for member in unverified_members:
+					await guild.kick(member, reason=reason)
 
 
 	async def kick_unverified_task():
