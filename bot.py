@@ -42,19 +42,17 @@ def build_bot(prefix="!"):
 		unverified_members = unverified_role.members
 
 		if datetime.today().weekday() !=6:
-			for member in guild_members:
-				if 'Unverified' in (role.name for role in member.roles):
-					await member.send(
-											"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
-											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
-										)
+			for member in unverified_members:
+				await member.send(
+						"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
+						"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+					)
 			else:
-				for member in guild_members:
-					if 'Unverified' in (role.name for role in member.roles):
-						await member.send(
-											"Automated Sunday Kick Warning: You will be kicked in 5 minutes if you do not " \
-											"introduce yourself in #if-you-are-new-click here within the Coding Community server."
-										)
+				for member in unverified_members:
+					await member.send(
+										"Automated Sunday Kick Warning: You will be kicked in 5 minutes if you do not " \
+										"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+									)
 
 				await asyncio.sleep(300)
 
