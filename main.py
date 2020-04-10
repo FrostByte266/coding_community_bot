@@ -5,6 +5,7 @@ import json
 import os
 import sys
 
+from bot import Bot
 
 def load_config():
 	"""
@@ -44,11 +45,10 @@ def run_client(client, *args, **kwargs):
 	print("Restarting...")
 
 if __name__ == "__main__":
-
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
-		Bot = Bot()
+		Bot = Bot("!")
 		run_client(Bot, token)
 		importlib.reload(bot)
 
