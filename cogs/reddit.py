@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-from discord.ext import commands
-from discord import PermissionOverwrite
-=======
-from discord import client
-from discord.ext import commands,tasks
->>>>>>> Stashed changes
+from discord.ext import commands, tasks
+from discord import PermissionOverwrite, client
 from random import sample
 
 import json
