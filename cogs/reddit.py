@@ -78,7 +78,7 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config =
+        self.config = bot.config
 
     @tasks.loop(seconds=86400)
     async def get_reddit(self, ctx, mode='assorted'):

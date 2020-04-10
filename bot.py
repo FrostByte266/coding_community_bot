@@ -9,6 +9,7 @@ from discord import Embed
 from discord.ext import commands,tasks
 from discord.utils import get
 
+
 #merging for Nerd review
 '''
 def build_bot(prefix="!"):
@@ -81,7 +82,7 @@ class Bot():
 			unverified_members = unverified_role.members
 
 			if datetime.today().weekday() !=6:
->>>>>>> Stashed changes
+
 				for member in unverified_members:
 					await member.send(
 							"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
@@ -217,6 +218,7 @@ class Bot():
 					print(f"Failed to load cog {file}")
 					print(f"Error:\n{e}")
 
-	def __init__(self,prefix='!'):
-		self.bot = self.load_cogs(self.build_bot(prefix='!'))
+
+	def __init__(self, prefix):
+		self.bot = self.load_cogs(self.build_bot(prefix=prefix))
 		self.config = json.loads(open('assets/config.json', 'r').read())
