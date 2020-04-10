@@ -51,7 +51,7 @@ def build_bot(prefix="!"):
 			else:
 '''
 class Bot():
-	def build_bot(prefix="!"):
+	def build_bot(self, prefix="!"):
 		bot = commands.Bot(command_prefix=prefix)
 
 		@bot.event
@@ -209,7 +209,7 @@ class Bot():
 
 		return bot
 
-	def load_cogs(bot):
+	def load_cogs(self, bot):
 		for file in os.listdir('./cogs'):
 			if file.endswith('.py'):
 				try:
