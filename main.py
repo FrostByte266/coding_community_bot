@@ -48,8 +48,7 @@ if __name__ == "__main__":
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
-		Bot = bot.build_bot(prefix='!')
-		bot.load_cogs(Bot)
+		Bot = Bot()
 		run_client(Bot, token)
 		importlib.reload(bot)
 
