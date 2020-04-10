@@ -220,5 +220,5 @@ class Bot():
 
 
 	def __init__(self, prefix):
-		self.bot = self.load_cogs(self.build_bot(prefix=prefix))
+		self.bot = self.load_cogs(self.build_bot(prefix))
 		self.config = json.loads(open('assets/config.json', 'r').read())
