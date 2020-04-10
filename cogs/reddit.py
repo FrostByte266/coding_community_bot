@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 from discord.ext import commands
 from discord import PermissionOverwrite
+=======
+from discord import client
+from discord.ext import commands,tasks
+>>>>>>> Stashed changes
 from random import sample
 
 import json
@@ -78,8 +83,9 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.config =
 
-    @commands.command()
+    @tasks.loop(seconds=86400)
     async def get_reddit(self, ctx, mode='assorted'):
 
         try:
@@ -144,7 +150,11 @@ class Reddit(commands.Cog):
 
             # category is a list of subreddit names to be concatenated after r/
             category = sample(Reddit.sub_reddit_composite, 5)
-            await ctx.send(await readings_fetch(ctx,category, period=period, mode=mode))
+            reddit_config = json.loads(open('assets/config.json', 'r').read())['reddit_channel']
+            reddit_feed = client.get_channel(reddit_config)
+
+
+            await reddit_feed.send(await readings_fetch(ctx,category, period=period, mode=mode))
 
         except Exception as e:
             print(e)
