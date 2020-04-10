@@ -9,47 +9,6 @@ from discord import Embed
 from discord.ext import commands,tasks
 from discord.utils import get
 
-
-#merging for Nerd review
-'''
-def build_bot(prefix="!"):
-	bot = commands.Bot(command_prefix=prefix)
-
-	@bot.event
-	async def on_ready():
-		print("Ready")
-		config = json.loads(open('assets/config.json', 'r').read())
-
-		# Check if there are any new servers the bot does not have configs for
-		for server in bot.guilds:
-			if str(server.id) not in config:
-				# Add empty config to JSON + initialize all user win/loss stats
-				config[str(server.id)] = {
-					"verification_role": None,
-					"reporting_channel": None,
-					"reddit_channel": None,
-					"reports": {}
-				}
-				# Save to config file
-				json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
-
-
-	@tasks.loop(seconds=86400)
-	async def kick_unverified_task():
-		guild_id_to_monitor = 697292778215833652
-		guild = bot.get_guild(guild_id_to_monitor)
-		guild_members = guild.members
-		unverified_role = get(guild.roles, name="Unverified")
-		unverified_members = unverified_role.members
-
-		if datetime.today().weekday() !=6:
-			for member in unverified_members:
-				await member.send(
-						"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
-						"introduce yourself in #if-you-are-new-click here within the Coding Community server."
-					)
-			else:
-'''
 class Bot():
 	def build_bot(self, prefix="!"):
 		bot = commands.Bot(command_prefix=prefix)
