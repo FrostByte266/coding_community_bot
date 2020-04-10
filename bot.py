@@ -24,6 +24,7 @@ def build_bot(prefix="!"):
 				config[str(server.id)] = {
 					"verification_role": None,
 					"reporting_channel": None,
+					"reddit_channel": None,
 					"reports": {}
 				}
 				# Save to config file
@@ -151,6 +152,7 @@ def build_bot(prefix="!"):
 		config[str(guild.id)] = {
 			"verification_role": None,
 			"reporting_channel": None,
+			"reddit_channel": None,
 			"reports": {}
 		}
 		# Save to config file
