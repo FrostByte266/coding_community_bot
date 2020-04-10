@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import PermissionOverwrite
 from random import sample
 
 import json
@@ -147,6 +148,25 @@ class Reddit(commands.Cog):
 
         except Exception as e:
             print(e)
+
+	@commands.command()
+	@commands.has_permissions(manage_guild=True)
+	async def reddit(self, ctx, state: bool):
+		"""Enable or disable the reddit system"""
+		config = self.config_full[str(ctx.message.guild.id)]
+		if state is True and config["reddit"] is None:
+            permission_overrides = {
+                ctx.guild.default_role: PermissionOverwrite(send_messages=False)
+                ctx.guild.me: PermissionOverwrite(send_messages=True)
+            }
+			channel = await ctx.message.guild.create_channel("reddit-feed", overwrites=permission_overrides)
+			config.update(reddit_channel = channel.id)
+			json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+		elif state is False and config["reddit_channel"] is not None:
+			channel = bot.get_channel(config["reddit_channel"])
+			await channel.delete()
+			config.update(reddit_channel=None)
+			json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 def setup(bot):
     bot.add_cog(Reddit(bot))
