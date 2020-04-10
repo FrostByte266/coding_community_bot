@@ -5,7 +5,6 @@ import json
 import os
 import sys
 
-from bot import Bot
 
 def load_config():
 	"""
@@ -48,8 +47,8 @@ if __name__ == "__main__":
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
-		Bot = Bot("!")
-		run_client(Bot, token)
+		bot_object = bot.Bot("!")
+		run_client(bot_object, token)
 		importlib.reload(bot)
 
 	# Remove the file "poweroff" so it'll turn on next time
