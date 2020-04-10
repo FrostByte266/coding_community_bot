@@ -5,6 +5,8 @@ import json
 import os
 import sys
 
+from traceback import print_tb
+
 
 def load_config():
 	"""
@@ -40,7 +42,9 @@ def run_client(client, *args, **kwargs):
 	try:
 		loop.run_until_complete(client.start(*args, **kwargs))
 	except Exception as e:
-		print("Error", e)
+		print(e)
+		print_tb(e.__traceback__)
+		exit()
 	print("Restarting...")
 
 if __name__ == "__main__":
@@ -48,7 +52,8 @@ if __name__ == "__main__":
 
 	while not os.path.exists("poweroff"):
 		bot_object = bot.Bot("!")
-		run_client(bot_object, token)
+		bot_object.load_cogs(bot_object.bot)
+		run_client(bot_object.bot, token)
 		importlib.reload(bot)
 
 	# Remove the file "poweroff" so it'll turn on next time
