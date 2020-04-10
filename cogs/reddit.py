@@ -158,7 +158,7 @@ class Reddit(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def reddit(self, ctx, state: bool):
         """Enable or disable the reddit system"""
-        config = self.config_full[str(ctx.message.guild.id)]
+        config = self.bot.config[str(ctx.message.guild.id)]
         if state is True and config["reddit"] is None:
             permission_overrides = {
                 ctx.guild.default_role: PermissionOverwrite(send_messages=False),

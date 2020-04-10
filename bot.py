@@ -12,11 +12,12 @@ from discord.utils import get
 class Bot():
 	def build_bot(self, prefix="!"):
 		bot = commands.Bot(command_prefix=prefix)
+		bot
 
 		@bot.event
 		async def on_ready():
 			print("Ready")
-			config = json.loads(open('assets/config.json', 'r').read())
+			self.config = json.loads(open('assets/config.json', 'r').read())
 
 			# Check if there are any new servers the bot does not have configs for
 			for server in bot.guilds:
@@ -179,5 +180,5 @@ class Bot():
 
 
 	def __init__(self, prefix):
-		self.bot = self.load_cogs(self.build_bot(prefix))
+		self.bot = self.build_bot(prefix)
 		self.config = json.loads(open('assets/config.json', 'r').read())
