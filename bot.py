@@ -9,15 +9,37 @@ from discord import Embed
 from discord.ext import commands,tasks
 from discord.utils import get
 
-class Bot():
-	def build_bot(self, prefix="!"):
+class CodingBot:
+
+	def __init__(self, prefix='!'):
+		self.config = json.loads(open('assets/config.json', 'r').read())
+		self.bot = self.build_bot(prefix)
+		self.load_cogs()
+
+	def load_cogs(self):
+		for file in os.listdir('./cogs'):
+			if file.endswith('.py'):
+				try:
+					self.bot.load_extension(f'cogs.{file[:-3]}')
+				except Exception as e:
+					print(f"Failed to load cog {file}")
+					print(f"Error:\n{e}")
+
+	def run_bot(self, *args, **kwargs):
+		loop = asyncio.get_event_loop()
+		try:
+			loop.run_until_complete(self.bot.start(*args, **kwargs))
+		except Exception as e:
+			print("Error", e)
+		print("Restarting...")
+
+	def build_bot(self, prefix):
 		bot = commands.Bot(command_prefix=prefix)
-		bot
 
 		@bot.event
 		async def on_ready():
 			print("Ready")
-			self.config = json.loads(open('assets/config.json', 'r').read())
+			config = json.loads(open('assets/config.json', 'r').read())
 
 			# Check if there are any new servers the bot does not have configs for
 			for server in bot.guilds:
@@ -42,7 +64,6 @@ class Bot():
 			unverified_members = unverified_role.members
 
 			if datetime.today().weekday() !=6:
-
 				for member in unverified_members:
 					await member.send(
 							"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
@@ -82,9 +103,9 @@ class Bot():
 				word_group = list(set(word_group))
 
 				ignored_roles = ['@everyone', 'Admin', 'Spartan Mod','Moderator', 'Owner', 'Staff',
-								 'Merit Badge (lvl - Moderator)',
-								 'Merit Badge (lvl - Admin)',
-								 'Merit Badge (lvl - Owner)','BOT', 'little fox familiar']
+								'Merit Badge (lvl - Moderator)',
+								'Merit Badge (lvl - Admin)',
+								'Merit Badge (lvl - Owner)','BOT', 'little fox familiar']
 
 				roles = {role.name.lower():role for role in message.guild.roles if role.name not in ignored_roles}
 				member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
@@ -101,9 +122,9 @@ class Bot():
 					await message.author.remove_roles(unverified_role)
 			elif verification_enabled and str(message.channel) != 'if-you-are-new-click-here' and unverified_role in message.author.roles:
 				await message.author.send("Before you can send messages you need to introduce yourself in #if-you-are-new-click-here."\
-										  " Please state any programming languages you have used, as well as whether you are a"\
-										  "Beginner, Novice, Advanced, or Professional. You can review earlier introductions in "\
-										  "the #if-you-are-new-click-here channel for examples.")
+										" Please state any programming languages you have used, as well as whether you are a"\
+										"Beginner, Novice, Advanced, or Professional. You can review earlier introductions in "\
+										"the #if-you-are-new-click-here channel for examples.")
 				await message.delete()
 			await bot.process_commands(message)
 
@@ -168,17 +189,3 @@ class Bot():
 			json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
 
 		return bot
-
-	def load_cogs(self, bot):
-		for file in os.listdir('./cogs'):
-			if file.endswith('.py'):
-				try:
-					bot.load_extension(f'cogs.{file[:-3]}')
-				except Exception as e:
-					print(f"Failed to load cog {file}")
-					print(f"Error:\n{e}")
-
-
-	def __init__(self, prefix):
-		self.bot = self.build_bot(prefix)
-		self.config = json.loads(open('assets/config.json', 'r').read())
