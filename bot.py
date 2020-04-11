@@ -11,10 +11,39 @@ from discord.utils import get
 
 class CodingBot:
 
-	def __init__(self, prefix='!'):
-		self.config = json.loads(open('assets/config.json', 'r').read())
+	def __init__(self, config_file, prefix='!'):
+		self.config = json.loads(open(config_file, 'r').read())
 		self.bot = self.build_bot(prefix)
 		self.load_cogs()
+		self.bot_token = self.fetch_token()
+
+	def fetch_token(self):
+		"""
+		Loads bot configuration for use.
+		"""
+		token = None
+		try:
+			# Attempt to fetch the token from config.json
+			token = self.config['token']
+		except FileNotFoundError:
+			# If config.json does not exist, it must be the first time starting the
+			# bot, run through configuration
+			# If we are running from a docker container, fetch the token through an
+			# environment variable, otherwise, prompt the user to enter it
+			environment = os.environ.get('BOT_TOKEN', None)
+			token = environment if environment is not None else input(
+				'It appears this is the first time running the bot. '
+				'Please enter your bot\'s token: ')
+
+			initial_config = {"token": token}
+
+			json.dump(initial_config, open(file_path, 'w'),
+					indent=2, separators=(',', ': '))
+
+			os.mkdir('./assets/network_charts')
+			os.mkdir('./assets/role_charts')
+		finally:
+			return token
 
 	def load_cogs(self):
 		for file in os.listdir('./cogs'):
@@ -25,10 +54,10 @@ class CodingBot:
 					print(f"Failed to load cog {file}")
 					print(f"Error:\n{e}")
 
-	def run_bot(self, *args, **kwargs):
+	def run_bot(self):
 		loop = asyncio.get_event_loop()
 		try:
-			loop.run_until_complete(self.bot.start(*args, **kwargs))
+			loop.run_until_complete(self.bot.start(self.bot_token))
 		except Exception as e:
 			print("Error", e)
 		print("Restarting...")
