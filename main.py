@@ -6,7 +6,7 @@ from bot import CodingBot
 
 if __name__ == '__main__':
 	while not os.path.exists('poweroff'):
-		Bot = CodingBot('assets/config.json', prefix='!')
+		Bot = CodingBot('assets/config.json')
 		Bot.run_bot()
 		importlib.reload(bot)
 

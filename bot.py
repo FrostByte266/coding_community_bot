@@ -11,39 +11,55 @@ from discord.utils import get
 
 class CodingBot:
 
-	def __init__(self, config_file, prefix='!'):
-		self.config = json.loads(open(config_file, 'r').read())
-		self.bot = self.build_bot(prefix)
+	def __init__(self, config_file):
+		self.config_file_path = config_file
+		(self.config, self.bot_token) = self.load_config_and_fetch_token(config_file)
+		self.bot = self.build_bot()
 		self.load_cogs()
-		self.bot_token = self.fetch_token()
 
-	def fetch_token(self):
+	def load_config_and_fetch_token(self, config_file):
 		"""
 		Loads bot configuration for use.
 		"""
 		token = None
 		try:
 			# Attempt to fetch the token from config.json
-			token = self.config['token']
+			config = json.loads(open(config_file, 'r').read())
+			token = config['token']
+			return (config, token)
 		except FileNotFoundError:
 			# If config.json does not exist, it must be the first time starting the
 			# bot, run through configuration
 			# If we are running from a docker container, fetch the token through an
 			# environment variable, otherwise, prompt the user to enter it
-			environment = os.environ.get('BOT_TOKEN', None)
-			token = environment if environment is not None else input(
+			token_env = os.environ.get('BOT_TOKEN', None)
+			prefix_env = os.environ.get('BOT_PREFIX', None)
+			token = token_env if token_env is not None else input(
 				'It appears this is the first time running the bot. '
 				'Please enter your bot\'s token: ')
 
-			initial_config = {"token": token}
+			prefix = prefix_env if prefix_env is not None else input(
+				'Please enter the prefix for your bot '
+			) 
 
-			json.dump(initial_config, open(file_path, 'w'),
-					indent=2, separators=(',', ': '))
+			initial_config = {
+				'token': token,
+				'prefix': prefix
+			}
 
-			os.mkdir('./assets/network_charts')
-			os.mkdir('./assets/role_charts')
-		finally:
-			return token
+			json.dump(initial_config, open(config_file, 'w'),
+				indent=2, separators=(',', ': '))
+
+			os.makedirs('./assets/network_charts', exist_ok=True)
+			os.makedirs('./assets/role_charts', exist_ok=True)
+			
+			return (initial_config, token)
+
+	def refresh_config(self, new_config, write=True):
+		self.config = new_config
+		if write:
+			json.dump(new_config, open(self.config_file_path, 'w'),
+						indent=2, separators=(',', ': '))
 
 	def load_cogs(self):
 		for file in os.listdir('./cogs'):
@@ -62,8 +78,8 @@ class CodingBot:
 			print("Error", e)
 		print("Restarting...")
 
-	def build_bot(self, prefix):
-		bot = commands.Bot(command_prefix=prefix)
+	def build_bot(self):
+		bot = commands.Bot(command_prefix=self.config['prefix'])
 
 		@bot.event
 		async def on_ready():
@@ -74,14 +90,14 @@ class CodingBot:
 			for server in bot.guilds:
 				if str(server.id) not in config:
 					# Add empty config to JSON + initialize all user win/loss stats
-					config[str(server.id)] = {
+					self.config[str(server.id)] = {
 						"verification_role": None,
 						"reporting_channel": None,
 						"reddit_channel": None,
 						"reports": {}
 					}
 					# Save to config file
-					json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+					self.refresh_config(self.config)
 
 
 		@tasks.loop(seconds=86400)
@@ -118,8 +134,7 @@ class CodingBot:
 			elif message.author == bot.user:
 				return
 
-			config_full = json.loads(open('assets/config.json', 'r').read())
-			config = config_full[str(message.guild.id)]
+			config = self.config[str(message.guild.id)]
 			verification_enabled = True if config["verification_role"] is not None else False
 			unverified_role = get(message.author.guild.roles, name="Unverified")
 
@@ -159,14 +174,14 @@ class CodingBot:
 
 		@bot.event
 		async def on_member_join(member):
-			config_full = json.loads(open('assets/config.json', 'r').read())
-			config = config_full[str(member.guild.id)]
+			config = self.config[str(member.guild.id)]
 			verification_enabled = True if config["verification_role"] is not None else False
 			if verification_enabled and not member.bot:
 				role = get(member.guild.roles, id=config["verification_role"])
 				await member.add_roles(role)
 
-			message = open('assets/welcome_message.txt').read()
+			with open('assets/welcome_message.txt') as f:
+				message = f.read()
 			await member.send(message)
 
 			# Prepare welcome embed
@@ -200,21 +215,19 @@ class CodingBot:
 
 		@bot.event
 		async def on_guild_join(guild):
-			config = json.loads(open('assets/config.json', 'r').read())
 			# Create configuration dict to store in JSON
-			config[str(guild.id)] = {
+			self.config[str(guild.id)] = {
 				"verification_role": None,
 				"reporting_channel": None,
 				"reddit_channel": None,
 				"reports": {}
 			}
 			# Save to config file
-			json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+			self.refresh_config(config)
 
 		@bot.event
 		async def on_guild_remove(guild):
-			config = json.loads(open('assets/config.json', 'r').read())
-			config.pop(str(guild.id))
-			json.dump(config, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+			self.config.pop(str(guild.id))
+			self.refresh_config(self.config)
 
 		return bot
