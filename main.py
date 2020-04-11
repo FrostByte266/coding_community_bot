@@ -35,21 +35,13 @@ def load_config():
 	finally:
 		return token
 
-def run_client(client, *args, **kwargs):
-	loop = asyncio.get_event_loop()
-	try:
-		loop.run_until_complete(client.start(*args, **kwargs))
-	except Exception as e:
-		print("Error", e)
-	print("Restarting...")
-
 if __name__ == "__main__":
 
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
 		Bot = bot.CodingBot(prefix='!')
-		run_client(Bot.bot, token)
+		Bot.run_bot(token)
 		importlib.reload(bot)
 
 	# Remove the file "poweroff" so it'll turn on next time
