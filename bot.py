@@ -25,6 +25,14 @@ class CodingBot:
 					print(f"Failed to load cog {file}")
 					print(f"Error:\n{e}")
 
+	def run_bot(self, *args, **kwargs):
+		loop = asyncio.get_event_loop()
+		try:
+			loop.run_until_complete(self.bot.start(*args, **kwargs))
+		except Exception as e:
+			print("Error", e)
+		print("Restarting...")
+
 	def build_bot(self, prefix):
 		bot = commands.Bot(command_prefix=prefix)
 
