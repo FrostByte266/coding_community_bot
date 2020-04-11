@@ -48,9 +48,8 @@ if __name__ == "__main__":
 	token = load_config()
 
 	while not os.path.exists("poweroff"):
-		Bot = bot.build_bot(prefix='!')
-		bot.load_cogs(Bot)
-		run_client(Bot, token)
+		Bot = bot.CodingBot(prefix='!')
+		run_client(Bot.bot, token)
 		importlib.reload(bot)
 
 	# Remove the file "poweroff" so it'll turn on next time
