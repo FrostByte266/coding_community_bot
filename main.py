@@ -2,11 +2,11 @@ import importlib
 import json
 import os
 
-from bot import CodingBot
+import bot
 
 if __name__ == '__main__':
 	while not os.path.exists('poweroff'):
-		Bot = CodingBot('assets/config.json')
+		Bot = bot.CodingBot('assets/config.json')
 		Bot.run_bot()
 		importlib.reload(bot)
 
