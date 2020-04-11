@@ -13,9 +13,11 @@ class CodingBot:
 
 	def __init__(self, config_file):
 		self.config_file_path = config_file
-		(self.config, self.bot_token) = self.load_config_and_fetch_token(config_file)
+		self.config, self.bot_token = self.load_config_and_fetch_token(config_file)
 		self.bot = self.build_bot()
 		self.load_cogs()
+		with open('assets/welcome_message.txt') as f:
+				self.welcome_message = f.read()
 
 	def load_config_and_fetch_token(self, config_file):
 		"""
@@ -30,7 +32,7 @@ class CodingBot:
 		except FileNotFoundError:
 			# If config.json does not exist, it must be the first time starting the
 			# bot, run through configuration
-			# If we are running from a docker container, fetch the token through an
+			# If running from a docker container, fetch the token through an
 			# environment variable, otherwise, prompt the user to enter it
 			token_env = os.environ.get('BOT_TOKEN', None)
 			prefix_env = os.environ.get('BOT_PREFIX', None)
@@ -84,11 +86,10 @@ class CodingBot:
 		@bot.event
 		async def on_ready():
 			print("Ready")
-			config = json.loads(open('assets/config.json', 'r').read())
 
 			# Check if there are any new servers the bot does not have configs for
 			for server in bot.guilds:
-				if str(server.id) not in config:
+				if str(server.id) not in self.config:
 					# Add empty config to JSON + initialize all user win/loss stats
 					self.config[str(server.id)] = {
 						"verification_role": None,
@@ -180,9 +181,8 @@ class CodingBot:
 				role = get(member.guild.roles, id=config["verification_role"])
 				await member.add_roles(role)
 
-			with open('assets/welcome_message.txt') as f:
-				message = f.read()
-			await member.send(message)
+			
+			await member.send(self.welcome_message)
 
 			# Prepare welcome embed
 			embed = Embed(
@@ -223,7 +223,7 @@ class CodingBot:
 				"reports": {}
 			}
 			# Save to config file
-			self.refresh_config(config)
+			self.refresh_config(self.config)
 
 		@bot.event
 		async def on_guild_remove(guild):
