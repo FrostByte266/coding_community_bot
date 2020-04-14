@@ -17,7 +17,8 @@ import os
 import traceback
 
 from discord.ext import commands
-from discord import client
+from discord import client, Forbidden
+from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
 
@@ -48,6 +49,32 @@ class Admin(commands.Cog):
             await ctx.send(f"Logging level set to {level}")
         else:
             await ctx.send("Invalid logging level specified.")
+
+    @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
+    @commands.has_permissions(administrator=True)
+    async def role_refresh(self, ctx):
+
+        roles_to_refresh = (ctx.message()).split(' ')[1:]
+        for role in roles_to_refresh:
+            old_role = get(ctx.message.server.roles, name=role)
+            if old_role:
+                #preserve needed data prior to old role deletion
+                role_refresh_name = old_role.name
+                old_role_members = old_role.members
+
+                try:
+                    await self.bot.delete_role(ctx.message.server, role)
+                    await self.bot.say(f'The role {old_role.name} has been refreshed')
+                except Forbidden:
+                    await self.bot.say("Missing Permissions to delete this role!")
+
+                await ctx.guild.create_role(role_refresh_name)
+                for member in old_role_members:
+                    refreshed_role = get(ctx.message.server.roles, name=role_refresh_name)
+                    await client.add_roles(member, refreshed_role)
+
+            else:
+                await self.bot.say("The role doesn't exist!")
 
     @commands.command(hidden=True, description="Turns off the bot")
     @commands.has_permissions(administrator=True)
