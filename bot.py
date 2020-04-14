@@ -19,6 +19,7 @@ class CodingBot:
 		with open('assets/welcome_message.txt') as f:
 				self.welcome_message = f.read()
 
+
 	def load_config_and_fetch_token(self, config_file):
 		"""
 		Loads bot configuration for use.

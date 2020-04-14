@@ -15,6 +15,10 @@ class Messages(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        with open('assets/courtesy_message.txt') as f:
+            self.courtesy_message = f.read()
+        with open('assets/question_message.txt') as f:
+            self.question_message = f.read()
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
@@ -70,11 +74,10 @@ class Messages(commands.Cog):
 
     @commands.command()
     async def question(self, ctx):
-        await ctx.send("When asking a question please remember to include any relevant information, code snippets, and error messages. " +
-                       "If you are asking a SQL question, please also include the type of SQL server you have (MySQL, Postgres, Oracle, etc). " +
-                       "This ensures that all members of the community are able to provide quick and accurate advice in response to your question."
-                       )
+        await ctx.send(self.question_message)
 
-
+    @commands.command()
+    async def courtesy(self, ctx):
+        await ctx.send(self.courtesy_message)
 def setup(bot):
     bot.add_cog(Messages(bot))
