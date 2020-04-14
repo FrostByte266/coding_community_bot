@@ -19,6 +19,8 @@ class Messages(commands.Cog):
             self.courtesy_message = f.read()
         with open('assets/question_message.txt') as f:
             self.question_message = f.read()
+        with open('assets/patience_message.txt') as f:
+            self.patience_message = f.read()
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
@@ -73,11 +75,18 @@ class Messages(commands.Cog):
             await temp.delete()
 
     @commands.command()
+    async def courtesy(self, ctx):
+        await ctx.send(self.courtesy_message)
+
+    @commands.command()
+    async def patience(self, ctx):
+        await ctx.send(self.patience_message)
+
+    @commands.command()
     async def question(self, ctx):
         await ctx.send(self.question_message)
 
-    @commands.command()
-    async def courtesy(self, ctx):
-        await ctx.send(self.courtesy_message)
+
+
 def setup(bot):
     bot.add_cog(Messages(bot))
