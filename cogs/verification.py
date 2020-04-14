@@ -6,12 +6,12 @@ Commands provided by this cog.
 
 """
 
-import aiohttp
 import json
-from random import choice, choices, randint, sample
+import datetime
 
-from discord import File
-from discord.ext import commands
+import asyncio
+
+from discord.ext import tasks, commands
 from discord.utils import get
 
 
@@ -23,6 +23,33 @@ class Verification(commands.Cog):
 		self.config_full = json.loads(open('assets/config.json').read())
 		self.word_list_refresh_rate = 99
 		self.word_cache_size = 1000
+
+	@tasks.loop(seconds=86400)
+	async def kick_unverified_task(self):
+		guild_id_to_monitor = 697292778215833652
+		guild = self.bot.get_guild(guild_id_to_monitor)
+		guild_members = guild.members
+		unverified_role = get(guild.roles, name="Unverified")
+		unverified_members = unverified_role.members
+
+		if datetime.today().weekday() != 6:
+			for member in unverified_members:
+				await member.send(
+					"Automated Sunday Kick Warning: You will be kicked end of day Sunday if you do not " \
+					"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+				)
+			else:
+				for member in unverified_members:
+					await member.send(
+						"Automated Sunday Kick Warning: You will be kicked in 5 minutes if you do not " \
+						"introduce yourself in #if-you-are-new-click here within the Coding Community server."
+					)
+
+				await asyncio.sleep(300)
+
+				reason = "Automated weekly kick due to not introducing yourself in the #if-you-are-new-click-here channel"
+				for member in unverified_members:
+					await guild.kick(member, reason=reason)
 
 	@commands.command()
 	@commands.has_permissions(manage_guild=True)
