@@ -15,15 +15,19 @@ from discord.ext import commands
 
 class MessageLoader:
     def __init__(self, search_path):
+        # Use proper directory separator for host OS
         if os.name == 'nt':
             sep = '\\'
         else:
             sep = '/'
 
+        # Iterate through directory and find all files ending with _message.txt
         for message_file in glob(f'{search_path}{sep}*_message.txt'):
+            # Strip away path and _message.txt suffix
             absolute_path = os.path.abspath(message_file).split(sep)[-1]
             message_name = absolute_path[:-12]
             try:
+                # Set class variable for the message and read file into it
                 with open(message_file, 'r', encoding='utf-8') as f:
                     self.__dict__[message_name] = f.read()
             except IOError:
