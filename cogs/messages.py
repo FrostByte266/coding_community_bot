@@ -5,22 +5,42 @@ Commands provided by this cog.
     move  : Moves messages between channels. Manage Messages permissions.
 """
 
+import os
+
 from asyncio import sleep
+from glob import glob
 
 from discord import Embed, TextChannel, User
 from discord.ext import commands
 
+class MessageLoader:
+    def __init__(self, search_path):
+        if os.name == 'nt':
+            sep = '\\'
+        else:
+            sep = '/'
+
+        for message_file in glob(f'{search_path}{sep}*_message.txt'):
+            absolute_path = os.path.abspath(message_file).split(sep)[-1]
+            message_name = absolute_path[:-12]
+            try:
+                with open(message_file, 'r', encoding='utf-8') as f:
+                    self.__dict__[message_name] = f.read()
+            except IOError:
+                print(f'Failed to process file: {message_file}')
+            
 
 class Messages(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        with open('assets/courtesy_message.txt') as f:
-            self.courtesy_message = f.read()
-        with open('assets/question_message.txt') as f:
-            self.question_message = f.read()
-        with open('assets/patience_message.txt') as f:
-            self.patience_message = f.read()
+        # with open('assets/courtesy_message.txt') as f:
+        #     self.courtesy_message = f.read()
+        # with open('assets/question_message.txt') as f:
+        #     self.question_message = f.read()
+        # with open('assets/patience_message.txt') as f:
+        #     self.patience_message = f.read()
+        self.messages = MessageLoader('assets/')
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
@@ -76,15 +96,18 @@ class Messages(commands.Cog):
 
     @commands.command()
     async def courtesy(self, ctx):
-        await ctx.send(self.courtesy_message)
+        # await ctx.send(self.courtesy_message)
+        await ctx.send(self.messages.courtesy)
 
     @commands.command()
     async def patience(self, ctx):
-        await ctx.send(self.patience_message)
+        # await ctx.send(self.patience_message)
+        await ctx.send(self.messages.patience)
 
     @commands.command()
     async def question(self, ctx):
-        await ctx.send(self.question_message)
+        # await ctx.send(self.question_message)
+        await ctx.send(self.messages.question)
 
 
 
