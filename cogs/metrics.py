@@ -1,16 +1,19 @@
 """
 Commands provided by this cog.
 
-    networkplot : Prots connections between user roles on the server
-    plot : Gives a graph of role usage in the server
+	networkplot : Prots connections between user roles on the server
+	plot : Gives a graph of role usage in the server
+	uptime: Shows the bot uptime
 """
 
+from datetime import datetime
 from discord.ext import commands
 from discord import File
 from pandas import DataFrame
-from datetime import datetime
+from utils import metrics_utils
 import matplotlib.pyplot as plt
 import networkx as nx
+
 
 class Metrics(commands.Cog):
 
@@ -32,8 +35,8 @@ class Metrics(commands.Cog):
 				member_roles.remove('@everyone')
 			for role in member_roles:
 				for co_role in member_roles:
-					df.loc[role,co_role] += 1
-					df.loc[co_role,role] += 1
+					df.loc[role, co_role] += 1
+					df.loc[co_role, role] += 1
 
 			max_connection_weight = df.max().max()
 
@@ -78,7 +81,8 @@ class Metrics(commands.Cog):
 		# G.edges(data = True)
 
 		# manually copy and pasted the node order using 'nx.nodes(G)'
-		# Couldn't determine another route to listing out the order of nodes for future work
+		# Couldn't determine another route to listing out the order of nodes
+		# for future work
 		node_order = [str(x) for x in nx.nodes(graph)]
 
 		# reorder node list
@@ -147,6 +151,17 @@ class Metrics(commands.Cog):
 		plt.tight_layout()
 		plt.savefig(image_path)
 		await ctx.message.author.send(f'{ctx.guild.name} roles chart', file=File(image_path))
+
+	@commands.command(description="Show uptime")
+	async def uptime(self, ctx):
+		"""
+		View bot uptime.
+
+		usage:
+			!uptime
+		"""
+
+		await ctx.send(await metrics_utils.uptime_calculation(self.bot))
 
 
 def setup(bot):

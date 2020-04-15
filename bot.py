@@ -15,6 +15,7 @@ class CodingBot:
 		self.config_file_path = config_file
 		self.config, self.bot_token = self.load_config_and_fetch_token(config_file)
 		self.bot = self.build_bot()
+		self.bot.boot_time = datetime.now()
 		self.load_cogs()
 		with open('assets/welcome_message.txt') as f:
 				self.welcome_message = f.read()
@@ -43,7 +44,7 @@ class CodingBot:
 
 			prefix = prefix_env if prefix_env is not None else input(
 				'Please enter the prefix for your bot '
-			) 
+			)
 
 			initial_config = {
 				'token': token,
@@ -55,7 +56,7 @@ class CodingBot:
 
 			os.makedirs('./assets/network_charts', exist_ok=True)
 			os.makedirs('./assets/role_charts', exist_ok=True)
-			
+
 			return (initial_config, token)
 
 	def refresh_config(self, new_config, write=True):
@@ -155,7 +156,7 @@ class CodingBot:
 				role = get(member.guild.roles, id=config["verification_role"])
 				await member.add_roles(role)
 
-			
+
 			await member.send(self.welcome_message)
 
 			# Prepare welcome embed
