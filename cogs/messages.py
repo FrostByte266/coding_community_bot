@@ -32,7 +32,10 @@ class MessageLoader:
                     self.__dict__[message_name] = f.read()
             except IOError:
                 print(f'Failed to process file: {message_file}')
-            
+
+    # Allows access to attributes with indexing syntax
+    def __getitem__(self, key):
+        return self.__dict__[key]
 
 class Messages(commands.Cog):
 
@@ -93,17 +96,13 @@ class Messages(commands.Cog):
             await temp.delete()
 
     @commands.command()
-    async def courtesy(self, ctx):
-        await ctx.send(self.messages.courtesy)
+    async def message(self, ctx, selection: str):
+        # discord.py error handler will catch this if index fails
+        await ctx.send(self.messages[selection])
 
-    @commands.command()
-    async def patience(self, ctx):
-        await ctx.send(self.messages.patience)
-
-    @commands.command()
-    async def question(self, ctx):
-        await ctx.send(self.messages.question)
-
+    @message.error 
+    async def message_error(self, ctx, error):
+        await ctx.send(f'Choice `{ctx.args[-1]}` is invalid!')
 
 
 def setup(bot):
