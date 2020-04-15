@@ -38,12 +38,6 @@ class Messages(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        # with open('assets/courtesy_message.txt') as f:
-        #     self.courtesy_message = f.read()
-        # with open('assets/question_message.txt') as f:
-        #     self.question_message = f.read()
-        # with open('assets/patience_message.txt') as f:
-        #     self.patience_message = f.read()
         self.messages = MessageLoader('assets/')
 
     @commands.command()
@@ -100,17 +94,14 @@ class Messages(commands.Cog):
 
     @commands.command()
     async def courtesy(self, ctx):
-        # await ctx.send(self.courtesy_message)
         await ctx.send(self.messages.courtesy)
 
     @commands.command()
     async def patience(self, ctx):
-        # await ctx.send(self.patience_message)
         await ctx.send(self.messages.patience)
 
     @commands.command()
     async def question(self, ctx):
-        # await ctx.send(self.question_message)
         await ctx.send(self.messages.question)
 
 
