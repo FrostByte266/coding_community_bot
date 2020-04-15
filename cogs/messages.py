@@ -13,6 +13,7 @@ from glob import glob
 from discord import Embed, TextChannel, User
 from discord.ext import commands
 
+
 class MessageLoader:
     def __init__(self, search_path):
         # Use proper directory separator for host OS
@@ -36,6 +37,7 @@ class MessageLoader:
     # Allows access to attributes with indexing syntax
     def __getitem__(self, key):
         return self.__dict__[key]
+
 
 class Messages(commands.Cog):
 
@@ -73,12 +75,13 @@ class Messages(commands.Cog):
                 if any([emb.description.startswith(zero_width_space) for emb in message.embeds]):
                     messages.extend(message.embeds)
                 else:
-                    embed = Embed(description=f'{zero_width_space}{message.content}')
+                    embed = Embed(
+                        description=f'{zero_width_space}{message.content}')
                     embed.set_author(name=message.author.name,
-                                    icon_url=message.author.avatar_url)
+                                     icon_url=message.author.avatar_url)
                     embed.timestamp = message.created_at
                     messages.append(embed)
-                    
+
                 if not copy:
                     await message.delete()
 
@@ -100,7 +103,7 @@ class Messages(commands.Cog):
         # discord.py error handler will catch this if index fails
         await ctx.send(self.messages[selection])
 
-    @message.error 
+    @message.error
     async def message_error(self, ctx, error):
         await ctx.send(f'Choice `{ctx.args[-1]}` is invalid!')
 

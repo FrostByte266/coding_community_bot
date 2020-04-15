@@ -94,42 +94,42 @@ class Reddit(commands.Cog):
             Reddit.init = True
             Reddit.timeframes = ['all', 'year', 'month']
             Reddit.learning = ['learnprogramming',
-                                   'learnpython',
-                                   'learngolang']
+                               'learnpython',
+                               'learngolang']
 
             Reddit.ai = ['neuralnetworks', 'statistics']
 
             Reddit.language = [
-                                'python',
-                                'sql',
-                                'julia',
-                                'rlanguage',
-                                'golang',
-                                'cpp'
-                                ]
+                'python',
+                'sql',
+                'julia',
+                'rlanguage',
+                'golang',
+                'cpp'
+            ]
 
             Reddit.cstopics = [
-                                'programming',
-                                'proceduralgeneration',
-                                'demoscene'
-                            ]
+                'programming',
+                'proceduralgeneration',
+                'demoscene'
+            ]
 
             Reddit.industry = ['devops',
-                                'webdev',
-                                'coding',
-                                'datasets'
-                                ]
+                               'webdev',
+                               'coding',
+                               'datasets'
+                               ]
 
             Reddit.entertainment = ['softwaregore',
-                                        'programmerhumor',
-                                        'ImaginaryFeels',
-                                        'awww',
-                                        'ultrahdwallpapers',
-                                        'wallpapers',
-                                        'minimalwallpaper',
-                                        'DnDGreentext',
-                                        'shitdwarffortresssays'
-                                        ]
+                                    'programmerhumor',
+                                    'ImaginaryFeels',
+                                    'awww',
+                                    'ultrahdwallpapers',
+                                    'wallpapers',
+                                    'minimalwallpaper',
+                                    'DnDGreentext',
+                                    'shitdwarffortresssays'
+                                    ]
 
             Reddit.categories = [
                 Reddit.learning,
@@ -166,14 +166,16 @@ class Reddit(commands.Cog):
                 ctx.guild.me: PermissionOverwrite(send_messages=True)
             }
             channel = await ctx.message.guild.create_text_channel("reddit-feed", overwrites=permission_overrides)
-            config.update(reddit_channel = channel.id)
-            json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+            config.update(reddit_channel=channel.id)
+            json.dump(self.config_full, open('assets/config.json',
+                                             'w'), indent=2, separators=(',', ': '))
         elif state is False and config["reddit_channel"] is not None:
             channel = self.bot.get_channel(config["reddit_channel"])
             await channel.delete()
             config.update(reddit_channel=None)
-            json.dump(self.config_full, open('assets/config.json', 'w'), indent=2, separators=(',', ': '))
+            json.dump(self.config_full, open('assets/config.json',
+                                             'w'), indent=2, separators=(',', ': '))
+
 
 def setup(bot):
     bot.add_cog(Reddit(bot))
-

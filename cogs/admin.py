@@ -58,7 +58,7 @@ class Admin(commands.Cog):
         for role in roles_to_refresh:
             old_role = get(ctx.message.server.roles, name=role)
             if old_role:
-                #preserve needed data prior to old role deletion
+                # preserve needed data prior to old role deletion
                 role_refresh_name = old_role.name
                 old_role_members = old_role.members
 
@@ -70,7 +70,8 @@ class Admin(commands.Cog):
 
                 await ctx.guild.create_role(role_refresh_name)
                 for member in old_role_members:
-                    refreshed_role = get(ctx.message.server.roles, name=role_refresh_name)
+                    refreshed_role = get(
+                        ctx.message.server.roles, name=role_refresh_name)
                     await client.add_roles(member, refreshed_role)
 
             else:
