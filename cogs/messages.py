@@ -6,6 +6,7 @@ Commands provided by this cog.
 """
 
 import os
+import traceback
 
 from asyncio import sleep
 from glob import glob
@@ -16,6 +17,7 @@ from discord.ext import commands
 
 class MessageLoader:
     def __init__(self, search_path):
+        self.search_path = search_path
         # Use proper directory separator for host OS
         if os.name == 'nt':
             sep = '\\'
@@ -23,20 +25,36 @@ class MessageLoader:
             sep = '/'
 
         # Iterate through directory and find all files ending with _message.txt
-        for message_file in glob(f'{search_path}{sep}*_message.txt'):
-            # Strip away path and _message.txt suffix
-            absolute_path = os.path.abspath(message_file).split(sep)[-1]
-            message_name = absolute_path[:-12]
+        for message, path in self.load_names(include_full_paths=True):
             try:
                 # Set class variable for the message and read file into it
-                with open(message_file, 'r', encoding='utf-8') as f:
-                    self.__dict__[message_name] = f.read()
-            except IOError:
-                print(f'Failed to process file: {message_file}')
+                with open(path, 'r', encoding='utf-8') as f:
+                    self.__dict__[message] = f.read()
+            except IOError as e:
+                print(f'Failed to process file: {path}')
 
     # Allows access to attributes with indexing syntax
     def __getitem__(self, key):
         return self.__dict__[key]
+
+    def load_names(self, include_full_paths=False):
+        # Use proper directory separator for host OS
+        if os.name == 'nt':
+            sep = '\\'
+        else:
+            sep = '/'
+
+        # Iterate through directory and find all files ending with _message.txt
+        for message_file in glob(f'{self.search_path}{sep}*_message.txt'):
+            # Strip away path and _message.txt suffix
+            absolute_path = os.path.abspath(message_file)
+            relative_path = absolute_path.split(sep)[-1]
+            message_name = relative_path[:-12]
+            if not include_full_paths:
+                yield message_name
+            else:
+                yield (message_name, absolute_path)
+
 
 
 class Messages(commands.Cog):
@@ -44,6 +62,7 @@ class Messages(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.messages = MessageLoader('assets/')
+        self.message_names = ', '.join(list(self.messages.load_names()))
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
@@ -100,12 +119,15 @@ class Messages(commands.Cog):
 
     @commands.command()
     async def message(self, ctx, selection: str):
-        # discord.py error handler will catch this if index fails
-        await ctx.send(self.messages[selection])
+        if selection == 'list':
+            await ctx.send(f'Available messages are: {self.message_names}')
+        else:
+            # discord.py error handler will catch this if index fails
+            await ctx.send(self.messages[selection])
 
     @message.error
     async def message_error(self, ctx, error):
-        await ctx.send(f'Choice `{ctx.args[-1]}` is invalid!')
+        await ctx.send(f'Choice `{ctx.args[-1]}` is invalid! Available messages are: {self.message_names}')
 
 
 def setup(bot):
