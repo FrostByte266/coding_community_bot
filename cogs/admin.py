@@ -14,10 +14,11 @@ Commands provided by this Cog
 """
 
 import os
+import functools
 import traceback
 
 from discord.ext import commands
-from discord import client, Forbidden
+from discord import client, Forbidden, Role, Permissions
 from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
@@ -52,30 +53,29 @@ class Admin(commands.Cog):
 
     @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
     @commands.has_permissions(administrator=True)
-    async def role_refresh(self, ctx):
+    async def role_refresh(self, ctx, role: Role):
+        affected_members = role.members
 
-        roles_to_refresh = (ctx.message()).split(' ')[1:]
-        for role in roles_to_refresh:
-            old_role = get(ctx.message.server.roles, name=role)
-            if old_role:
-                # preserve needed data prior to old role deletion
-                role_refresh_name = old_role.name
-                old_role_members = old_role.members
+        new_role = await ctx.guild.create_role(
+            name=role.name,
+            permissions=role.permissions,
+            mentionable=role.mentionable,
+            color=role.color,
+            hoist=role.hoist,
+        )
+        await new_role.edit(position=role.position)
+        await ctx.send('Role refresh initiated, this may take a while...')
 
-                try:
-                    await self.bot.delete_role(ctx.message.server, role)
-                    await self.bot.say(f'The role {old_role.name} has been refreshed')
-                except Forbidden:
-                    await self.bot.say("Missing Permissions to delete this role!")
+        # Remove old role from members before deleting
+        for member in affected_members:
+            await member.remove_roles(role, reason='Removal of old role for role refresh')
 
-                await ctx.guild.create_role(role_refresh_name)
-                for member in old_role_members:
-                    refreshed_role = get(
-                        ctx.message.server.roles, name=role_refresh_name)
-                    await client.add_roles(member, refreshed_role)
+        # Delete the old role, and add the new role back
+        await role.delete(reason='Performing role refresh')
+        for member in affected_members:
+            await member.add_roles(new_role, reason='Adding refreshed role')
 
-            else:
-                await self.bot.say("The role doesn't exist!")
+        await ctx.send('Role refresh complete :thumbsup:')
 
     @commands.command(hidden=True, description="Turns off the bot")
     @commands.has_permissions(administrator=True)
