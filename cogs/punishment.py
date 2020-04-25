@@ -231,12 +231,15 @@ class Punishment(commands.Cog):
             # User ID has been provided
             user = await self.bot.fetch_user(args)
             user_name = f'{user.name}#{user.discriminator}'
-            results = []
+
             reports = config["reports"]
-            for report_iter in config["reports"]:
-                report_num = str(report_iter)
-                if any((reports[report_num]["issuer"] == user_name, reports[report_num]["subject"] == user_name)):
-                    results.append(report_num)
+            results = [str(report) for report in config["reports"]
+                       if any((
+                                reports[str(report)]["issuer"] == user_name,
+                                reports[str(report)]["subject"] == user_name
+                                ))
+                       ]
+
             if results:
                 for result in results:
                     embed = Embed(
@@ -258,12 +261,9 @@ class Punishment(commands.Cog):
             # User provided via mention
             user = ctx.message.mentions[0]
             user_name = f'{user.name}#{user.discriminator}'
-            results = []
             reports = config["reports"]
-            for report_iter in config["reports"]:
-                report_num = str(report_iter)
-                if reports[report_num]["subject"] == user_name:
-                    results.append(report_num)
+            results = [str(report) for report in config["reports"] if reports[str(report)]["subject"] == user_name]
+
             if results:
                 for result in results:
                     embed = Embed(
