@@ -15,7 +15,8 @@ class Config(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config_full = json.loads(open('assets/config.json').read())
+        self.config_path = 'assets/config.json'
+        self.config_full = json.loads(open(self.config_path).read())
 
     @commands.command()
     @commands.has_permissions(manage_guild=True)
@@ -25,14 +26,14 @@ class Config(commands.Cog):
         if state is True and config["reporting_channel"] is None:
             channel = await ctx.message.guild.create_text_channel(name="Reporting")
             config.update(reporting_channel=channel.id)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
         elif state is False and config["reporting_channel"] is not None:
             channel = get(ctx.message.guild.text_channels,
                           id=config["reporting_channel"])
             await channel.delete()
             config.update(reporting_channel=None)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
 
 

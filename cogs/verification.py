@@ -20,7 +20,8 @@ class Verification(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config_full = json.loads(open('assets/config.json').read())
+        self.config_path = 'assets/config.json'
+        self.config_full = json.loads(open(self.config_path).read())
         self.word_list_refresh_rate = 99
         self.word_cache_size = 1000
 
@@ -28,7 +29,6 @@ class Verification(commands.Cog):
     async def kick_unverified_task(self):
         guild_id_to_monitor = 697292778215833652
         guild = self.bot.get_guild(guild_id_to_monitor)
-        guild_members = guild.members
         unverified_role = get(guild.roles, name="Unverified")
         unverified_members = unverified_role.members
 
@@ -59,7 +59,7 @@ class Verification(commands.Cog):
         if state is True and config["verification_role"] is None:
             role = await ctx.message.guild.create_role(name="Unverified")
             config.update(verification_role=role.id)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
         elif state is False and config["verification_role"] is not None:
             role = get(ctx.message.guild.roles, id=config["verification_role"])

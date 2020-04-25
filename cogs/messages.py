@@ -18,11 +18,6 @@ from discord.ext import commands
 class MessageLoader:
     def __init__(self, search_path):
         self.search_path = search_path
-        # Use proper directory separator for host OS
-        if os.name == 'nt':
-            sep = '\\'
-        else:
-            sep = '/'
 
         # Iterate through directory and find all files ending with _message.txt
         for message, path in self.load_names(include_full_paths=True):
@@ -30,7 +25,7 @@ class MessageLoader:
                 # Set class variable for the message and read file into it
                 with open(path, 'r', encoding='utf-8') as f:
                     self.__dict__[message] = f.read()
-            except IOError as e:
+            except IOError:
                 print(f'Failed to process file: {path}')
 
     # Allows access to attributes with indexing syntax
