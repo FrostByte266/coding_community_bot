@@ -86,22 +86,24 @@ class CodingBot:
     def build_bot(self):
         bot = commands.Bot(command_prefix=self.config['prefix'])
 
+        def setup_guild_config(guild):
+            # Add empty config to JSON for any server that is missing
+            self.config[str(guild.id)] = {
+                "verification_role": None,
+                "reporting_channel": None,
+                "reddit_channel": None,
+                "reports": {}
+            }
+            # Save to config file
+            self.refresh_config(self.config)
+
         @bot.event
         async def on_ready():
             print("Ready")
 
             # Check if there are any new servers the bot does not have configs for
-            for server in bot.guilds:
-                if str(server.id) not in self.config:
-                    # Add empty config to JSON + initialize all user win/loss stats
-                    self.config[str(server.id)] = {
-                        "verification_role": None,
-                        "reporting_channel": None,
-                        "reddit_channel": None,
-                        "reports": {}
-                    }
-                    # Save to config file
-                    self.refresh_config(self.config)
+            [setup_guild_config(guild) for guild in bot.guilds if str(guild.id) not in self.config]
+
 
         @bot.event
         async def on_message(message):
