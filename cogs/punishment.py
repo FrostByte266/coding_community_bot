@@ -235,7 +235,7 @@ class Punishment(commands.Cog):
             reports = config["reports"]
             for report_iter in config["reports"]:
                 report_num = str(report_iter)
-                if reports[report_num]["issuer"] == user_name or reports[report_num]["subject"] == user_name:
+                if any((reports[report_num]["issuer"] == user_name, reports[report_num]["subject"] == user_name)):
                     results.append(report_num)
             if results:
                 for result in results:
@@ -297,7 +297,7 @@ class Punishment(commands.Cog):
                 await ctx.send(embed=embed)
             else:
                 await ctx.send('No reports found with the ID number provided')
-        if not ctx.message.mentions and args.endswith("--receipt"):
+        if all((not ctx.message.mentions, args.endswith("--receipt"))):
             # If user requests a copy of the report, DM it to them (only single reports can be sent via DM)
             await ctx.message.author.send(embed=embed)
 
