@@ -107,17 +107,17 @@ class CodingBot:
 
         @bot.event
         async def on_message(message):
-            if message.guild is None:
-                return await bot.process_commands(message)
-            elif message.author == bot.user:
-                return
+            is_bot = message.author == bot.user
+            not_guild = message.guild is None
+            if any(is_bot, not_guild):
+                return None
 
             config = self.config[str(message.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
             unverified_role = get(
                 message.author.guild.roles, name="Unverified")
 
-            if str(message.channel) == 'if-you-are-new-click-here' and message.content is not None:
+            if all(str(message.channel) == 'if-you-are-new-click-here', message.content is not None):
                 words_split = message.content.replace(":", " ").split()
                 word_group = list(re.sub("(,|\.|:)$", "", word)
                                   for word in words_split)
@@ -146,7 +146,7 @@ class CodingBot:
                 )
                 if verification_enabled:
                     await message.author.remove_roles(unverified_role)
-            elif verification_enabled and str(message.channel) != 'if-you-are-new-click-here' and unverified_role in message.author.roles:
+            elif all(verification_enabled, str(message.channel) != 'if-you-are-new-click-here', unverified_role in message.author.roles):
                 await message.author.send("Before you can send messages you need to introduce yourself in #if-you-are-new-click-here."
                                           " Please state any programming languages you have used, as well as whether you are a"
                                           "Beginner, Novice, Advanced, or Professional. You can review earlier introductions in "
@@ -158,7 +158,7 @@ class CodingBot:
         async def on_member_join(member):
             config = self.config[str(member.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
-            if verification_enabled and not member.bot:
+            if all(verification_enabled, not member.bot):
                 role = get(member.guild.roles, id=config["verification_role"])
                 await member.add_roles(role)
 
