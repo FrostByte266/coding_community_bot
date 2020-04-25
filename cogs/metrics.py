@@ -24,14 +24,14 @@ class Metrics(commands.Cog):
     @commands.command()
     async def networkplot(self, ctx):
         # Create dict of role names and the number of members in each
-        roles = [str(role.name) for role in ctx.guild.roles]
-        roles.remove('@everyone')
-
+        default_role = '@everyone'
+        roles = [str(role.name) for role in ctx.guild.roles if role.name != default_role]
+        
         df = DataFrame(columns=roles, index=roles)
         df[:] = int(0)
 
         for member in ctx.guild.members:
-            member_roles = [role.name for role in member.roles if role.name != '@everyone']
+            member_roles = [role.name for role in member.roles if role.name != default_role]
             for role, co_role in itertools.product(member_roles, member_roles):
                 df.loc[role, co_role] += 1
                 df.loc[co_role, role] += 1
@@ -53,14 +53,11 @@ class Metrics(commands.Cog):
         for role, edge in itertools.product(roles, updated_edge_list):
             if all((role == edge[0], role == edge[1])):
                 node_list.append((role, edge[2] * 6))
-        for i in node_list:
-            if i[1] == 0.0:
-                node_list.remove(i)
+        
+        [node_list.remove(i) for i in node_list if i[1] == 0.0]
 
         # remove self references
-        for i in updated_edge_list:
-            if i[0] == i[1]:
-                updated_edge_list.remove(i)
+        [updated_edge_list.remove(i) for i in updated_edge_list if i[0] == i[1]]
 
         # Create plot
 
@@ -69,8 +66,7 @@ class Metrics(commands.Cog):
 
         # networkx graph time!
         graph = nx.Graph()
-        for i in sorted(node_list):
-            graph.add_node(i[0], size=i[1])
+        [graph.add_node(i[0], size=i[1]) for i in sorted(node_list)]
         graph.add_weighted_edges_from(updated_edge_list)
 
         # check data of graphs
@@ -84,18 +80,17 @@ class Metrics(commands.Cog):
 
         # reorder node list
         updated_node_order = []
-        for i in node_order:
-            for x in node_list:
-                if x[0] == i:
-                    updated_node_order.append(x)
+        for i, x in itertools.product(node_order, node_list):
+            if x[0] == i:
+                updated_node_order.append(x)
+
 
         # reorder edge list
         test = nx.get_edge_attributes(graph, 'weight')
         updated_again_edges = []
-        for i in nx.edges(graph):
-            for x in test.keys():
-                if i[0] == x[0] and i[1] == x[1]:
-                    updated_again_edges.append(test[x])
+        for i, x in itertools.product(nx.edges(graph), test.keys()):
+            if all((i[0] == x[0], i[1] == x[1])):
+                updated_again_edges.append(test[x])
 
         # Drawing customization
         node_scalar = 1600
