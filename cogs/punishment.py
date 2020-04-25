@@ -26,7 +26,8 @@ class IncidentReport:
         self.subject = subject
         self.body = body
         self.server = server
-        self.config_full = json.loads(open('assets/config.json').read())
+        self.config_path = 'assets/config.json'
+        self.config_full = json.loads(open(self.config_path).read())
         self.config = self.config_full[str(self.server.id)]
         self.report_number = self.next_report_number()
         self.finalize_report()
@@ -43,7 +44,7 @@ class IncidentReport:
             "body": self.body
         }
         self.config["reports"].update({self.report_number: report})
-        json.dump(self.config_full, open('assets/config.json', 'w'),
+        json.dump(self.config_full, open(self.config_path, 'w'),
                   indent=2, separators=(',', ': '))
 
     def generate_receipt(self):
@@ -73,7 +74,8 @@ class Punishment(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config_full = json.loads(open('assets/config.json').read())
+        self.config_path = 'assets/config.json'
+        self.config_full = json.loads(open(self.config_path).read())
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -308,7 +310,7 @@ class Punishment(commands.Cog):
             config = self.config_full[str(ctx.message.guild.id)]
             reports = config["reports"]
             reports.pop(report_id)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
             await ctx.send(f'Report #{report_id} successfully cleared!')
         except KeyError:

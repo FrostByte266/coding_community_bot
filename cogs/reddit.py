@@ -20,7 +20,7 @@ def reddit_bot():
     try:
         reddit = reddit_bot.reddit
         return reddit
-    except Exception as e:
+    except Exception:
         reddit_config = load_reddit_conf()[0]
         reddit = praw.Reddit(
             client_id=reddit_config['client_id'],
@@ -83,7 +83,8 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config_full = json.loads(open('assets/config.json', 'r').read())
+        self.config_path = 'assets/config.json'
+        self.config_full = json.loads(open(self.config_path, 'r').read())
 
     @tasks.loop(seconds=86400)
     async def get_reddit(self, ctx, mode='assorted'):
@@ -167,13 +168,13 @@ class Reddit(commands.Cog):
             }
             channel = await ctx.message.guild.create_text_channel("reddit-feed", overwrites=permission_overrides)
             config.update(reddit_channel=channel.id)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
         elif state is False and config["reddit_channel"] is not None:
             channel = self.bot.get_channel(config["reddit_channel"])
             await channel.delete()
             config.update(reddit_channel=None)
-            json.dump(self.config_full, open('assets/config.json',
+            json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
 
 
