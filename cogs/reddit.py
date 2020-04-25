@@ -6,22 +6,17 @@ import json
 import praw
 
 
-def load_reddit_conf():
-    config = json.loads(open('assets/config.json', 'r').read())
-    return config["reddit_config"]
-
-
 def __init__(self, bot):
     self.bot = bot
     self.reddit_config = self.bot.reddit_config
 
 
-def reddit_bot():
+def reddit_bot(self):
     try:
         reddit = reddit_bot.reddit
         return reddit
     except Exception:
-        reddit_config = load_reddit_conf()[0]
+        reddit_config = self.reddit_config
         reddit = praw.Reddit(
             client_id=reddit_config['client_id'],
             client_secret=reddit_config['client_secret'],
@@ -161,7 +156,7 @@ class Reddit(commands.Cog):
     async def reddit(self, ctx, state: bool):
         """Enable or disable the reddit system"""
         config = self.config_full[str(ctx.message.guild.id)]
-        if state is True and config["reddit_channel"] is None:
+        if all((state is True, config["reddit_channel"] is None)):
             permission_overrides = {
                 ctx.guild.default_role: PermissionOverwrite(send_messages=False),
                 ctx.guild.me: PermissionOverwrite(send_messages=True)
@@ -170,7 +165,7 @@ class Reddit(commands.Cog):
             config.update(reddit_channel=channel.id)
             json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
-        elif state is False and config["reddit_channel"] is not None:
+        elif all((state is False, config["reddit_channel"] is not None)):
             channel = self.bot.get_channel(config["reddit_channel"])
             await channel.delete()
             config.update(reddit_channel=None)
