@@ -6,7 +6,6 @@ Commands provided by this cog.
 """
 
 import os
-import functools
 
 from asyncio import sleep
 from glob import glob
@@ -112,7 +111,7 @@ class Messages(commands.Cog):
             await sleep(3)
             await temp.delete()
 
-    @functools.lru_cache(maxsize=8)
+
     @commands.command()
     async def message(self, ctx, selection: str):
         if selection == 'list':
