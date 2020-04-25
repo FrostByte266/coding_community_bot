@@ -13,6 +13,7 @@ from pandas import DataFrame
 from utils import metrics_utils
 import matplotlib.pyplot as plt
 import networkx as nx
+import itertools
 
 
 class Metrics(commands.Cog):
@@ -31,10 +32,9 @@ class Metrics(commands.Cog):
 
         for member in ctx.guild.members:
             member_roles = [role.name for role in member.roles if role.name != '@everyone']
-            for role in member_roles:
-                for co_role in member_roles:
-                    df.loc[role, co_role] += 1
-                    df.loc[co_role, role] += 1
+            for role, co_role in itertools.product(member_roles, member_roles):
+                df.loc[role, co_role] += 1
+                df.loc[co_role, role] += 1
 
             max_connection_weight = df.max().max()
 
@@ -50,10 +50,9 @@ class Metrics(commands.Cog):
         updated_edge_list = [x for x in edge_list if not x[2] == 0.0]
 
         node_list = []
-        for r in roles:
-            for e in updated_edge_list:
-                if r == e[0] and r == e[1]:
-                    node_list.append((r, e[2] * 6))
+        for role, edge in itertools.product(roles, updated_edge_list):
+            if all((role == edge[0], role == edge[1])):
+                node_list.append((role, edge[2] * 6))
         for i in node_list:
             if i[1] == 0.0:
                 node_list.remove(i)
