@@ -4,11 +4,7 @@ from random import sample
 
 import json
 import praw
-
-
-def __init__(self, bot):
-    self.bot = bot
-    self.reddit_config = self.bot.reddit_config
+from itertools import chain
 
 
 def reddit_bot(self):
@@ -81,71 +77,65 @@ class Reddit(commands.Cog):
         self.config_path = 'assets/config.json'
         self.config_full = json.loads(open(self.config_path, 'r').read())
 
+        self.timeframes = ['all', 'year', 'month']
+        self.learning = ['learnprogramming',
+                           'learnpython',
+                           'learngolang']
+
+        self.ai = ['neuralnetworks', 'statistics']
+
+        self.language = [
+            'python',
+            'sql',
+            'julia',
+            'rlanguage',
+            'golang',
+            'cpp'
+        ]
+
+        self.cstopics = [
+            'programming',
+            'proceduralgeneration',
+            'demoscene'
+        ]
+
+        self.industry = ['devops',
+                           'webdev',
+                           'coding',
+                           'datasets'
+                           ]
+
+        self.entertainment = ['softwaregore',
+                                'programmerhumor',
+                                'ImaginaryFeels',
+                                'awww',
+                                'ultrahdwallpapers',
+                                'wallpapers',
+                                'minimalwallpaper',
+                                'DnDGreentext',
+                                'shitdwarffortresssays'
+                                ]
+
+        self.categories = [
+            self.learning,
+            self.language,
+            self.cstopics,
+            self.ai,
+            self.industry,
+            self.entertainment
+        ]
+
+        # Makes a single composite of all the subreddits
+        self.sub_reddit_composite = [subreddit for subreddit in chain(*self.categories)]
+
     @tasks.loop(seconds=86400)
     async def get_reddit(self, ctx, mode='assorted'):
 
         try:
-            Reddit.init
-        except Exception as e:
-            Reddit.init = True
-            Reddit.timeframes = ['all', 'year', 'month']
-            Reddit.learning = ['learnprogramming',
-                               'learnpython',
-                               'learngolang']
+            period = sample(self.timeframes, 1)[0]
 
-            Reddit.ai = ['neuralnetworks', 'statistics']
-
-            Reddit.language = [
-                'python',
-                'sql',
-                'julia',
-                'rlanguage',
-                'golang',
-                'cpp'
-            ]
-
-            Reddit.cstopics = [
-                'programming',
-                'proceduralgeneration',
-                'demoscene'
-            ]
-
-            Reddit.industry = ['devops',
-                               'webdev',
-                               'coding',
-                               'datasets'
-                               ]
-
-            Reddit.entertainment = ['softwaregore',
-                                    'programmerhumor',
-                                    'ImaginaryFeels',
-                                    'awww',
-                                    'ultrahdwallpapers',
-                                    'wallpapers',
-                                    'minimalwallpaper',
-                                    'DnDGreentext',
-                                    'shitdwarffortresssays'
-                                    ]
-
-            Reddit.categories = [
-                Reddit.learning,
-                Reddit.language,
-                Reddit.cstopics,
-                Reddit.ai,
-                Reddit.industry,
-                Reddit.entertainment
-            ]
-
-            # initilization for horrible abuse of the python language
-            Reddit.sub_reddit_composite = []
-
-            # horrible abuse of the python language. One line and it works. but feel free to make the below abuse/pythonic more readable.
-            [Reddit.sub_reddit_composite.extend(x) for x in Reddit.categories]
-        try:
-            period = sample(Reddit.timeframes, 1)[0]
-
-            # category is a list of subreddit names to be concatenated after r/
-            category = sample(Reddit.sub_reddit_composite, 5)
+            # category is a list of randomly sampled subreddit names to be concatenated after r/
+            category = sample(self.sub_reddit_composite, 5)
             await ctx.send(await readings_fetch(ctx, category, period=period, mode=mode))
 
         except Exception as e:
