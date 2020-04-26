@@ -32,7 +32,7 @@ class Metrics(commands.Cog):
 
         for member in ctx.guild.members:
             member_roles = [role.name for role in member.roles if role.name != default_role]
-            for role, co_role in itertools.product(member_roles, member_roles):
+            for role, co_role in itertools.product(member_roles, repeat=2):
                 df.loc[role, co_role] += 1
                 df.loc[co_role, role] += 1
 
