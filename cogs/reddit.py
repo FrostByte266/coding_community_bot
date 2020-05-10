@@ -16,56 +16,7 @@ class Reddit(commands.Cog):
         self.config_full = json.loads(open(self.config_path, 'r').read())
 
         self.timeframes = ['all', 'year', 'month']
-        self.learning = [
-                         'learnprogramming',
-                         'learnpython',
-                         'learngolang'
-                        ]
-
-        self.ai = ['neuralnetworks', 'statistics']
-
-        self.language = [
-                            'python',
-                            'sql',
-                            'julia',
-                            'rlanguage',
-                            'golang',
-                            'cpp'
-                        ]
-
-        self.cstopics = [
-                            'programming',
-                            'proceduralgeneration',
-                            'demoscene'
-                        ]
-
-        self.industry = [
-                            'devops',
-                            'webdev',
-                            'coding',
-                            'datasets'
-                        ]
-
-        self.entertainment = [
-                                'softwaregore',
-                                'programmerhumor',
-                                'ImaginaryFeels',
-                                'awww',
-                                'ultrahdwallpapers',
-                                'wallpapers',
-                                'minimalwallpaper',
-                                'DnDGreentext',
-                                'shitdwarffortresssays'
-                            ]
-
-        self.categories = [
-            self.learning,
-            self.language,
-            self.cstopics,
-            self.ai,
-            self.industry,
-            self.entertainment
-        ]
+        self.categories = []
 
         # Makes a single composite of all the subreddits
         self.sub_reddit_composite = [subreddit for subreddit in chain(*self.categories)]

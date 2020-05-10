@@ -92,6 +92,7 @@ class CodingBot:
                 "verification_role": None,
                 "reporting_channel": None,
                 "reddit_channel": None,
+                "subreddits": {},
                 "reports": {}
             }
             # Save to config file
