@@ -11,9 +11,9 @@ class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.reddit = await self.reddit_bot()
         self.config_path = 'assets/config.json'
         self.config_full = json.loads(open(self.config_path, 'r').read())
+        self.reddit = self.reddit_bot()
 
         self.timeframes = ['all', 'year', 'month']
         self.categories = []
@@ -21,8 +21,8 @@ class Reddit(commands.Cog):
         # Makes a single composite of all the subreddits
         self.sub_reddit_composite = [subreddit for subreddit in chain(*self.categories)]
 
-    async def reddit_bot(self):
-        reddit_config = None #(Pseudocode: Read reddit_config from full_config)
+    def reddit_bot(self):
+        reddit_config = self.config_full['reddit_config']
         reddit = praw.Reddit(
             client_id=reddit_config['client_id'],
             client_secret=reddit_config['client_secret'],
@@ -30,7 +30,6 @@ class Reddit(commands.Cog):
             username=reddit_config['username'],
             password=reddit_config['password']
         )
-        self.reddit_bot.reddit = reddit
         return reddit
 
     async def topinxperiod(self, subreddit, period='year', return_quantity=3):
