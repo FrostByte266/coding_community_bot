@@ -24,7 +24,6 @@ class CodingBot:
         self.empty_config = {
             'verification_role': None,
             'reporting_channel': None,
-            'reddit_channel': None,
             'reddit_channel': {},
             'reports': {}
         }

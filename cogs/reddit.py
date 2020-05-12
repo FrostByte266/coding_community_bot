@@ -2,6 +2,8 @@ from discord.ext import commands, tasks
 from discord import PermissionOverwrite, client
 from random import sample
 
+from traceback import print_tb
+
 import json
 import praw
 from itertools import chain
@@ -63,7 +65,7 @@ class Reddit(commands.Cog):
         except Exception as e:
             print(e)
 
-        top_links_in_period = sample(top_links_in_period, 5)
+        top_links_in_period = sample(top_links_in_period, 1)
 
         while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
             top_links_in_period.pop(-1)
@@ -74,12 +76,27 @@ class Reddit(commands.Cog):
     async def get_reddit(self):
         for guild_id in self.config_full["reddit_enabled"]:
             for channel_id in self.config_full[str(guild_id)]['reddit_config'].keys():
-                channel_object = discord.get_channel(channel_id)
+                channel_object = self.bot.get_channel(channel_id)
                 try:
                     period = sample(self.timeframes, 1)[0]
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
                     category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 5)
+                    await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
+
+                except Exception as e:
+                    print(e)
+
+    @commands.command()
+    async def get_reddit_test(self, ctx):
+        for guild_id in self.config_full["reddit_enabled"]:
+            for channel_id in self.config_full[str(guild_id)]['reddit_config'].keys():
+                channel_object = self.bot.get_channel(int(channel_id))
+                try:
+                    period = sample(self.timeframes, 1)[0]
+
+                    # category is a list of randomly sampled subreddit names to be concatenated after r/
+                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 1)
                     await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
                 except Exception as e:
