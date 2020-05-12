@@ -72,14 +72,14 @@ class Reddit(commands.Cog):
 
     @tasks.loop(seconds=86400)
     async def get_reddit(self):
-        for guild_dict in self.config_full["reddit_enabled"]:
-            for channel_id in guild_dict.keys():
+        for guild_id in self.config_full["reddit_enabled"]:
+            for channel_id in self.config_full[str(guild_id)]['reddit_config'].keys():
                 channel_object = discord.get_channel(channel_id)
                 try:
                     period = sample(self.timeframes, 1)[0]
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
-                    category = sample(guild_dict[channel_id], 5)
+                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 5)
                     await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
                 except Exception as e:
