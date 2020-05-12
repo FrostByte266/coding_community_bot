@@ -26,7 +26,7 @@ class Reddit(commands.Cog):
         reddit = praw.Reddit(
             client_id=reddit_config['client_id'],
             client_secret=reddit_config['client_secret'],
-            user_agent=reddit_config['user_agent'],
+            user_agent='Coding Community Bot/1.0',
             username=reddit_config['username'],
             password=reddit_config['password']
         )
