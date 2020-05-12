@@ -44,7 +44,7 @@ class Reddit(commands.Cog):
         except Exception as e:
             print(str(e))
 
-    async def readings_fetch(self, ctx, subreddits_list, period='year', mode='top'):
+    async def readings_fetch(self, subreddits_list, period='year', mode='top'):
         top_links_in_period = []
 
         if mode == 'assorted':
@@ -71,17 +71,19 @@ class Reddit(commands.Cog):
         return '\n'.join([str(x) for x in top_links_in_period])
 
     @tasks.loop(seconds=86400)
-    async def get_reddit(self, ctx, mode='assorted'):
+    async def get_reddit(self):
+        for guild_dict in self.config_full["reddit_enabled"]:
+            for channel_id in guild_dict.keys():
+                channel_object = discord.get_channel(channel_id)
+                try:
+                    period = sample(self.timeframes, 1)[0]
 
-        try:
-            period = sample(self.timeframes, 1)[0]
+                    # category is a list of randomly sampled subreddit names to be concatenated after r/
+                    category = sample(guild_dict[channel_id], 5)
+                    await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
-            # category is a list of randomly sampled subreddit names to be concatenated after r/
-            category = sample(self.sub_reddit_composite, 5)
-            await ctx.send(await self.readings_fetch(ctx, category, period=period, mode=mode))
-
-        except Exception as e:
-            print(e)
+                except Exception as e:
+                    print(e)
 
     @commands.command()
     @commands.has_permissions(manage_guild=True)
