@@ -21,6 +21,17 @@ class CodingBot:
         self.load_cogs()
         with open('assets/welcome_message.txt') as f:
             self.welcome_message = f.read()
+        self.empty_config = {
+            'verification_role': None,
+            'reporting_channel': None,
+            'reddit_channel': None,
+            'reddit_channel': {},
+            'reports': {}
+        }
+
+    def get_initial_config_value(self, env_key, prompt):
+        env_var = os.environ.get(env_key, None)
+        return env_var if env_var is not None else input(f'Please provide the {prompt}: ')
 
     def load_config_and_fetch_token(self, config_file):
         """
@@ -37,19 +48,23 @@ class CodingBot:
             # bot, run through configuration
             # If running from a docker container, fetch the token through an
             # environment variable, otherwise, prompt the user to enter it
-            token_env = os.environ.get('BOT_TOKEN', None)
-            prefix_env = os.environ.get('BOT_PREFIX', None)
-            token = token_env if token_env is not None else input(
-                'It appears this is the first time running the bot. '
-                'Please enter your bot\'s token: ')
+            prefix = self.get_initial_config_value('BOT_PREFIX', 'prefix for the bot')
+            token = self.get_initial_config_value('BOT_TOKEN', 'bot API token')
+            client_id = self.get_initial_config_value('REDDIT_CLIENT_ID', 'Reddit API client ID')
+            client_secret = self.get_initial_config_value('REDDIT_CLIENT_SECRET', 'Reddit API client secret')
+            reddit_username = self.get_initial_config_value('REDDIT_BOT_USER', 'username for the Reddit bot')
+            reddit_pass = self.get_initial_config_value('REDDIT_BOT_PASSWORD', 'password for the Reddit bot')
 
-            prefix = prefix_env if prefix_env is not None else input(
-                'Please enter the prefix for your bot '
-            )
 
             initial_config = {
                 'token': token,
-                'prefix': prefix
+                'prefix': prefix,
+                'reddit_config': {
+                    'client_id': client_id,
+                    'client_secret': client_secret,
+                    'username': reddit_username,
+                    'password': reddit_pass
+                }
             }
 
             json.dump(initial_config, open(config_file, 'w'),
@@ -88,13 +103,7 @@ class CodingBot:
 
         def setup_guild_config(guild):
             # Add empty config to JSON for any server that is missing
-            self.config[str(guild.id)] = {
-                "verification_role": None,
-                "reporting_channel": None,
-                "reddit_channel": None,
-                "subreddits": {},
-                "reports": {}
-            }
+            self.config[str(guild.id)] = self.empty_config
             # Save to config file
             self.refresh_config(self.config)
 
@@ -198,12 +207,7 @@ class CodingBot:
         @bot.event
         async def on_guild_join(guild):
             # Create configuration dict to store in JSON
-            self.config[str(guild.id)] = {
-                "verification_role": None,
-                "reporting_channel": None,
-                "reddit_channel": None,
-                "reports": {}
-            }
+            self.config[str(guild.id)] = self.empty_config
             # Save to config file
             self.refresh_config(self.config)
 
