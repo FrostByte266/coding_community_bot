@@ -99,7 +99,7 @@ class CodingBot:
         print("Restarting...")
 
     async def category_check(self, message):
-        if 'resources' in message.channel.category.name.lower() and self.url_regex.search(message.content):
+        if 'resources' in message.channel.category.name.lower() and not self.url_regex.search(message.content):
             failMessage = f"**Message Removed**\nSorry but your message in #{message.channel.name} does not contain a link to your external reference. If this was a mistake please try resubmitting your message with the link. If this was intended as a conversational message please re-send it in General or Chill-Chat."
             await message.delete()
             await message.author.send(failMessage)
