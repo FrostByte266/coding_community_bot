@@ -146,9 +146,9 @@ class CodingBot:
                 word_group = list(set(word_group))
 
                 ignored_roles = ['@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
-                                 'Merit Badge (lvl - Moderator)',
-                                 'Merit Badge (lvl - Admin)',
-                                 'Merit Badge (lvl - Owner)', 'BOT', 'little fox familiar']
+                                 'Merit Badge (lvl - M)',
+                                 'Merit Badge (lvl - A)',
+                                 'Merit Badge (lvl - O)', 'BOT', 'little fox familiar']
 
                 roles = {role.name.lower(
                 ): role for role in message.guild.roles if role.name not in ignored_roles}
