@@ -99,8 +99,8 @@ class CodingBot:
 
     async def category_check(self, message):
         urlMatcher = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
-        if 'resources' in message.channel.category.name and not urlMatcher.match(message.content):
-            failMessage = f"**Message Removed** Sorry but your message in {message.channel.name} does not contain a link to your external reference. If this was a mistake please try resubmitting your message with the link. If this was intended as a conversational message please re-send it in General or Chill-Chat."
+        if 'resources' in message.channel.category.name.lower() and not urlMatcher.match(message.content):
+            failMessage = f"**Message Removed**\nSorry but your message in #{message.channel.name} does not contain a link to your external reference. If this was a mistake please try resubmitting your message with the link. If this was intended as a conversational message please re-send it in General or Chill-Chat."
             await message.delete()
             await message.author.send(failMessage)
             
