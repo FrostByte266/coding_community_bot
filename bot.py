@@ -177,7 +177,7 @@ class CodingBot:
         async def on_member_join(member):
             config = self.config[str(member.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
-            if all(verification_enabled, not member.bot):
+            if all((verification_enabled, not member.bot)):
                 role = get(member.guild.roles, id=config["verification_role"])
                 await member.add_roles(role)
 
