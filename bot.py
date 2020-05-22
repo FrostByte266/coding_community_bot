@@ -106,7 +106,9 @@ class CodingBot:
             
 
     def build_bot(self):
-        bot = commands.Bot(command_prefix=self.config['prefix'])
+        bot = commands.Bot(
+            command_prefix=self.config['prefix'],
+            case_insensitive=True)
 
         def setup_guild_config(guild):
             # Add empty config to JSON for any server that is missing
