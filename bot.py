@@ -64,7 +64,7 @@ class CodingBot:
                     'client_secret': client_secret,
                     'username': reddit_username,
                     'password': reddit_pass
-                }
+                },
                 'reddit_enabled': []
             }
 
@@ -140,8 +140,10 @@ class CodingBot:
                 message.author.guild.roles, name="Unverified")
 
             if all((str(message.channel) == 'if-you-are-new-click-here', message.content is not None)):
-                words_split = message.content.replace(":", " ").split()
-                word_group = list(re.sub("(,|\.|:)$", "", word)
+                content = re.sub("(,|\.|:|,\s+)$", " ", message.content, flags=re.UNICODE)
+                words_split = content.split()
+
+                word_group = list(re.sub("(,|\.|:|,\s+)$", "", word)
                                   for word in words_split)
                 word_group.extend(words_split)
 
