@@ -25,7 +25,7 @@ class CodingBot:
         self.empty_config = {
             'verification_role': None,
             'reporting_channel': None,
-            'reddit_channel': {},
+            'reddit_config': {},
             'reports': {}
         }
 
@@ -65,6 +65,7 @@ class CodingBot:
                     'username': reddit_username,
                     'password': reddit_pass
                 }
+                'reddit_enabled': []
             }
 
             json.dump(initial_config, open(config_file, 'w'),
