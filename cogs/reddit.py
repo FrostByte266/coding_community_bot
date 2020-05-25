@@ -23,6 +23,8 @@ class Reddit(commands.Cog):
         # Makes a single composite of all the subreddits
         self.sub_reddit_composite = [subreddit for subreddit in chain(*self.categories)]
 
+        self.get_reddit.start()
+
     def reddit_bot(self):
         reddit_config = self.config_full['reddit_config']
         reddit = praw.Reddit(
@@ -72,20 +74,24 @@ class Reddit(commands.Cog):
 
         return '\n'.join([str(x) for x in top_links_in_period])
 
-    @tasks.loop(seconds=86400)
+    @tasks.loop(hours=12)
     async def get_reddit(self):
         for guild_id in self.config_full["reddit_enabled"]:
             for channel_id in self.config_full[str(guild_id)]['reddit_config'].keys():
-                channel_object = self.bot.get_channel(channel_id)
+                channel_object = self.bot.get_channel(int(channel_id))
                 try:
                     period = sample(self.timeframes, 1)[0]
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
-                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 5)
+                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 1)
                     await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
                 except Exception as e:
                     print(e)
+
+    @get_reddit.before_loop
+    async def before_get_reddit(self):
+        await self.bot.wait_until_ready()
 
     @commands.command()
     async def get_reddit_test(self, ctx):
