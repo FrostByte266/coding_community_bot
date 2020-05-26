@@ -47,7 +47,7 @@ class AutoRedditGuild(AutoRedditBase):
     def __init__(self, guild, config_path):
         super().__init__(config_path)
         self.guild = guild
-        self.channels = self.config[str(self.channel.guild.id)]['reddit_config']
+        self.channels = self.config[str(self.guild.id)]['reddit_config']
 
     def __call__(self):
         state = self.guild.id in self.config['reddit_enabled']
@@ -77,7 +77,6 @@ class Reddit(commands.Cog):
         self.config_path = 'assets/config.json'
         self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
-
         self.timeframes = ['all', 'year', 'month']
 
         self.get_reddit.start()
@@ -169,25 +168,21 @@ class Reddit(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def reddit(self, ctx, state: bool):
         """Enable or disable the reddit system"""
-        config = self.config_full[str(ctx.message.guild.id)]
-        if all((state is True, config["reddit_channel"] is None)):
-            permission_overrides = {
-                ctx.guild.default_role: PermissionOverwrite(send_messages=False),
-                ctx.guild.me: PermissionOverwrite(send_messages=True)
-            }
-            channel = await ctx.message.guild.create_text_channel("reddit-feed", overwrites=permission_overrides)
-            config.update(reddit_channel=channel.id)
-            json.dump(self.config_full, open(self.config_path,
-                                             'w'), indent=2, separators=(',', ': '))
-        elif all((state is False, config["reddit_channel"] is not None)):
-            channel = self.bot.get_channel(config["reddit_channel"])
-            await channel.delete()
-            config.update(reddit_channel=None)
-            json.dump(self.config_full,
-                      open(self.config_path, 'w'),
-                      indent=2,
-                      separators=(',', ': ')
-                      )
+        guild = ctx.guild
+
+        if ctx.args == None:
+            AutoRedditGuild(guild, self.config_path)()
+
+        if ctx.args[0] == type(ctx.channel):
+            if ctx.args[1][0] == '+':
+                AutoRedditChannel(guild, ctx.channel, self.config_path) + ctx.args[1][1:]
+
+            elif ctx.args[1][0] == '-':
+                AutoRedditChannel(guild, ctx.channel, self.config_path) - ctx.args[1][1:]
+
+
+
+
 
 
 def setup(bot):
