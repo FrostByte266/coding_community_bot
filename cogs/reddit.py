@@ -18,10 +18,6 @@ class Reddit(commands.Cog):
         self.reddit = self.reddit_bot()
 
         self.timeframes = ['all', 'year', 'month']
-        self.categories = []
-
-        # Makes a single composite of all the subreddits
-        self.sub_reddit_composite = [subreddit for subreddit in chain(*self.categories)]
 
         self.get_reddit.start()
 
