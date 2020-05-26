@@ -8,13 +8,74 @@ import json
 import praw
 from itertools import chain
 
+class AutoRedditBase:
+    def __init__(self, config_path):
+        self.config_path = config_path
+        with open(self.config_path, 'r') as f:
+            self.config = json.load(f)
+
+    def save_config(self):
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=2, separators=(',', ': '))
+
+class AutoRedditChannel(AutoRedditBase):
+    
+    def __init__(self, channel, config_path):
+        super().__init__(config_path)
+        self.channel = channel
+        # Test to see if the channel is in the config, initialize it to an empty list if not
+        try:
+            self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)]
+        except KeyError:
+            self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)] = []
+        finally:
+            self.config = self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)]
+
+
+    def __iadd__(self, new_subreddit):
+        self.subreddits.append(new_subreddit)
+        self.save_config()
+        return self
+
+    def __isub__(self, subreddit_to_remove):
+        self.subreddits.remove(subreddit_to_remove)
+        self.save_config()
+        return self
+
+class AutoRedditGuild(AutoRedditBase):
+
+    def __init__(self, guild, config_path):
+        super().__init__(config_path)
+        self.guild = guild
+        self.channels = self.config[str(self.channel.guild.id)]['reddit_config']
+
+    def __call__(self):
+        state = self.guild.id in self.config['reddit_enabled']
+        guild_id = self.guild.id
+        if state is True:
+            self.config['reddit_enabled'].remove(guild_id)
+        else:
+            self.config['reddit_enabled'].append(guild_id)
+        self.save_config()
+
+    def __iadd__(self, new_channel):
+        self.channels[str(new_channel.id)] = []
+        self.save_config()
+        return self
+
+    def __isub__(self, channel_to_remove):
+        self.channels.pop(str(channel_to_remove.id))
+        self.save_config()
+        return self
+
+
 
 class Reddit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.config_path = 'assets/config.json'
-        self.config_full = json.loads(open(self.config_path, 'r').read())
+        self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
 
         self.timeframes = ['all', 'year', 'month']
