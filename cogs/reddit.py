@@ -194,7 +194,7 @@ class Reddit(commands.Cog):
             status = 'on' if guild() is True else 'off'
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
         elif mentioned_channel is not None:
-            # Modifying an existing channel, procedd to managing subreddits
+            # Modifying an existing channel, proceed to managing subreddits
             channel = AutoRedditChannel(ctx.channel, self.config_path)
             if mode == '+':
                 channel += first_arg
