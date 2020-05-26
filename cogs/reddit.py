@@ -33,7 +33,7 @@ class AutoRedditChannel(AutoRedditBase):
         except KeyError:
             self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)] = []
         finally:
-            self.config = self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)]
+            self.subreddits = self.config[str(self.channel.guild.id)]['reddit_config'][str(channel.id)]
 
 
     def __iadd__(self, new_subreddit):
@@ -75,7 +75,6 @@ class AutoRedditGuild(AutoRedditBase):
 
 class RedditCommandParser(commands.Converter):
     async def convert(self, ctx, argument):
-        print(argument)
         args = argument.split(' ')
         regex = '\<#(.*?)\>'
         mentioned_channel = re.search(regex, args[0])
@@ -184,55 +183,44 @@ class Reddit(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def reddit(self, ctx, *, parameters: RedditCommandParser):
         """Enable or disable the reddit system"""
-        print(parameters)
-        args = parameters[1]
-        first_arg = parameters[0] if type(parameters[0]) is TextChannel else args[0]
         guild = AutoRedditGuild(ctx.guild, self.config_path)
         mentioned_channel = parameters[0]
+        args = parameters[1]
+        mode = args[0][0]
+        first_arg = args[0][1:]
         error_message = 'Error: Malformed parameters!'
         
         if args is None:
             status = 'on' if guild() is True else 'off'
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
-        elif type(first_arg) is TextChannel:
+        elif mentioned_channel is not None:
             # Modifying an existing channel, procedd to managing subreddits
-            second_arg = args[1]
-            print(second_arg)
             channel = AutoRedditChannel(ctx.channel, self.config_path)
-            subreddit = second_arg[1:]
-            if second_arg.startswith('+'):
-                channel += subreddit
-                await ctx.send(f'Added r/{subreddit} to {mentioned_channel.mention}')
-            elif second_arg.startswith('-'):
-                channel -= subreddit
-                await ctx.send(f'Removed r/{subreddit} from {mentioned_channel.mention}')
+            if mode == '+':
+                channel += first_arg
+                await ctx.send(f'Added r/{first_arg} to {mentioned_channel.mention}')
+            elif mode == '-':
+                channel -= first_arg
+                await ctx.send(f'Removed r/{first_arg} from {mentioned_channel.mention}')
             else:
                 await ctx.send(error_message)
-        elif first_arg.startswith('+'):
+        elif mode == '+':
             # Registering a new channel
             permissions = {
                 ctx.guild.default_role: PermissionOverwrite(send_messages=False),
                 ctx.guild.me: PermissionOverwrite(send_messages=True)
             }
-            created_channel = await ctx.guild.create_text_channel(args[0][1:], overwrites=permissions)
+            created_channel = await ctx.guild.create_text_channel(first_arg, overwrites=permissions)
             guild += created_channel
             await ctx.send(f'Created new auto reddit channel: {created_channel.mention}')
-        elif first_arg.startswith('-'):
+        elif mode == '-':
             # Removing a channel
-            channel = get(ctx.guild.text_channels, name=first_arg[1:])
+            channel = get(ctx.guild.text_channels, name=first_arg)
+            guild -= channel
             await ctx.send(f'Deleted auto reddit channel: #{channel.name}')
             await channel.delete()
         else:
             await ctx.send(error_message)
-
-    @commands.command()
-    async def test_args(self, ctx):
-        print(ctx.args)
-
-
-
-
-
 
 def setup(bot):
     bot.add_cog(Reddit(bot))
