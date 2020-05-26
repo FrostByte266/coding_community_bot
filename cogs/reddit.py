@@ -1,5 +1,9 @@
+import re
+from typing import Optional
+
 from discord.ext import commands, tasks
-from discord import PermissionOverwrite, client
+from discord.utils import get
+from discord import PermissionOverwrite, TextChannel, client
 from random import sample
 
 from traceback import print_tb
@@ -57,6 +61,7 @@ class AutoRedditGuild(AutoRedditBase):
         else:
             self.config['reddit_enabled'].append(guild_id)
         self.save_config()
+        return not state
 
     def __iadd__(self, new_channel):
         self.channels[str(new_channel.id)] = []
@@ -68,7 +73,18 @@ class AutoRedditGuild(AutoRedditBase):
         self.save_config()
         return self
 
-
+class RedditCommandParser(commands.Converter):
+    async def convert(self, ctx, argument):
+        print(argument)
+        args = argument.split(' ')
+        regex = '\<#(.*?)\>'
+        mentioned_channel = re.search(regex, args[0])
+        if mentioned_channel is not None:
+            channel_id = int(mentioned_channel.group(1))
+            channel = ctx.guild.get_channel(channel_id)
+            return (channel, args[1:])
+        else:
+            return (None, args)
 
 class Reddit(commands.Cog):
 
@@ -166,19 +182,52 @@ class Reddit(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_guild=True)
-    async def reddit(self, ctx, state: bool):
+    async def reddit(self, ctx, *, parameters: RedditCommandParser):
         """Enable or disable the reddit system"""
-        guild = ctx.guild
+        print(parameters)
+        args = parameters[1]
+        first_arg = parameters[0] if type(parameters[0]) is TextChannel else args[0]
+        guild = AutoRedditGuild(ctx.guild, self.config_path)
+        mentioned_channel = parameters[0]
+        error_message = 'Error: Malformed parameters!'
+        
+        if args is None:
+            status = 'on' if guild() is True else 'off'
+            await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
+        elif type(first_arg) is TextChannel:
+            # Modifying an existing channel, procedd to managing subreddits
+            second_arg = args[1]
+            print(second_arg)
+            channel = AutoRedditChannel(ctx.channel, self.config_path)
+            subreddit = second_arg[1:]
+            if second_arg.startswith('+'):
+                channel += subreddit
+                await ctx.send(f'Added r/{subreddit} to {mentioned_channel.mention}')
+            elif second_arg.startswith('-'):
+                channel -= subreddit
+                await ctx.send(f'Removed r/{subreddit} from {mentioned_channel.mention}')
+            else:
+                await ctx.send(error_message)
+        elif first_arg.startswith('+'):
+            # Registering a new channel
+            permissions = {
+                ctx.guild.default_role: PermissionOverwrite(send_messages=False),
+                ctx.guild.me: PermissionOverwrite(send_messages=True)
+            }
+            created_channel = await ctx.guild.create_text_channel(args[0][1:], overwrites=permissions)
+            guild += created_channel
+            await ctx.send(f'Created new auto reddit channel: {created_channel.mention}')
+        elif first_arg.startswith('-'):
+            # Removing a channel
+            channel = get(ctx.guild.text_channels, name=first_arg[1:])
+            await ctx.send(f'Deleted auto reddit channel: #{channel.name}')
+            await channel.delete()
+        else:
+            await ctx.send(error_message)
 
-        if ctx.args == None:
-            AutoRedditGuild(guild, self.config_path)()
-
-        if ctx.args[0] == type(ctx.channel):
-            if ctx.args[1][0] == '+':
-                AutoRedditChannel(guild, ctx.channel, self.config_path) + ctx.args[1][1:]
-
-            elif ctx.args[1][0] == '-':
-                AutoRedditChannel(guild, ctx.channel, self.config_path) - ctx.args[1][1:]
+    @commands.command()
+    async def test_args(self, ctx):
+        print(ctx.args)
 
 
 
