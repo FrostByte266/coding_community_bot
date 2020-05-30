@@ -186,7 +186,7 @@ class Reddit(commands.Cog):
         guild = AutoRedditGuild(ctx.guild, self.config_path)
         mentioned_channel = parameters[0]
         args = parameters[1]
-        mode = args[0][0]
+        mode = args[0] if args[0] in ('status','list') else args[0][0]
         first_arg = args[0][1:]
         error_message = 'Error: Malformed parameters!'
         
@@ -196,7 +196,14 @@ class Reddit(commands.Cog):
         elif mentioned_channel is not None:
             # Modifying an existing channel, proceed to managing subreddits
             channel = AutoRedditChannel(mentioned_channel, self.config_path)
-            if mode == '+':
+
+            if mode == 'status':
+                status = 'on' if guild() is True else 'off'
+                await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
+            elif mode == 'list':
+                sub_list = channel.subreddits
+                await ctx.send(f'{channel.name} subreddits are {sub_list} for {ctx.guild.name}')
+            elif mode == '+':
                 channel += first_arg
                 await ctx.send(f'Added r/{first_arg} to {mentioned_channel.mention}')
             elif mode == '-':
