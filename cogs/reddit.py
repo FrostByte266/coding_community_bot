@@ -184,7 +184,7 @@ class Reddit(commands.Cog):
     async def reddit(self, ctx, *, parameters: RedditCommandParser):
         """Enable or disable the reddit system"""
         guild = AutoRedditGuild(ctx.guild, self.config_path)
-        mentioned_channel = guild.channels.find(parameters[0]) if type(parameters[0]) == str else parameters[0]
+        mentioned_channel = parameters[0]
         args = parameters[1]
         mode = args[0][0]
         first_arg = args[0][1:]
@@ -195,7 +195,7 @@ class Reddit(commands.Cog):
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
         elif mentioned_channel is not None:
             # Modifying an existing channel, proceed to managing subreddits
-            channel = AutoRedditChannel(mentioned_channel.name, self.config_path)
+            channel = AutoRedditChannel(mentioned_channel, self.config_path)
             if mode == '+':
                 channel += first_arg
                 await ctx.send(f'Added r/{first_arg} to {mentioned_channel.mention}')
