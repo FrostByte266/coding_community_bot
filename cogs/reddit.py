@@ -140,8 +140,9 @@ class Reddit(commands.Cog):
                                         )
         except Exception as e:
             print(e)
-
-        top_links_in_period = sample(top_links_in_period, 1)
+        return_count = len(top_links_in_period)
+        sample_size = 3 if return_count > 2 else 1
+        top_links_in_period = sample(top_links_in_period, sample_size)
 
         while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
             top_links_in_period.pop(-1)
