@@ -205,7 +205,7 @@ class Reddit(commands.Cog):
 
             if mode == 'status':
                 status = 'on' if guild(query_status=True) is True else 'off'
-                await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
+                await ctx.send(f'Auto reddit is {status} for {ctx.guild.name}')
             elif mode == 'list':
                 sub_list = channel.subreddits
                 await ctx.send(f'{channel.name} subreddits are {sub_list} for {ctx.guild.name}')
