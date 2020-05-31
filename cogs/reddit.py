@@ -207,8 +207,9 @@ class Reddit(commands.Cog):
                 status = 'on' if guild(query_status=True) is True else 'off'
                 await ctx.send(f'Auto reddit is {status} for {ctx.guild.name}')
             elif mode == 'list':
-                sub_list = channel.subreddits
-                await ctx.send(f'{channel.channel.name} subreddits are {sub_list} for {ctx.guild.name}')
+                sub_list = ', '.join(channel.subreddits)
+                await ctx.send(f'{ctx.guild.name} {channel.channel.name} subreddits are:\n'
+                               f' {sub_list} ')
             elif mode == '+':
                 channel += first_arg
                 await ctx.send(f'Added r/{first_arg} to {mentioned_channel.mention}')
