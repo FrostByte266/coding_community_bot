@@ -181,7 +181,7 @@ class Reddit(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_guild=True)
-    async def reddit(self, ctx, *, parameters: RedditCommandParser):
+    async def reddit(self, ctx, *, parameters: Optional[RedditCommandParser]):
         """Enable or disable the reddit system"""
         guild = AutoRedditGuild(ctx.guild, self.config_path)
         mentioned_channel = parameters[0]
