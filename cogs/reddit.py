@@ -184,13 +184,13 @@ class Reddit(commands.Cog):
     async def reddit(self, ctx, *, parameters: Optional[RedditCommandParser]):
         """Enable or disable the reddit system"""
         args = parameters[1] if parameters is not None else None
+        guild = AutoRedditGuild(ctx.guild, self.config_path)
 
         if args is None:
             status = 'on' if guild() is True else 'off'
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
             return None
         else: 
-            guild = AutoRedditGuild(ctx.guild, self.config_path)
             mentioned_channel = parameters[0]
             mode = args[0] if args[0] in ('status','list') else args[0][0]
             first_arg = args[0][1:]
