@@ -53,8 +53,11 @@ class AutoRedditGuild(AutoRedditBase):
         self.guild = guild
         self.channels = self.config[str(self.guild.id)]['reddit_config']
 
-    def __call__(self):
+    def __call__(self, query_status=False):
         state = self.guild.id in self.config['reddit_enabled']
+        if query_status is True:
+            return state
+        
         guild_id = self.guild.id
         if state is True:
             self.config['reddit_enabled'].remove(guild_id)
@@ -201,7 +204,7 @@ class Reddit(commands.Cog):
             channel = AutoRedditChannel(mentioned_channel, self.config_path)
 
             if mode == 'status':
-                status = 'on' if guild() is True else 'off'
+                status = 'on' if guild(query_status=True) is True else 'off'
                 await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
             elif mode == 'list':
                 sub_list = channel.subreddits
