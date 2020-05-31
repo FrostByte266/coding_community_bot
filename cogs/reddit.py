@@ -55,11 +55,11 @@ class AutoRedditGuild(AutoRedditBase):
 
     def __call__(self, query_status=False):
         state = self.guild.id in self.config['reddit_enabled']
+        guild_id = self.guild.id
+
         if query_status is True:
             return state
-        
-        guild_id = self.guild.id
-        if state is True:
+        elif state is True:
             self.config['reddit_enabled'].remove(guild_id)
         else:
             self.config['reddit_enabled'].append(guild_id)
