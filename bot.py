@@ -150,8 +150,14 @@ class CodingBot:
 
                 roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
 
+                alias = {'js': 'javascript', 'intermediate': 'novice'}
+
+                first_role = roles.keys()[0]
+                for a in alias.keys():
+                    roles[a] = roles.get(alias[a], roles[first_role])
+
                 member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
-                
+
                 await message.author.add_roles(*member_roles)
 
                 newline = '\n'
