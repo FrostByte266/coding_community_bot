@@ -148,10 +148,10 @@ class CodingBot:
                                  'Merit Badge (lvl - A)',
                                  'Merit Badge (lvl - O)', 'BOT', 'little fox familiar']
 
-                roles = {role.name.lower(
-                ): role for role in message.guild.roles if role.name not in ignored_roles}
-                member_roles = [roles.get(
-                    word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
+                roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
+
+                member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
+                
                 await message.author.add_roles(*member_roles)
 
                 newline = '\n'
