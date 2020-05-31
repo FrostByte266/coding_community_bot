@@ -141,7 +141,7 @@ class CodingBot:
 
             if all((str(message.channel) == 'if-you-are-new-click-here', message.content is not None)):
                 content = re.sub("[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
-                word_group = [x.strip() for x in content.split()]
+                word_group = content.split()
 
                 ignored_roles = ['@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
                                  'Merit Badge (lvl - M)',
