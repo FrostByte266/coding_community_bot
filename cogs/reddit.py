@@ -183,17 +183,20 @@ class Reddit(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def reddit(self, ctx, *, parameters: Optional[RedditCommandParser]):
         """Enable or disable the reddit system"""
-        guild = AutoRedditGuild(ctx.guild, self.config_path)
-        mentioned_channel = parameters[0]
-        args = parameters[1]
-        mode = args[0] if args[0] in ('status','list') else args[0][0]
-        first_arg = args[0][1:]
-        error_message = 'Error: Malformed parameters!'
-        
+        args = parameters[1] if parameters is not None else None
+
         if args is None:
             status = 'on' if guild() is True else 'off'
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
-        elif mentioned_channel is not None:
+            return None
+        else: 
+            guild = AutoRedditGuild(ctx.guild, self.config_path)
+            mentioned_channel = parameters[0]
+            mode = args[0] if args[0] in ('status','list') else args[0][0]
+            first_arg = args[0][1:]
+            error_message = 'Error: Malformed parameters!'
+            
+        if mentioned_channel is not None:
             # Modifying an existing channel, proceed to managing subreddits
             channel = AutoRedditChannel(mentioned_channel, self.config_path)
 
