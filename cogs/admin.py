@@ -17,8 +17,11 @@ import os
 import functools
 import traceback
 
+from datetime import datetime
+from io import StringIO
+
 from discord.ext import commands
-from discord import client, Forbidden, Role, Permissions
+from discord import client, Forbidden, Role, Permissions, File
 from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
@@ -76,6 +79,25 @@ class Admin(commands.Cog):
             await member.add_roles(new_role, reason='Adding refreshed role')
 
         await ctx.send('Role refresh complete :thumbsup:')
+
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def list_unverified(self, ctx):
+        unverfied_role = get(ctx.guild.roles, name='Unverified')
+        list_of_members = [f'{member.name} (ID: {member.id})' for member in unverfied_role.members]
+        newline_separated_list = '\n'.join(sorted(list_of_members))
+        length_of_list = len(newline_separated_list)
+        if length_of_list > 2000:
+            buffer = StringIO()
+            buffer.write(newline_separated_list)
+            buffer.seek(0)
+            timestamp = datetime.now().strftime('%m-%d-%Y_%H%M')
+            upload = File(buffer, filename=f'unverified_list_{timestamp}.txt')
+            await ctx.send('List exceeds message character limit, please refer to the attached file', file=upload)
+        elif length_of_list == 0:
+            await ctx.send('No unverified members!')
+        else:
+            await ctx.send(newline_separated_list)
 
     @commands.command(hidden=True, description="Turns off the bot")
     @commands.has_permissions(administrator=True)
@@ -136,7 +158,8 @@ class Admin(commands.Cog):
         if pull == "pull":
             cmd = Popen(["git", "pull"], stdout=PIPE)
             out, _ = cmd.communicate()
-            if out == b'Already up to date.\n':
+            out = out.decode('utf-8')
+            if out == 'Already up to date.\n':
                 return await ctx.send("I'm already up to date.")
             await ctx.send(f"Pulling files from github...\n{out}")
 
