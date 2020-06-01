@@ -77,6 +77,13 @@ class Admin(commands.Cog):
 
         await ctx.send('Role refresh complete :thumbsup:')
 
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def list_unverified(self, ctx):
+        unverfied_role = get(ctx.guild.roles, name='Unverified')
+        list_of_members = [f'{member.name} (ID: {member.id})' for member in unverfied_role]
+        await ctx.send('\n'.join(list_of_members))
+
     @commands.command(hidden=True, description="Turns off the bot")
     @commands.has_permissions(administrator=True)
     async def poweroff(self, ctx):
@@ -135,7 +142,7 @@ class Admin(commands.Cog):
 
         if pull == "pull":
             cmd = Popen(["git", "pull"], stdout=PIPE)
-            out, _ = cmd.communicate()
+            out, _ = cmd.communicate().decode('utf-8')
             if out == b'Already up to date.\n':
                 return await ctx.send("I'm already up to date.")
             await ctx.send(f"Pulling files from github...\n{out}")
