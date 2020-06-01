@@ -84,7 +84,7 @@ class Admin(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def list_unverified(self, ctx):
         unverfied_role = get(ctx.guild.roles, name='Unverified')
-        list_of_members = [f'{member.name} (ID: {member.id})' for member in unverfied_role.members]
+        list_of_members = [f'{member.name} (ID: {member.id})' for member in unverfied_role.members.sort()]
         newline_separated_list = '\n'.join(list_of_members)
         length_of_list = len(newline_separated_list)
         if length_of_list > 2000:
