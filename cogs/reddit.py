@@ -151,7 +151,7 @@ class Reddit(commands.Cog):
         return '\n'.join([str(x) for x in top_links_in_period])
 
     @commands.command()
-    async def reddit_dm(self):
+    async def reddit_dm(self,ctx):
         if self.alternate:
             try:
 
