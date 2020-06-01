@@ -85,7 +85,7 @@ class Admin(commands.Cog):
     async def list_unverified(self, ctx):
         unverfied_role = get(ctx.guild.roles, name='Unverified')
         list_of_members = [f'{member.name} (ID: {member.id})' for member in unverfied_role.members]
-        newline_separated_list = '\n'.join(list_of_members.sort())
+        newline_separated_list = '\n'.join(sorted(list_of_members))
         length_of_list = len(newline_separated_list)
         if length_of_list > 2000:
             buffer = StringIO()
