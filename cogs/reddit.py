@@ -96,6 +96,7 @@ class Reddit(commands.Cog):
         self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
         self.timeframes = ['all', 'year', 'month']
+        self.alternate = True
 
         self.get_reddit.start()
 
@@ -148,6 +149,33 @@ class Reddit(commands.Cog):
             top_links_in_period.pop(-1)
 
         return '\n'.join([str(x) for x in top_links_in_period])
+
+    @commands.command()
+    async def reddit_dm(self):
+        if self.alternate:
+            try:
+
+                period = sample(self.timeframes, 1)[0]
+
+                motivational_list = ['ImaginaryFeels',  'Awww', 'earthporn', 'babyanimals', 'puppies', 'kittens']
+                sample_size = 3
+
+                # category is a list of randomly sampled subreddit names to be concatenated after r/
+                category = sample(motivational_list, sample_size)
+                motivational_content = await self.readings_fetch(category, period=period, mode='assorted')
+
+                user_list = [186202944461471745, 307353036043583498]
+
+                for id in user_list:
+                    user = client.get_user(id)
+                    await user.send(motivational_content)
+
+                self.alternate = not self.alternate
+
+            except Exception as e:
+                print(e)
+        else:
+            self.alternate = not self.alternate
 
     @tasks.loop(hours=12)
     async def get_reddit(self):
