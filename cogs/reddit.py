@@ -187,7 +187,7 @@ class Reddit(commands.Cog):
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
                     list_size = len(self.config_full[str(guild_id)]['reddit_config'][channel_id])
-                    sample_size = 3 if len(list) > 2 else 1
+                    sample_size = 3 if list_size > 2 else 1
                     category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], sample_size)
                     await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
