@@ -55,11 +55,11 @@ class AutoRedditGuild(AutoRedditBase):
 
     def __call__(self, query_status=False):
         state = self.guild.id in self.config['reddit_enabled']
+        guild_id = self.guild.id
+
         if query_status is True:
             return state
-        
-        guild_id = self.guild.id
-        if state is True:
+        elif state is True:
             self.config['reddit_enabled'].remove(guild_id)
         else:
             self.config['reddit_enabled'].append(guild_id)
@@ -140,8 +140,9 @@ class Reddit(commands.Cog):
                                         )
         except Exception as e:
             print(e)
-
-        top_links_in_period = sample(top_links_in_period, 1)
+        return_count = len(top_links_in_period)
+        sample_size = 3 if return_count > 2 else 1
+        top_links_in_period = sample(top_links_in_period, sample_size)
 
         while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
             top_links_in_period.pop(-1)
@@ -157,7 +158,9 @@ class Reddit(commands.Cog):
                     period = sample(self.timeframes, 1)[0]
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
-                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], 1)
+                    list_size = len(self.config_full[str(guild_id)]['reddit_config'][channel_id])
+                    sample_size = 3 if list > 2 else 1
+                    category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], sample_size)
                     await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
 
                 except Exception as e:
@@ -205,10 +208,11 @@ class Reddit(commands.Cog):
 
             if mode == 'status':
                 status = 'on' if guild(query_status=True) is True else 'off'
-                await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
+                await ctx.send(f'Auto reddit is {status} for {ctx.guild.name}')
             elif mode == 'list':
-                sub_list = channel.subreddits
-                await ctx.send(f'{channel.name} subreddits are {sub_list} for {ctx.guild.name}')
+                sub_list = ', '.join(channel.subreddits)
+                await ctx.send(f'{ctx.guild.name} {channel.channel.name} subreddits are:\n'
+                               f' {sub_list} ')
             elif mode == '+':
                 channel += first_arg
                 await ctx.send(f'Added r/{first_arg} to {mentioned_channel.mention}')
