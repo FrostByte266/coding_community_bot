@@ -152,7 +152,7 @@ class CodingBot:
 
                 alias = {'js': 'javascript', 'intermediate': 'novice'}
 
-                first_role = roles.keys()[0]
+                first_role = [*roles.keys()][0]
                 for a in alias.keys():
                     roles[a] = roles.get(alias[a], roles[first_role])
 
