@@ -142,8 +142,9 @@ class Admin(commands.Cog):
 
         if pull == "pull":
             cmd = Popen(["git", "pull"], stdout=PIPE)
-            out, _ = cmd.communicate().decode('utf-8')
-            if out == b'Already up to date.\n':
+            out, _ = cmd.communicate()
+            out = out.decode('utf-8')
+            if out == 'Already up to date.\n':
                 return await ctx.send("I'm already up to date.")
             await ctx.send(f"Pulling files from github...\n{out}")
 
