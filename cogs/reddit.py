@@ -95,7 +95,7 @@ class Reddit(commands.Cog):
         self.config_path = 'assets/config.json'
         self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
-        self.timeframes = ['all', 'year', 'month']
+        self.timeframes = ['all', 'year', 'month', 'week']
         self.alternate = True
 
         self.get_reddit.start()
