@@ -98,32 +98,30 @@ class Admin(commands.Cog):
     async def kick_unverified(self, ctx):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
-        for member in ctx.guild.members:
-            if unverified_role in member.roles:
-                joined_delta = datetime.now() - member.joined_at
-                if joined_delta.days() > 7:
-                    await commands.kick(member)
+        for member in unverified_role.members:
+            joined_delta = datetime.now() - member.joined_at
+            if joined_delta.days() > 7:
+                await member.kick()
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def warn_unverified(self, ctx):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
-        for member in ctx.guild.members:
-            if unverified_role in member.roles:
-                joined_delta = datetime.now() - member.joined_at
-                if joined_delta.days() > 7:
-                    await member.send('Please introduce yourself in #if-you-are-new-click-here. '
-                                      'The Moderation Team regularly kicks Unverified members that have been on'
-                                      'the server more then 7 days, a category which you fall into. Please notify @Moderator if the Unverified role '
-                                      'is not automatically removed within 5 minutes of your introduction within '
-                                      '#if-you-are-new-click-here')
-                else:
-                    await member.send('Please introduce yourself in #if-you-are-new-click-here. '
-                                      'The Moderation Team regularly kicks Unverified members that have been on'
-                                      'the server more then 7 days. Please notify @Moderator if the Unverified role '
-                                      'is not automatically removed within 5 minutes of your introduction within '
-                                      '#if-you-are-new-click-here')
+        for member in unverified_role.members:
+            joined_delta = datetime.now() - member.joined_at
+            if joined_delta.days() > 7:
+                await member.send('Please introduce yourself in #if-you-are-new-click-here. '
+                                  'The Moderation Team regularly kicks Unverified members that have been on'
+                                  'the server more then 7 days, a category which you fall into. Please notify @Moderator if the Unverified role '
+                                  'is not automatically removed within 5 minutes of your introduction within '
+                                  '#if-you-are-new-click-here')
+            else:
+                await member.send('Please introduce yourself in #if-you-are-new-click-here. '
+                                  'The Moderation Team regularly kicks Unverified members that have been on'
+                                  'the server more then 7 days. Please notify @Moderator if the Unverified role '
+                                  'is not automatically removed within 5 minutes of your introduction within '
+                                  '#if-you-are-new-click-here')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
