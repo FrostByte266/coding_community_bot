@@ -104,7 +104,7 @@ class Admin(commands.Cog):
             if joined_delta.days > 7:
                 await member.kick()
                 count +=1
-        ctx.message.author.send(f'kicked {count} members')
+        await ctx.message.author.send(f'kicked {count} members')
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -128,7 +128,7 @@ class Admin(commands.Cog):
                                   'is not automatically removed within 5 minutes of your introduction within '
                                   '#if-you-are-new-click-here')
 
-        ctx.message.author.send(f'kick warned {count} members')
+        await ctx.message.author.send(f'kick warned {count} members')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
