@@ -21,7 +21,7 @@ from datetime import datetime
 from io import StringIO
 
 from discord.ext import commands
-from discord import client, Forbidden, Role, Permissions, File
+from discord import client, Forbidden, Role, Permissions, File, PermissionOverwrite
 from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
@@ -89,6 +89,31 @@ class Admin(commands.Cog):
             member_roles = [role.name for role in member.roles if role.name != default_role]
             if len(member_roles) == 0:
                 await member.add_roles(unverified_role)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def block_unverified(self, ctx):
+        ignored_categories = ['getting started', 'purgatory']
+        unverfied_role =  get(ctx.guild.roles, name="Unverified")
+        existing_overwrites = dict(ctx.channel.overwrites)
+        for channel in ctx.guild.channels:
+            write_new_pemissions = False
+            category = channel.category.name.lower() if channel.category is not None else 'no-category'
+            if category == 'purgatory':
+                overwrite_to_apply = PermissionOverwrite(send_messages=False, read_message_history=True)
+                write_new_pemissions = True
+            elif category not in ignored_categories:
+                overwrite_to_apply = PermissionOverwrite(send_messages=False, read_messages=False)
+                write_new_pemissions = True
+            
+            if write_new_pemissions:
+                new_overwrites = {
+                    unverfied_role: overwrite_to_apply
+                }
+                merged_overwrites = {**existing_overwrites, **new_overwrites}
+                await channel.edit(overwrites=merged_overwrites, reason='Denying Unverified roles')
+
+
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
