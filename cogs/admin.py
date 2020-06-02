@@ -17,11 +17,13 @@ import os
 import functools
 import traceback
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import StringIO
+
 
 from discord.ext import commands
 from discord import client, Forbidden, Role, Permissions, File, PermissionOverwrite
+
 from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
@@ -89,6 +91,39 @@ class Admin(commands.Cog):
             member_roles = [role.name for role in member.roles if role.name != default_role]
             if len(member_roles) == 0:
                 await member.add_roles(unverified_role)
+
+
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def kick_unverified(self, ctx):
+        default_role = '@everyone'
+        unverified_role = get(ctx.guild.roles, name="Unverified")
+        for member in ctx.guild.members:
+            if unverified_role in member.roles:
+                joined_delta = datetime.now() - member.joined_at
+                if joined_delta.days() > 7:
+                    await commands.kick(member)
+
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def warn_unverified(self, ctx):
+        default_role = '@everyone'
+        unverified_role = get(ctx.guild.roles, name="Unverified")
+        for member in ctx.guild.members:
+            if unverified_role in member.roles:
+                joined_delta = datetime.now() - member.joined_at
+                if joined_delta.days() > 7:
+                    await member.send('Please introduce yourself in #if-you-are-new-click-here. '
+                                      'The Moderation Team regularly kicks Unverified members that have been on'
+                                      'the server more then 7 days, a category which you fall into. Please notify @Moderator if the Unverified role '
+                                      'is not automatically removed within 5 minutes of your introduction within '
+                                      '#if-you-are-new-click-here')
+                else:
+                    await member.send('Please introduce yourself in #if-you-are-new-click-here. '
+                                      'The Moderation Team regularly kicks Unverified members that have been on'
+                                      'the server more then 7 days. Please notify @Moderator if the Unverified role '
+                                      'is not automatically removed within 5 minutes of your introduction within '
+                                      '#if-you-are-new-click-here')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
