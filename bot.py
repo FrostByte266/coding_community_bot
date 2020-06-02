@@ -157,8 +157,8 @@ class CodingBot:
                 newline = '\n'
                 await message.author.send(
                     f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                    f'{newline.join([role.name for role in member_roles])} \n'
-                    'If you believe you are missing some roles or have received roles that do not apply to you, '
+                    f'{newline.join([role.name for role in member_roles])}, \n'
+                    '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
                     'please feel free to contact the moderation team'
                 )
                 if verification_enabled:
