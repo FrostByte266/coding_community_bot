@@ -176,7 +176,9 @@ class CodingBot:
             if error == 'on_message':
                 message = args[0]
                 print(f'Error in on message: {message.content}, {type(message.author)}')
-                traceback.format_exc()
+            
+            print(f'Ignoring exception in: {error}')
+            traceback.format_exc()
 
         @bot.event
         async def on_member_join(member):
