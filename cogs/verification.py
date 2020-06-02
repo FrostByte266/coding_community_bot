@@ -61,9 +61,15 @@ class Verification(commands.Cog):
             config.update(verification_role=role.id)
             json.dump(self.config_full, open(self.config_path,
                                              'w'), indent=2, separators=(',', ': '))
+
+            default_role = '@everyone'
+            for member in ctx.guild.members:
+                member_roles = [role.name for role in member.roles if role.name != default_role]
+                if len(member_roles) == 0:
+                    await member.add_roles(role)
+
         elif state is False and config["verification_role"] is not None:
             role = get(ctx.message.guild.roles, id=config["verification_role"])
-            await role.delete()
             config.update(verification_role=None)
             json.dump(self.config_full, open('assets/config.json',
                                              'w'), indent=2, separators=(',', ': '))
