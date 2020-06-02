@@ -172,13 +172,17 @@ class CodingBot:
             await bot.process_commands(message)
 
         @bot.event
-        async def on_error(self, error, *args, **kwargs):
+        async def on_error(error, *args, **kwargs):
             if error == 'on_message':
                 message = args[0]
                 print(f'Error in on message: {message.content}, {type(message.author)}')
             
-            print(f'Ignoring exception in: {error}')
-            traceback.format_exc()
+            bot.logger.exception(f'Uncaught exception in: {error}', exc_info=True)
+
+        @bot.event
+        async def on_command_error(ctx, error):
+            bot.logger.exception(f'Uncaught exception in: {ctx.command}', exc_info=error)
+            
 
         @bot.event
         async def on_member_join(member):
