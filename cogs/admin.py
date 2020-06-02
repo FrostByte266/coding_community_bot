@@ -128,7 +128,7 @@ class Admin(commands.Cog):
                                   'is not automatically removed within 5 minutes of your introduction within '
                                   '#if-you-are-new-click-here')
 
-        ctx.message.author.send(f'kicked {count} members')
+        ctx.message.author.send(f'kick warned {count} members')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
