@@ -111,10 +111,9 @@ class Admin(commands.Cog):
     async def warn_unverified(self, ctx):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
-        count = 0
+        count = len(unverified_role.members)
         for member in unverified_role.members:
             joined_delta = datetime.now() - member.joined_at
-            count += 1
             if joined_delta.days > 7:
                 await member.send('Please introduce yourself in #if-you-are-new-click-here. '
                                   'The Moderation Team regularly kicks Unverified members that have been on'
