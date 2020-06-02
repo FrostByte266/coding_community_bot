@@ -13,8 +13,9 @@ Commands provided by this Cog
 
 """
 
-import os
+import discord
 import functools
+import os
 import traceback
 
 from datetime import datetime, timedelta
@@ -108,8 +109,12 @@ class Admin(commands.Cog):
         unverified_role = get(ctx.guild.roles, name="Unverified")
         count = 0
         for member in unverified_role.members:
+            member_roles = [role.name for role in member.roles if role.name != default_role]
             joined_delta = datetime.now() - member.joined_at
-            if joined_delta.days > 7:
+            if len(member_roles) > 1:
+                await ctx.send(f'{member.name} has additional roles. Please remove unverified from this user.')
+
+            elif joined_delta.days > 7:
                 await member.kick()
                 self.bot.logger.info(f'Kicked {ident_string(member)}')
                 count +=1
@@ -121,6 +126,17 @@ class Admin(commands.Cog):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
         count = len(unverified_role.members)
+
+        channel = discord.get_channel(717419157167276133)
+        await channel.send(f'{unverified_role.mention} '
+                           f'Please introduce yourself in #if-you-are-new-click-here. '
+                           f'The Moderation Team regularly kicks Unverified members that have been on'
+                           f'the server more then 7 days. Please notify @Moderator if the Unverified role '
+                           f'is not automatically removed within 5 minutes of your introduction within '
+                           f'#if-you-are-new-click-here'
+                           )
+
+
         for member in unverified_role.members:
             joined_delta = datetime.now() - member.joined_at
             if joined_delta.days > 7:
