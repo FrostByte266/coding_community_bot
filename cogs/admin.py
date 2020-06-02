@@ -139,7 +139,7 @@ class Admin(commands.Cog):
             write_new_pemissions = False
             category = channel.category.name.lower() if channel.category is not None else 'no-category'
             if category == 'purgatory':
-                overwrite_to_apply = PermissionOverwrite(send_messages=False, read_message_history=True)
+                overwrite_to_apply = PermissionOverwrite(send_messages=False, read_message_history=True, read_messages=True)
                 write_new_pemissions = True
             elif category not in ignored_categories:
                 overwrite_to_apply = PermissionOverwrite(send_messages=False, read_messages=False)
