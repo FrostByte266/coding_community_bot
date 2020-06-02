@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import os
 import re
+import traceback
 
 import asyncio
 
@@ -170,6 +171,13 @@ class CodingBot:
                                           "the #if-you-are-new-click-here channel for examples.")
                 await message.delete()
             await bot.process_commands(message)
+
+        @bot.event
+        async def on_error(self, error, *args, **kwargs):
+            if error == 'on_message':
+                message = args[0]
+                print(f'Error in on message: {message.content}, {type(message.author)}')
+                traceback.format_exc()
 
         @bot.event
         async def on_member_join(member):
