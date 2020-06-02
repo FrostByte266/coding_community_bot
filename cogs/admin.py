@@ -81,6 +81,16 @@ class Admin(commands.Cog):
         await ctx.send('Role refresh complete :thumbsup:')
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def add_unverified(self, ctx):
+        default_role = '@everyone'
+        unverified_role = get(ctx.guild.roles, name="Unverified")
+        for member in ctx.guild.members:
+            member_roles = [role.name for role in member.roles if role.name != default_role]
+            if len(member_roles) == 0:
+                await member.add_roles(unverified_role)
+
+    @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def list_unverified(self, ctx):
         unverfied_role = get(ctx.guild.roles, name='Unverified')

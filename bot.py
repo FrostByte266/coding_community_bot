@@ -137,8 +137,7 @@ class CodingBot:
 
             config = self.config[str(message.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
-            unverified_role = get(
-                message.author.guild.roles, name="Unverified")
+            unverified_role = get(message.author.guild.roles, name="Unverified")
 
             if all((str(message.channel) == 'if-you-are-new-click-here', message.content is not None)):
                 content = re.sub("[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
