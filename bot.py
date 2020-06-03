@@ -1,8 +1,10 @@
-from datetime import datetime
 import json
+import logging
 import os
 import re
 import traceback
+
+from datetime import datetime
 
 import asyncio
 
@@ -82,6 +84,36 @@ class CodingBot:
         if write:
             json.dump(new_config, open(self.config_file_path, 'w'),
                       indent=2, separators=(',', ': '))
+            
+    def start_logging(self, log="discord.log"):
+        """
+        Sets up the bot log with the following defaults
+
+        Default log level: 50  (CRITICAL)
+        Default log name: discord.log
+
+        bot: discord.ext.commands.Bot()
+        log: string
+            -> None
+        """
+
+        # Rotate logs
+        old_log_path = f'{log}.old'
+        if os.path.exists(old_log_path):
+            os.remove(old_log_path)
+        if os.path.exists(log):
+            os.rename(log, old_log_path)
+
+        self.bot.logger = logging.getLogger('discord')
+        self.bot.logger.setLevel(logging.WARNING)
+        self.bot.handler = logging.FileHandler(filename=log,
+                                        encoding='utf-8', mode='w')
+        self.bot.handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:'
+                                                '%(name)s: %(message)s'))
+        self.bot.logger.addHandler(self.bot.handler)
+    
+    def stop_logging(self):
+        self.bot.handler.close()
 
     def load_cogs(self):
         for file in os.listdir('./cogs'):
@@ -121,6 +153,7 @@ class CodingBot:
         @bot.event
         async def on_ready():
             print("Ready")
+            bot.logger.info('Bot started')
 
             # Check if there are any new servers the bot does not have configs for
             [setup_guild_config(guild) for guild in bot.guilds if str(guild.id) not in self.config]

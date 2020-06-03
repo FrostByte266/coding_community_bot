@@ -29,11 +29,15 @@ from subprocess import Popen, PIPE
 from utils import admin_utils
 
 
+def ident_string(discord_object):
+    root_module = discord_object.__module__.split('.')[0]
+    assert root_module == 'discord', f'Ident string called on non discord object'
+    return f'{discord_object.name} (ID: {discord_object.id})'
+
 class Admin(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        admin_utils.setup_logging(self.bot)
 
     @commands.command(hidden=True, description="Sets bot logging level")
     async def logging(self, ctx, level):
@@ -70,6 +74,7 @@ class Admin(commands.Cog):
         )
         await new_role.edit(position=role.position)
         await ctx.send('Role refresh initiated, this may take a while...')
+        self.bot.logger.info(f'Beginning role refresh for role {ident_string(role)}, initiated by {ident_string(ctx.author)} for {ident_string(ctx.guild)}')
 
         # Remove old role from members before deleting
         for member in affected_members:
@@ -81,6 +86,7 @@ class Admin(commands.Cog):
             await member.add_roles(new_role, reason='Adding refreshed role')
 
         await ctx.send('Role refresh complete :thumbsup:')
+        self.bot.logger.info(f'Role refresh for role {ident_string(role)}, initiated by {ident_string(ctx.author)} for {ident_string(ctx.guild)} completed')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -91,11 +97,13 @@ class Admin(commands.Cog):
             member_roles = [role.name for role in member.roles if role.name != default_role]
             if len(member_roles) == 0:
                 await member.add_roles(unverified_role)
+                self.bot.logger.info(f'Added Unverified to {ident_string(member)} in {ident_string(ctx.guild)}')
 
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick_unverified(self, ctx):
+        self.bot.logger.info(f'Unverified kick started by {ident_string(ctx.author)} for {ident_string(ctx.guild)}')
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
         count = 0
@@ -103,6 +111,7 @@ class Admin(commands.Cog):
             joined_delta = datetime.now() - member.joined_at
             if joined_delta.days > 7:
                 await member.kick()
+                self.bot.logger.info(f'Kicked {ident_string(member)}')
                 count +=1
         await ctx.send(f'kicked {count} members')
 
@@ -126,12 +135,14 @@ class Admin(commands.Cog):
                                   'the server more then 7 days. Please notify @Moderator if the Unverified role '
                                   'is not automatically removed within 5 minutes of your introduction within '
                                   '#if-you-are-new-click-here')
+            self.bot.logger.info(f'Warning message sent to {ident_string(member)} for guild {ident_string(ctx.guild)}')
 
         await ctx.send(f'kick warned {count} members')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def block_unverified(self, ctx):
+        self.bot.logger.into(f'Blocking unverified in {ident_string(ctx.guild)}, initiated by {ident_string(ctx.author)}')
         ignored_categories = ['getting started', 'purgatory']
         unverfied_role =  get(ctx.guild.roles, name="Unverified")
         existing_overwrites = dict(ctx.channel.overwrites)
@@ -151,6 +162,7 @@ class Admin(commands.Cog):
                 }
                 merged_overwrites = {**existing_overwrites, **new_overwrites}
                 await channel.edit(overwrites=merged_overwrites, reason='Denying Unverified roles')
+                self.bot.logger.info(f'Channel permissions for unverified updated in #{ident_string(channel)} ({ident_string(ctx.guild)})')
 
 
 
@@ -189,6 +201,7 @@ class Admin(commands.Cog):
 
         shutdown_message = "Bot is being desummoned."
         await ctx.send(shutdown_message)
+        self.bot.logger.info(f'Bot shutdown (command invoked by {ident_string(ctx.author)})')
         await client.Client.logout(self.bot)
 
     @commands.command(hidden=True,
@@ -205,10 +218,12 @@ class Admin(commands.Cog):
         cmd = Popen(["git", "pull"], stdout=PIPE)
         out, _ = cmd.communicate()
         out = out.decode()
-        if "+" in out:
+        updating = '+' in out
+        if updating:
             await ctx.send(f"Updated:\n{out}")
 
         await ctx.send(f"rebooting....")
+        
         await client.Client.logout(self.bot)
 
     @commands.command(hidden=True, description="Reloads bot cogs")
@@ -229,13 +244,16 @@ class Admin(commands.Cog):
             {self.bot.command_prefix}reload pull
             """
 
-        if pull == "pull":
+        updating = pull == 'pull'
+        self.bot.logger.info(f'Bot reboot (pull={"yes" if updating else "no"})(command invoked by {ident_string(ctx.author)})')
+        if updating:
             cmd = Popen(["git", "pull"], stdout=PIPE)
             out, _ = cmd.communicate()
             out = out.decode('utf-8')
             if out == 'Already up to date.\n':
                 return await ctx.send("I'm already up to date.")
             await ctx.send(f"Pulling files from github...\n{out}")
+            self.bot.logger.info(f'Pulled update:\n {out}')
 
         await self.load_cogs()
         await ctx.send("Reloaded")
