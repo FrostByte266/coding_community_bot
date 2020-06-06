@@ -15,13 +15,14 @@ def setup_logging(bot, log="discord.log"):
     """
 
     # Rotate logs
-    if os.path.exists(f"{log}.old"):
-        os.remove(f"{log}.old")
+    old_log_path = f'{log}.old'
+    if os.path.exists(old_log_path):
+        os.remove(old_log_path)
     if os.path.exists(log):
-        os.rename(log, f"{log}.old")
+        os.rename(log, old_log_path)
 
     bot.logger = logging.getLogger('discord')
-    bot.logger.setLevel(logging.CRITICAL)
+    bot.logger.setLevel(logging.WARNING)
     bot.handler = logging.FileHandler(filename=log,
                                       encoding='utf-8', mode='w')
     bot.handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:'

@@ -59,11 +59,10 @@ class Verification(commands.Cog):
         if state is True and config["verification_role"] is None:
             role = await ctx.message.guild.create_role(name="Unverified")
             config.update(verification_role=role.id)
-            json.dump(self.config_full, open(self.config_path,
-                                             'w'), indent=2, separators=(',', ': '))
+            json.dump(self.config_full, open(self.config_path, 'w'), indent=2, separators=(',', ': '))
+
         elif state is False and config["verification_role"] is not None:
             role = get(ctx.message.guild.roles, id=config["verification_role"])
-            await role.delete()
             config.update(verification_role=None)
             json.dump(self.config_full, open('assets/config.json',
                                              'w'), indent=2, separators=(',', ': '))

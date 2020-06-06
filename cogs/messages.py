@@ -122,7 +122,10 @@ class Messages(commands.Cog):
 
     @message.error
     async def message_error(self, ctx, error):
-        await ctx.send(f'Choice `{ctx.args[-1]}` is invalid! Available messages are: {self.message_names}')
+        if type(ctx.args[-1]) is str:
+            await ctx.send(f'Choice `{ctx.args[-1]}` is invalid! Available messages are: {self.message_names}')
+        else:
+            await ctx.send(f'No selection specified! Available messages are: {self.message_names}')
 
 
 def setup(bot):

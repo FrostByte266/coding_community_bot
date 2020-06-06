@@ -1,7 +1,10 @@
-from datetime import datetime
 import json
+import logging
 import os
 import re
+import traceback
+
+from datetime import datetime
 
 import asyncio
 
@@ -25,7 +28,7 @@ class CodingBot:
         self.empty_config = {
             'verification_role': None,
             'reporting_channel': None,
-            'reddit_channel': {},
+            'reddit_config': {},
             'reports': {}
         }
 
@@ -64,7 +67,8 @@ class CodingBot:
                     'client_secret': client_secret,
                     'username': reddit_username,
                     'password': reddit_pass
-                }
+                },
+                'reddit_enabled': []
             }
 
             json.dump(initial_config, open(config_file, 'w'),
@@ -80,6 +84,36 @@ class CodingBot:
         if write:
             json.dump(new_config, open(self.config_file_path, 'w'),
                       indent=2, separators=(',', ': '))
+            
+    def start_logging(self, log="discord.log"):
+        """
+        Sets up the bot log with the following defaults
+
+        Default log level: 50  (CRITICAL)
+        Default log name: discord.log
+
+        bot: discord.ext.commands.Bot()
+        log: string
+            -> None
+        """
+
+        # Rotate logs
+        old_log_path = f'{log}.old'
+        if os.path.exists(old_log_path):
+            os.remove(old_log_path)
+        if os.path.exists(log):
+            os.rename(log, old_log_path)
+
+        self.bot.logger = logging.getLogger('discord')
+        self.bot.logger.setLevel(logging.WARNING)
+        self.bot.handler = logging.FileHandler(filename=log,
+                                        encoding='utf-8', mode='w')
+        self.bot.handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:'
+                                                '%(name)s: %(message)s'))
+        self.bot.logger.addHandler(self.bot.handler)
+    
+    def stop_logging(self):
+        self.bot.handler.close()
 
     def load_cogs(self):
         for file in os.listdir('./cogs'):
@@ -106,7 +140,9 @@ class CodingBot:
             
 
     def build_bot(self):
-        bot = commands.Bot(command_prefix=self.config['prefix'])
+        bot = commands.Bot(
+            command_prefix=self.config['prefix'],
+            case_insensitive=True)
 
         def setup_guild_config(guild):
             # Add empty config to JSON for any server that is missing
@@ -117,6 +153,7 @@ class CodingBot:
         @bot.event
         async def on_ready():
             print("Ready")
+            bot.logger.info('Bot started')
 
             # Check if there are any new servers the bot does not have configs for
             [setup_guild_config(guild) for guild in bot.guilds if str(guild.id) not in self.config]
@@ -133,34 +170,28 @@ class CodingBot:
 
             config = self.config[str(message.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
-            unverified_role = get(
-                message.author.guild.roles, name="Unverified")
+            unverified_role = get(message.author.guild.roles, name="Unverified")
 
             if all((str(message.channel) == 'if-you-are-new-click-here', message.content is not None)):
-                words_split = message.content.replace(":", " ").split()
-                word_group = list(re.sub("(,|\.|:)$", "", word)
-                                  for word in words_split)
-                word_group.extend(words_split)
-
-                # run word_group through set as a filter to force unique words
-                word_group = list(set(word_group))
+                content = re.sub("[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
+                word_group = content.split()
 
                 ignored_roles = ['@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
                                  'Merit Badge (lvl - M)',
                                  'Merit Badge (lvl - A)',
                                  'Merit Badge (lvl - O)', 'BOT', 'little fox familiar']
 
-                roles = {role.name.lower(
-                ): role for role in message.guild.roles if role.name not in ignored_roles}
-                member_roles = [roles.get(
-                    word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
+                roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
+
+                member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
+
                 await message.author.add_roles(*member_roles)
 
                 newline = '\n'
                 await message.author.send(
                     f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                    f'{newline.join([role.name for role in member_roles])} \n'
-                    'If you believe you are missing some roles or have received roles that do not apply to you, '
+                    f'{newline.join([role.name for role in member_roles])}, \n'
+                    '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
                     'please feel free to contact the moderation team'
                 )
                 if verification_enabled:
@@ -172,6 +203,19 @@ class CodingBot:
                                           "the #if-you-are-new-click-here channel for examples.")
                 await message.delete()
             await bot.process_commands(message)
+
+        @bot.event
+        async def on_error(error, *args, **kwargs):
+            if error == 'on_message':
+                message = args[0]
+                print(f'Error in on message: {message.content}, {type(message.author)}')
+            
+            bot.logger.exception(f'Uncaught exception in: {error}', exc_info=True)
+
+        @bot.event
+        async def on_command_error(ctx, error):
+            bot.logger.exception(f'Uncaught exception in: {ctx.command}', exc_info=error)
+            
 
         @bot.event
         async def on_member_join(member):
