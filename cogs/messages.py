@@ -111,6 +111,53 @@ class Messages(commands.Cog):
             await sleep(3)
             await temp.delete()
 
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def linkmove(self, ctx, messageID: int, target: TextChannel, copy: bool = False):
+        """Move/copy all messages up to (and including) a message ID"""
+        await ctx.message.delete()
+        count = 0
+        found = 0
+        async for message in ctx.message.channel.history(limit=100):
+            count += 1
+            if message.id == messageID:
+                found = 1
+                break
+
+        async with target.typing():
+            if found == 1:
+                messages = []
+                zero_width_space = u'\u200B'
+                async for message in ctx.message.channel.history(limit=count):
+                    if any([emb.description.startswith(zero_width_space) for emb in message.embeds]):
+                        messages.extend(message.embeds)
+                    else:
+                        embed = Embed(
+                            description=f'{zero_width_space}{message.content}')
+                        embed.set_author(name=message.author.name,
+                                         icon_url=message.author.avatar_url)
+                        embed.timestamp = message.created_at
+                        messages.append(embed)
+
+                    if not copy:
+                        await message.delete()
+
+                await target.send(f'Moved from {ctx.message.channel.mention}:')
+
+                for embed in reversed(messages):
+                    await target.send(embed=embed)
+            else:
+                temp = await ctx.send(f"Error! Unable to find message with ID: {messageID}")
+                await sleep(3)
+                await temp.delete()
+
+    @linkmove.error
+    async def move_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.message.delete()
+            temp = await ctx.send("Error! Missing one or more of the following arguments: messageID, target")
+            await sleep(3)
+            await temp.delete()
 
     @commands.command()
     async def message(self, ctx, selection: str):
