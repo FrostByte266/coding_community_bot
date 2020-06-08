@@ -115,6 +115,7 @@ class Messages(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def linkmove(self, ctx, messageID: int, target: TextChannel, copy: bool = False):
         """Move/copy all messages up to (and including) a message ID"""
+        await ctx.message.delete()
         count = 0
         found = 0
         async for message in ctx.message.channel.history(limit=100):
@@ -124,7 +125,6 @@ class Messages(commands.Cog):
                 break
 
         async with target.typing():
-            await ctx.message.delete()
             if found == 1:
                 messages = []
                 zero_width_space = u'\u200B'
