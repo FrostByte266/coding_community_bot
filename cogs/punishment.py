@@ -123,7 +123,7 @@ class Punishment(commands.Cog):
             f'You have been banned from {ctx.message.guild}. The incident report is attached below:',
             embed=receipt
         )
-        await ctx.message.guild.ban(target, reason=reason)
+        await ctx.message.guild.ban(target, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {target.name}#{target.discriminator} has been banned. Report ID: {report.report_number}')
         reporting_enabled = True if self.config_full[str(ctx.message.guild.id)][
             "reporting_channel"] is not None else False
@@ -150,7 +150,7 @@ class Punishment(commands.Cog):
         await ctx.message.author.send(
             f'User: {user.name}#{user.discriminator} has been hackbanned. The incident report is attached below:',
             embed=receipt)
-        await ctx.message.guild.ban(user, reason=reason)
+        await ctx.message.guild.ban(user, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {user.name}#{user.discriminator} has been hackbanned. Report ID: {report.report_number}')
         reporting_enabled = True if self.config_full[str(ctx.message.guild.id)][
             "reporting_channel"] is not None else False

@@ -131,14 +131,7 @@ class CodingBot:
         except Exception as e:
             print("Error", e)
         print("Restarting...")
-
-    async def category_check(self, message):
-        if 'resources' in message.channel.category.name.lower() and not self.url_regex.search(message.content):
-            failMessage = f"**Message Removed**\nSorry but your message in #{message.channel.name} does not contain a link to your external reference. If this was a mistake please try resubmitting your message with the link. If this was intended as a conversational message please re-send it in General or Chill-Chat."
-            await message.delete()
-            await message.author.send(failMessage)
             
-
     def build_bot(self):
         bot = commands.Bot(
             command_prefix=self.config['prefix'],
@@ -166,7 +159,6 @@ class CodingBot:
             if any((is_bot, not_guild)):
                 return None
 
-            await self.category_check(message)
 
             config = self.config[str(message.guild.id)]
             verification_enabled = True if config["verification_role"] is not None else False
