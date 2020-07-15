@@ -127,7 +127,7 @@ class Admin(commands.Cog):
         unverified_role = get(ctx.guild.roles, name="Unverified")
         count = len(unverified_role.members)
 
-        channel = discord.get_channel(717419157167276133)
+        channel = ctx.guild.get_channel(717419157167276133)
         await channel.send(f'{unverified_role.mention} '
                            f'Please introduce yourself in #if-you-are-new-click-here. '
                            f'The Moderation Team regularly kicks Unverified members that have been on'
