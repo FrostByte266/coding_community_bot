@@ -95,7 +95,7 @@ class Reddit(commands.Cog):
         self.config_path = 'assets/config.json'
         self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
-        self.timeframes = ['all', 'year', 'month', 'week']
+        self.timeframes = ['month', 'week']
         self.alternate = True
 
         self.get_reddit.start()
@@ -111,7 +111,7 @@ class Reddit(commands.Cog):
         )
         return reddit
 
-    async def topinxperiod(self, subreddit, period='year', return_quantity=3):
+    async def topinxperiod(self, subreddit, period='year', return_quantity=6):
         try:
             if return_quantity > 7:
                 return_quantity = 7
@@ -127,9 +127,9 @@ class Reddit(commands.Cog):
         top_links_in_period = []
 
         if mode == 'assorted':
-            links_per_sub = 3
-        else:
             links_per_sub = 5
+        else:
+            links_per_sub = 7
 
         try:
             for subreddit in subreddits_list:
