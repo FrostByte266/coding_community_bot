@@ -108,16 +108,21 @@ class Admin(commands.Cog):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
         count = 0
-        for member in unverified_role.members:
-            member_roles = [role.name for role in member.roles if role.name != default_role]
-            joined_delta = datetime.now() - member.joined_at
-            if len(member_roles) > 1:
-                await ctx.send(f'{member.name} has additional roles. Please remove unverified from this user.')
 
-            elif joined_delta.days > 7:
+        unverified_members = tuple(member for member in unverified_role.members if len(member.roles) < 3)
+        fix_members = tuple(member for member in unverified_role.members if len(member.roles) > 2)
+
+        for member in fix_members:
+            await ctx.send(f'{member.name} has additional roles. Please remove unverified from this user.')
+
+        for member in unverified_members:
+            joined_delta = datetime.now() - member.joined_at
+
+            if joined_delta.days > 7:
                 await member.kick()
                 self.bot.logger.info(f'Kicked {ident_string(member)}')
-                count +=1
+                count += 1
+
         await ctx.send(f'kicked {count} members')
 
     @commands.command()
