@@ -175,7 +175,14 @@ class CodingBot:
 
                 roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
 
-                alias = (('js', roles['javascript']), ('cpp', roles['c++']),('c', roles['clang']))
+                #some aliases added to catch for spelling errors
+                alias = (('js', roles['javascript']),
+                         ('cpp', roles['c++']),
+                         ('c', roles['clang']),
+                         ('intermediate', roles['novice']),
+                         ('Begginer', roles['beginner']),
+                         ('Beginer', roles['beginner']),
+                         ('Begener', roles['beginner']))
 
                 for element in alias:
                     roles[element[0]] = element[1]
