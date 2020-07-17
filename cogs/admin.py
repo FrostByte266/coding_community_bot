@@ -167,8 +167,9 @@ class Admin(commands.Cog):
         self.bot.logger.into(f'Blocking unverified in {ident_string(ctx.guild)}, initiated by {ident_string(ctx.author)}')
         ignored_categories = ['getting started', 'purgatory']
         unverfied_role =  get(ctx.guild.roles, name="Unverified")
-        existing_overwrites = dict(ctx.channel.overwrites)
+        
         for channel in ctx.guild.channels:
+            existing_overwrites = dict(channel.overwrites)
             write_new_pemissions = False
             category = channel.category.name.lower() if channel.category is not None else 'no-category'
             if category == 'purgatory':
