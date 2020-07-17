@@ -168,21 +168,27 @@ class CodingBot:
                 content = re.sub("[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
                 word_group = content.split()
 
-                ignored_roles = ['@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
+                ignored_roles = ('@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
                                  'Merit Badge (lvl - M)',
                                  'Merit Badge (lvl - A)',
-                                 'Merit Badge (lvl - O)', 'BOT', 'little fox familiar']
+                                 'Merit Badge (lvl - O)', 'BOT', 'little fox familiar')
 
                 roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
 
-                member_roles = [roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0]
+                alias = (('js', roles['Javascript']), ('cpp', roles['C++']),('c', roles['Clang']))
+
+                for element in alias:
+                    roles[element[0]] = element[1]
+
+
+                member_roles = (roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0)
 
                 await message.author.add_roles(*member_roles)
 
                 newline = '\n'
                 await message.author.send(
                     f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                    f'{newline.join([role.name for role in member_roles])}, \n'
+                    f'{newline.join(role.name for role in member_roles)}, \n'
                     '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
                     'please feel free to contact the moderation team'
                 )
