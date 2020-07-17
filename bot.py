@@ -180,9 +180,9 @@ class CodingBot:
                          ('cpp', roles['c++']),
                          ('c', roles['clang']),
                          ('intermediate', roles['novice']),
-                         ('Begginer', roles['beginner']),
-                         ('Beginer', roles['beginner']),
-                         ('Begener', roles['beginner']))
+                         ('begginer', roles['beginner']),
+                         ('beginer', roles['beginner']),
+                         ('begener', roles['beginner']))
 
                 for element in alias:
                     roles[element[0]] = element[1]
