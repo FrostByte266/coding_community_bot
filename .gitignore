@@ -10,4 +10,4 @@ utils/__pycache__
 *.log
 *.log.old
 env
-
+docs/build
