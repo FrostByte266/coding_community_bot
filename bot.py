@@ -175,13 +175,13 @@ class CodingBot:
 
                 roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
 
-                alias = (('js', roles['Javascript']), ('cpp', roles['C++']),('c', roles['Clang']))
+                alias = (('js', roles['javascript']), ('cpp', roles['c++']),('c', roles['clang']))
 
                 for element in alias:
                     roles[element[0]] = element[1]
 
 
-                member_roles = (roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0)
+                member_roles = tuple((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
 
                 await message.author.add_roles(*member_roles)
 
