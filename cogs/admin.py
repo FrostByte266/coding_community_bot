@@ -150,12 +150,17 @@ class Admin(commands.Cog):
                             'not introducing yourself. If at any point in ' \
                             'the future you\'d like to rejoin then you may use' \
                             'this link: https://discord.gg/gneEsMS'
-                            
+
+        failed_dm_count = 0
         for member in final_kick_list:
-            await member.send(rejoin_invitation)
+            try:
+                await member.send(rejoin_invitation)
+            except discord.errors.Forbidden:
+                failed_dm_count += 1
+
             await member.kick(reason=kick_reason)
         
-        await ctx.send(f'Kicked {len(final_kick_list)} members')
+        await ctx.send(f'Kicked {len(final_kick_list)} members, failed to send re-invites to {failed_dm_count} member(s)')
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
