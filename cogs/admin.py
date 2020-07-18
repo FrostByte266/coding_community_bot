@@ -36,6 +36,9 @@ def ident_string(discord_object):
     assert root_module == 'discord', f'Ident string called on non discord object'
     return f'{discord_object.name} (ID: {discord_object.id})'
 
+def to_file(contents, filename='message.txt'):
+    return discord.File(StringIO(contents), filename=filename)
+
 class Admin(commands.Cog):
 
     def __init__(self, bot):
@@ -151,23 +154,29 @@ class Admin(commands.Cog):
                             'the future you\'d like to rejoin then you may use' \
                             'this link: https://discord.gg/gneEsMS'
 
-        failed_dm_count = 0
-        failed_dm_names = []
+        failed_dms = []
         for member in final_kick_list:
             try:
                 await member.send(rejoin_invitation)
             except discord.errors.Forbidden:
-                failed_dm_count += 1
-                failed_dm_names.append(member.name)
+                failed_dms.append(member.name)
 
             await member.kick(reason=kick_reason)
         
-        await ctx.send(f'Kicked {len(final_kick_list)} members. List of kicked members: ')
-        await ctx.send('\n'.join(final_kick_list))
-        await ctx.send(f'Due to message and privacy settings,'
-                       f' failed to send re-invites to {failed_dm_count} member(s). '
-                       f'failed invites list: ')
-        await ctx.send('\n'.join(failed_dm_names))
+
+        current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
+        newline = '\n'
+        report = f'{ctx.guild.name.title()} Unverified Kick Report - {current_datetime}{newline}' \
+                f'Kicked a total of {len(final_kick_list)} member(s):{newline}' \
+                f'{newline.join(final_kick_list)}{newline}' \ 
+                f'Due to DM privacy settings, {len(failed_dm_names)} member(s) ' \
+                f'were unable to receive re-invtes via DM, these members are:{newline}' \
+                f'{newline.join(failed_dm_names)}'
+
+        await ctx.send(f'Kicked {len(final_kick_list)} members with {len(failed_dm_names)} failed re-invite DMs. '
+                        f'Full report attached:',
+                        file=to_file(report, filename=f'kick-report-{current_datetime}')
+                    )
 
 
     @commands.command()
