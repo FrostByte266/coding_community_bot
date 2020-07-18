@@ -152,15 +152,23 @@ class Admin(commands.Cog):
                             'this link: https://discord.gg/gneEsMS'
 
         failed_dm_count = 0
+        failed_dm_names = []
         for member in final_kick_list:
             try:
                 await member.send(rejoin_invitation)
             except discord.errors.Forbidden:
                 failed_dm_count += 1
+                failed_dm_names.append(member.name)
 
             await member.kick(reason=kick_reason)
         
-        await ctx.send(f'Kicked {len(final_kick_list)} members, failed to send re-invites to {failed_dm_count} member(s)')
+        await ctx.send(f'Kicked {len(final_kick_list)} members. List of kicked members: ')
+        await ctx.send('\n'.join(final_kick_list))
+        await ctx.send(f'Due to message and privacy settings,'
+                       f' failed to send re-invites to {failed_dm_count} member(s). '
+                       f'failed invites list: ')
+        await ctx.send('\n'.join(failed_dm_names))
+
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -179,29 +187,48 @@ class Admin(commands.Cog):
                            f'{intro_channel.mention}'
                            )
 
+        unverified_members = '\n'.join(unverified_role.members)
+        await ctx.send(f'The following is a list of all'
+                       f' members that currently have'
+                       f' the unverified role:'
+                       )
+        await ctx.send(unverified_members)
+
+        fix_members = '\n'.join(tuple(member for member in unverified_role.members if len(member.roles) > 2))
+
+        await ctx.send(f'The following is a list of all members that may need unverified removed'
+                       f' due to them having roles assigned, please check and fix if necessary:'
+                        )
+        await ctx.send(fix_members)
+
         dm_count = 0
+        member_names = []
         for member in unverified_role.members:
             joined_delta = datetime.now() - member.joined_at
             try:
                 if joined_delta.days > 7:
                     await member.send('Please introduce yourself in #if-you-are-new-click-here. '
-                                    'The Moderation Team regularly kicks Unverified members that have been on'
-                                    'the server more then 7 days, a category which you fall into. Please notify @Moderator if the Unverified role '
-                                    'is not automatically removed within 5 minutes of your introduction within '
-                                    '#if-you-are-new-click-here')
+                                      'The Moderation Team regularly kicks Unverified members that have been on'
+                                      'the server more then 7 days, a category which you fall into. Please notify @Moderator if the Unverified role '
+                                      'is not automatically removed within 5 minutes of your introduction within '
+                                      '#if-you-are-new-click-here')
                 else:
                     await member.send('Please introduce yourself in #if-you-are-new-click-here. '
-                                    'The Moderation Team regularly kicks Unverified members that have been on'
-                                    'the server more then 7 days. Please notify @Moderator if the Unverified role '
-                                    'is not automatically removed within 5 minutes of your introduction within '
-                                    '#if-you-are-new-click-here')
+                                      'The Moderation Team regularly kicks Unverified members that have been on'
+                                      'the server more then 7 days. Please notify @Moderator if the Unverified role '
+                                      'is not automatically removed within 5 minutes of your introduction within '
+                                      '#if-you-are-new-click-here')
                 self.bot.logger.info(f'Warning message sent to {ident_string(member)} for guild {ident_string(ctx.guild)}')
                 dm_count += 1
             except discord.errors.Forbidden:
                 # Unable to DM user, move on to next user
+                member_names.append(member.name)
                 continue
 
-        await ctx.send(f'Sent {dm_count} warnings via DM')
+        no_dm_group = '\n'.join(member_names)
+
+        await ctx.send(f'Sent {dm_count} warnings via DM. The following list were people unable to be DM\'d:')
+        await ctx.send(no_dm_group)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
