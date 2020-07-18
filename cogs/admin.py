@@ -13,6 +13,7 @@ Commands provided by this Cog
 
 """
 
+import asyncio
 import discord
 import functools
 import os
@@ -115,15 +116,46 @@ class Admin(commands.Cog):
         for member in fix_members:
             await ctx.send(f'{member.name} has additional roles. Please remove unverified from this user.')
 
-        for member in unverified_members:
-            joined_delta = datetime.now() - member.joined_at
+        unverified_announcements = get(ctx.guild.text_channels, name='unverified-announcements')
+        intro_channel = get(ctx.guild.text_channels, name='if-you-are-new-click-here')
+        marker = await intro_channel.fetch_message(intro_channel.last_message_id)
+        kick_eligible_members = set(member for member in unverified_members if (datetime.now() - member.joined_at).days >= 7)
 
-            if joined_delta.days > 7:
-                await member.kick()
-                self.bot.logger.info(f'Kicked {ident_string(member)}')
-                count += 1
+        await unverified_announcements.send(f'{unverified_role.mention} **WARNING**: '
+                                            f'In 5 minutes, members who have joined '
+                                            f'7 or more days ago will be kicked in 5 minutes '
+                                            f'unless they introduce themselves in {intro_channel.mention}. '
+                                            f'To avoid getting kicked, you must introduce yourself in the ',
+                                            f'{intro_channel.mention} channel within the next 5 minutes.'
+        )
 
-        await ctx.send(f'kicked {count} members')
+        warning_message = '**WARNING**: In 5 minutes, you will be kicked from' \
+                        'Coding Community for failure to introduce yourself ' \
+                        'in #if-you-are-new-click-here. To avoid being kicked, ' \
+                        'introduce yourself in the aformentioned channel within 5 minutes.'
+
+        for member in kick_eligible_members:
+            try:
+                await member.send(warning_message)
+            except discord.errors.Forbidden:
+                continue
+
+        await asyncio.sleep(900)
+
+        intro_authors = set(message.author async for message in intro_channel.history(after=marker))
+
+        final_kick_list = kick_eligible_members - intro_authors
+        kick_reason = 'Failure to introduce within 7 day period'
+        rejoin_invitation = 'Uh-oh! It looks like you were kicked for ' \
+                            'not introducing yourself. If at any point in ' \
+                            'the future you\'d like to rejoin then you may use' \
+                            'this link: https://discord.gg/gneEsMS'
+                            
+        for member in final_kick_list:
+            await member.send(rejoin_invitation)
+            await member.kick(reason=kick_reason)
+        
+        await ctx.send(f'Kicked {len(final_kick_list)} members')
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
