@@ -169,11 +169,11 @@ class Admin(commands.Cog):
         report = f'{ctx.guild.name.title()} Unverified Kick Report - {current_datetime}{newline}' \
                 f'Kicked a total of {len(final_kick_list)} member(s):{newline}' \
                 f'{newline.join(final_kick_list)}{newline}' \ 
-                f'Due to DM privacy settings, {len(failed_dm_names)} member(s) ' \
+                f'Due to DM privacy settings, {len(failed_dms)} member(s) ' \
                 f'were unable to receive re-invtes via DM, these members are:{newline}' \
-                f'{newline.join(failed_dm_names)}'
+                f'{newline.join(failed_dms)}'
 
-        await ctx.send(f'Kicked {len(final_kick_list)} members with {len(failed_dm_names)} failed re-invite DMs. '
+        await ctx.send(f'Kicked {len(final_kick_list)} members with {len(failed_dms)} failed re-invite DMs. '
                         f'Full report attached:',
                         file=to_file(report, filename=f'kick-report-{current_datetime}')
                     )
@@ -196,22 +196,33 @@ class Admin(commands.Cog):
                            f'{intro_channel.mention}'
                            )
 
-        unverified_members = '\n'.join(unverified_role.members)
-        await ctx.send(f'The following is a list of all'
-                       f' members that currently have'
-                       f' the unverified role:'
+        unverified_members = unverified_role.members
+
+        report_message = f'The following is a list of all {len(unverified_members)} members' \
+                         f' that currently have the unverified role:'
+        report_list = '\n'.join(unverified_members)
+        report_full = f'{report_message} \n {report_list}'
+
+        current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
+        await ctx.send(report_message,
+                       file=to_file(report_full, filename=f'unverified-report-{current_datetime}')
                        )
-        await ctx.send(unverified_members)
 
-        fix_members = '\n'.join(tuple(member for member in unverified_role.members if len(member.roles) > 2))
+        fix_members = tuple(member for member in unverified_role.members if len(member.roles) > 2)
 
-        await ctx.send(f'The following is a list of all members that may need unverified removed'
-                       f' due to them having roles assigned, please check and fix if necessary:'
-                        )
-        await ctx.send(fix_members)
+        report_message = f'The following attached list of {len(fix_members)} members are those ' \
+                 f'that may need unverified removed due to them having roles assigned, ' \
+                 f'please check and fix if necessary:'
+        report_list = '\n'.join(fix_members)
+        report_full = f'{report_message} \n {report_list}'
+
+        current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
+        await ctx.send(report_message,
+                       file=to_file(report_full, filename=f'fix-report-{current_datetime}')
+                       )
 
         dm_count = 0
-        member_names = []
+        no_dm_group = []
         for member in unverified_role.members:
             joined_delta = datetime.now() - member.joined_at
             try:
@@ -231,13 +242,19 @@ class Admin(commands.Cog):
                 dm_count += 1
             except discord.errors.Forbidden:
                 # Unable to DM user, move on to next user
-                member_names.append(member.name)
+                no_dm_group.append(member.name)
                 continue
 
-        no_dm_group = '\n'.join(member_names)
+        report_message = f'Sent {dm_count} warnings via DM. The following' \
+                         f' list were people unable to be DM\'d:'
+        report_list = '\n'.join(no_dm_group)
+        report_full = f'{report_message} \n {report_list}'
 
-        await ctx.send(f'Sent {dm_count} warnings via DM. The following list were people unable to be DM\'d:')
-        await ctx.send(no_dm_group)
+        current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
+        await ctx.send(report_message,
+                       file=to_file(report_full, filename=f'no-dm-report-{current_datetime}')
+                       )
+
 
     @commands.command()
     @commands.has_permissions(administrator=True)
