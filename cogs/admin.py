@@ -191,7 +191,7 @@ class Admin(commands.Cog):
         await channel.send(f'{unverified_role.mention} '
                            f'Please introduce yourself in {intro_channel.mention}. '
                            f'The Moderation Team regularly kicks Unverified members that have been on'
-                           f'the server more then 7 days. Please notify @Moderator if the Unverified role '
+                           f' the server more then 7 days. Please notify @Moderator if the Unverified role '
                            f'is not automatically removed within 5 minutes of your introduction within '
                            f'{intro_channel.mention}'
                            )
