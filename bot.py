@@ -155,8 +155,9 @@ class CodingBot:
         @bot.event
         async def on_message(message):
             is_bot = message.author == bot.user
+            is_webhook = message.webhook_id is not None
             not_guild = message.guild is None
-            if any((is_bot, not_guild)):
+            if any((is_bot, is_webhook, not_guild)):
                 return None
 
 
@@ -211,10 +212,6 @@ class CodingBot:
 
         @bot.event
         async def on_error(error, *args, **kwargs):
-            if error == 'on_message':
-                message = args[0]
-                print(f'Error in on message: {message.content}, {type(message.author)}')
-            
             bot.logger.exception(f'Uncaught exception in: {error}', exc_info=True)
 
         @bot.event
