@@ -168,7 +168,7 @@ class Admin(commands.Cog):
         newline = '\n'
         report = f'{ctx.guild.name.title()} Unverified Kick Report - {current_datetime}{newline}' \
                 f'Kicked a total of {len(final_kick_list)} member(s):{newline}' \
-                f'{newline.join(final_kick_list)}{newline}' \ 
+                f'{newline.join(final_kick_list)}{newline}' \
                 f'Due to DM privacy settings, {len(failed_dms)} member(s) ' \
                 f'were unable to receive re-invtes via DM, these members are:{newline}' \
                 f'{newline.join(failed_dms)}'
