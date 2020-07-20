@@ -200,7 +200,7 @@ class Admin(commands.Cog):
 
         report_message = f'The following is a list of all {len(unverified_members)} members' \
                          f' that currently have the unverified role:'
-        report_list = '\n'.join(unverified_members)
+        report_list = '\n'.join(member.name for member in unverified_members)
         report_full = f'{report_message} \n {report_list}'
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
@@ -213,7 +213,7 @@ class Admin(commands.Cog):
         report_message = f'The following attached list of {len(fix_members)} members are those ' \
                  f'that may need unverified removed due to them having roles assigned, ' \
                  f'please check and fix if necessary:'
-        report_list = '\n'.join(fix_members)
+        report_list = '\n'.join(member.name for member in fix_members)
         report_full = f'{report_message} \n {report_list}'
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
