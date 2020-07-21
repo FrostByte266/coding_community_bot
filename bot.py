@@ -249,7 +249,7 @@ class CodingBot:
             intro_channel = get(member.guild.text_channels, name='if-you-are-new-click-here')
 
             channel_welcome_message = f' Welcome to our server {member.mention}.' \
-                                      f' Take some time to review the {rule_channel},' \
+                                      f' Take some time to review the {rule_channel.mention},' \
                                       f' this contains the server rules, culture, and customs.' \
                                       f' Also, don\'t forget to introduce yourself in' \
                                       f' the {intro_channel.mention} channel.'
