@@ -85,7 +85,7 @@ class Messages(commands.Cog):
             messages = []
             zero_width_space = u'\u200B'
             async for message in ctx.message.channel.history(limit=count):
-                if any([emb.description.startswith(zero_width_space) for emb in message.embeds]):
+                if message.embeds:
                     messages.extend(message.embeds)
                 else:
                     embed = Embed(
@@ -129,7 +129,7 @@ class Messages(commands.Cog):
                 messages = []
                 zero_width_space = u'\u200B'
                 async for message in ctx.message.channel.history(limit=count):
-                    if any([emb.description.startswith(zero_width_space) for emb in message.embeds]):
+                    if message.embeds:
                         messages.extend(message.embeds)
                     else:
                         embed = Embed(
