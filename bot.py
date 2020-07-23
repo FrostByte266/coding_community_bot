@@ -10,6 +10,7 @@ import asyncio
 
 from discord import Embed, Message
 from discord.ext import commands, tasks
+from discord.errors import Forbidden
 from discord.utils import get
 
 
@@ -229,7 +230,7 @@ class CodingBot:
 
             try:
                 await member.send(self.welcome_message)
-            except Exception as e:
+            except Forbidden:
                 pass
 
             # Prepare welcome embed
