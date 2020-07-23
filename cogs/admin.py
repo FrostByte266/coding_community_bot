@@ -128,7 +128,7 @@ class Admin(commands.Cog):
                                             f'In 5 minutes, members who have joined '
                                             f'7 or more days ago will be kicked in 5 minutes '
                                             f'unless they introduce themselves in {intro_channel.mention}. '
-                                            f'To avoid getting kicked, you must introduce yourself in the ',
+                                            f'To avoid getting kicked, you must introduce yourself in the '
                                             f'{intro_channel.mention} channel within the next 5 minutes.'
         )
 
