@@ -132,7 +132,7 @@ class Admin(commands.Cog):
                                             f'{intro_channel.mention} channel within the next 5 minutes.'
         )
 
-        warning_message = '**WARNING**: In 5 minutes, you will be kicked from' \
+        warning_message = '**WARNING**: In 5 minutes, you will be kicked from ' \
                         'Coding Community for failure to introduce yourself ' \
                         'in #if-you-are-new-click-here. To avoid being kicked, ' \
                         'introduce yourself in the aformentioned channel within 5 minutes.'
@@ -145,7 +145,7 @@ class Admin(commands.Cog):
 
         await asyncio.sleep(900)
 
-        intro_authors = set(message.author async for message in intro_channel.history(after=marker))
+        intro_authors = set(message.author for message in await intro_channel.history(after=marker).flatten())
 
         final_kick_list = kick_eligible_members - intro_authors
         kick_reason = 'Failure to introduce within 7 day period'
@@ -154,6 +154,7 @@ class Admin(commands.Cog):
                             'the future you\'d like to rejoin then you may use' \
                             'this link: https://discord.gg/gneEsMS'
 
+        kicked_member_names = (str(member) for member in final_kick_list)
         failed_dms = []
         for member in final_kick_list:
             try:
@@ -166,16 +167,16 @@ class Admin(commands.Cog):
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
         newline = '\n'
-        report = f'{ctx.guild.name.title()} Unverified Kick Report - {current_datetime}{newline}' \
+        report = f'{ctx.guild} Unverified Kick Report - {current_datetime}{newline}' \
                 f'Kicked a total of {len(final_kick_list)} member(s):{newline}' \
-                f'{newline.join(final_kick_list)}{newline}' \
+                f'{newline.join(kicked_member_names)}{newline}' \
                 f'Due to DM privacy settings, {len(failed_dms)} member(s) ' \
                 f'were unable to receive re-invtes via DM, these members are:{newline}' \
                 f'{newline.join(failed_dms)}'
 
         await ctx.send(f'Kicked {len(final_kick_list)} members with {len(failed_dms)} failed re-invite DMs. '
                         f'Full report attached:',
-                        file=to_file(report, filename=f'kick-report-{current_datetime}')
+                        file=to_file(report, filename=f'kick-report-{current_datetime}.txt')
                     )
 
 
@@ -185,9 +186,9 @@ class Admin(commands.Cog):
         default_role = '@everyone'
         unverified_role = get(ctx.guild.roles, name="Unverified")
         intro_channel = get(ctx.guild.text_channels, name="if-you-are-new-click-here")
+        channel = get(ctx.guild.text_channels, name='unverified-announcements')
         count = len(unverified_role.members)
 
-        channel = ctx.guild.get_channel(717419157167276133)
         await channel.send(f'{unverified_role.mention} '
                            f'Please introduce yourself in {intro_channel.mention}. '
                            f'The Moderation Team regularly kicks Unverified members that have been on'
@@ -196,7 +197,7 @@ class Admin(commands.Cog):
                            f'{intro_channel.mention}'
                            )
 
-        unverified_members = unverified_role.members
+        unverified_members = set(unverified_role.members)
 
         report_message = f'The following is a list of all {len(unverified_members)} members' \
                          f' that currently have the unverified role:'
@@ -205,10 +206,10 @@ class Admin(commands.Cog):
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
         await ctx.send(report_message,
-                       file=to_file(report_full, filename=f'unverified-report-{current_datetime}')
+                       file=to_file(report_full, filename=f'unverified-report-{current_datetime}.txt')
                        )
 
-        fix_members = tuple(member for member in unverified_role.members if len(member.roles) > 2)
+        fix_members = set(member for member in unverified_role.members if len(member.roles) > 2)
 
         report_message = f'The following attached list of {len(fix_members)} members are those ' \
                  f'that may need unverified removed due to them having roles assigned, ' \
@@ -218,12 +219,12 @@ class Admin(commands.Cog):
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
         await ctx.send(report_message,
-                       file=to_file(report_full, filename=f'fix-report-{current_datetime}')
+                       file=to_file(report_full, filename=f'fix-report-{current_datetime}.txt')
                        )
 
         dm_count = 0
         no_dm_group = []
-        for member in unverified_role.members:
+        for member in unverified_members - fix_members:
             joined_delta = datetime.now() - member.joined_at
             try:
                 if joined_delta.days > 7:
@@ -252,7 +253,7 @@ class Admin(commands.Cog):
 
         current_datetime = datetime.now().strftime('%m-%d-%Y_%H%M')
         await ctx.send(report_message,
-                       file=to_file(report_full, filename=f'no-dm-report-{current_datetime}')
+                       file=to_file(report_full, filename=f'no-dm-report-{current_datetime}.txt')
                        )
 
 
