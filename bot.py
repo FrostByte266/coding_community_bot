@@ -227,7 +227,10 @@ class CodingBot:
                 role = get(member.guild.roles, id=config["verification_role"])
                 await member.add_roles(role)
 
-            await member.send(self.welcome_message)
+            try:
+                await member.send(self.welcome_message)
+            except Exception as e:
+                pass
 
             # Prepare welcome embed
             embed = Embed(
