@@ -114,7 +114,7 @@ class Admin(commands.Cog):
         count = 0
 
         unverified_members = tuple(member for member in unverified_role.members if len(member.roles) < 3)
-        fix_members = tuple(member for member in unverified_role.members if len(member.roles) > 2)
+        fix_members = set(member for member in unverified_role.members if len(member.roles) > 2)
 
         for member in fix_members:
             await ctx.send(f'{member.name} has additional roles. Please remove unverified from this user.')
@@ -122,7 +122,7 @@ class Admin(commands.Cog):
         unverified_announcements = get(ctx.guild.text_channels, name='unverified-announcements')
         intro_channel = get(ctx.guild.text_channels, name='if-you-are-new-click-here')
         marker = await intro_channel.fetch_message(intro_channel.last_message_id)
-        kick_eligible_members = set(member for member in unverified_members if (datetime.now() - member.joined_at).days >= 7)
+        kick_eligible_members = set(member for member in unverified_members if (datetime.now() - member.joined_at).days >= 7) - fix_members
 
         await unverified_announcements.send(f'{unverified_role.mention} **WARNING**: '
                                             f'In 5 minutes, members who have joined '
