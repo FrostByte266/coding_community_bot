@@ -95,7 +95,7 @@ class Reddit(commands.Cog):
         self.config_path = 'assets/config.json'
         self.config_full = json.load(open(self.config_path, 'r'))
         self.reddit = self.reddit_bot()
-        self.timeframes = ['month', 'week']
+        self.timeframes = ['year', 'month', 'week']
         self.alternate = True
 
         self.get_reddit.start()
@@ -123,16 +123,17 @@ class Reddit(commands.Cog):
         except Exception as e:
             print(str(e))
 
-    async def readings_fetch(self, subreddits_list, period='year', mode='top'):
+    async def readings_fetch(self, subreddits_list, mode='top'):
         top_links_in_period = []
 
         if mode == 'assorted':
-            links_per_sub = 5
-        else:
             links_per_sub = 7
+        else:
+            links_per_sub = 9
 
         try:
             for subreddit in subreddits_list:
+                period = sample(self.timeframes, 1)[0]
                 top_links_in_period.extend(await self.topinxperiod(
                                                                     subreddit,
                                                                     period=period,
@@ -142,7 +143,7 @@ class Reddit(commands.Cog):
         except Exception as e:
             print(e)
         return_count = len(top_links_in_period)
-        sample_size = 3 if return_count > 2 else 1
+        sample_size = 5 if return_count > 4 else 1
         top_links_in_period = sample(top_links_in_period, sample_size)
 
         while len('\n'.join([str(x) for x in top_links_in_period])) > 2000:
@@ -156,13 +157,13 @@ class Reddit(commands.Cog):
             for channel_id in self.config_full[str(guild_id)]['reddit_config'].keys():
                 channel_object = self.bot.get_channel(int(channel_id))
                 try:
-                    period = sample(self.timeframes, 1)[0]
+
 
                     # category is a list of randomly sampled subreddit names to be concatenated after r/
                     list_size = len(self.config_full[str(guild_id)]['reddit_config'][channel_id])
                     sample_size = 3 if list_size > 2 else 1
                     category = sample(self.config_full[str(guild_id)]['reddit_config'][channel_id], sample_size)
-                    await channel_object.send(await self.readings_fetch(category, period=period, mode='assorted'))
+                    await channel_object.send(await self.readings_fetch(category, mode='assorted'))
 
                 except Exception as e:
                     print(e)
