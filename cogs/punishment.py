@@ -10,12 +10,13 @@ Commands provided by this cog.
     recall : Clears a single report. Requires an incident id.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import json
 
 from discord import Embed, Guild, User
 from discord.utils import get
-from discord.ext import commands
+from discord.errors import Forbidden
+from discord.ext import commands, tasks
 
 
 class IncidentReport:
@@ -76,6 +77,7 @@ class Punishment(commands.Cog):
         self.bot = bot
         self.config_path = 'assets/config.json'
         self.config_full = json.loads(open(self.config_path).read())
+        self.tempban_expiration_task.start()
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -107,6 +109,50 @@ class Punishment(commands.Cog):
     @kick.error
     async def kick_error(self, ctx, error):
         await handle_error(ctx, error)
+
+    def check_expired(self, entry):
+        has_tempban_flag = entry.reason.startswith('tempban')
+
+        expiration_date = datetime.fromtimestamp(int(entry.reason.split()[1]), timezone.utc)
+        entry_is_expired = datetime.now(timezone.utc) > expiration_date
+
+        return has_tempban_flag and entry_is_expired  
+
+    @tasks.loop(hours=1)
+    async def tempban_expiration_task(self):
+        await self.bot.wait_until_ready()
+        for guild in self.bot.guilds:
+            expired_entries = filter(self.check_expired, await guild.bans())
+            users_to_unban = (entry.user for entry in expired_entries)
+            for user in users_to_unban:
+                await guild.unban(user, reason='Temporary ban expired')
+
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def tempban(self, ctx, target: User, *, reason: str):
+        report = IncidentReport(ctx.guild, 'Temporary Ban',
+                                reason, ctx.author, target)
+        receipt = report.generate_receipt()
+        try:
+            await target.send(f'You have been temporarily banned from {ctx.guild} to '
+                            f'give the administration team an opportunity to further evaluate' 
+                            f'the matter. At the conclusion of their evaluation, you may '
+                            f'be permanently banned.', embed=receipt)
+            warning_dm_sent = True
+        except Forbidden:
+            warning_dm_sent = False
+
+        receipt.add_field(name='Target received warning DM', value=warning_dm_sent)
+        try:
+            await ctx.author.send(f'User: {target} has ben temporarily banned. Please '
+                                f'follow up with the administration team', embed=receipt)
+        except Forbidden:
+            pass
+
+        expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
+        unix_timestamp = int(expiration_time.timestamp())
+        await ctx.guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
+        await ctx.send(f'User {target} was temporarily banned. Report ID: {report.report_number}')
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -144,16 +190,30 @@ class Punishment(commands.Cog):
     async def hackban(self, ctx, target: int, *, reason: str):
         """Ban a user not in the server"""
         user = await self.bot.fetch_user(target)
+        tempban = find(lambda entry: entry.user == user and entry.reason.startswith('tempban'), await ctx.guild.bans())
+        if tempban is not None:
+            # Get the original reason without the tempban marker
+            original_reason = tempban.reason[tempban.reason.find('|'):].strip()
+            await ctx.guild.unban(user, reason='Temporary reversal')
+            reason = f'Tempban verified and converted to permaban. Additional comment: {reason}\nOriginal reason: {original_reason}'
+
         report = IncidentReport(
             ctx.message.guild, 'Hackban', reason, ctx.message.author, user)
         receipt = report.generate_receipt()
-        await ctx.message.author.send(
-            f'User: {user.name}#{user.discriminator} has been hackbanned. The incident report is attached below:',
-            embed=receipt)
-        await ctx.message.guild.ban(user, reason=reason, delete_message_days=0)
+
+        try:
+            await ctx.message.author.send(
+                f'User: {user.name}#{user.discriminator} has been hackbanned. The incident report is attached below:',
+                embed=receipt)
+        except Forbidden:
+            pass
+
+        await ctx.guild.ban(user, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {user.name}#{user.discriminator} has been hackbanned. Report ID: {report.report_number}')
+
         reporting_enabled = True if self.config_full[str(ctx.message.guild.id)][
             "reporting_channel"] is not None else False
+
         if reporting_enabled:
             report_channel = get(
                 ctx.message.guild.text_channels,
