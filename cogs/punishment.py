@@ -151,6 +151,8 @@ class Punishment(commands.Cog):
 
         expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
         unix_timestamp = int(expiration_time.timestamp())
+        if len(reason)>510:
+            reason = f'Ban reason exceeded 512 characters. Please review report #{report.report_number}'
         await ctx.guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
         await ctx.send(f'User {target} was temporarily banned. Report ID: {report.report_number}')
 
@@ -170,7 +172,7 @@ class Punishment(commands.Cog):
             embed=receipt
         )
         if len(reason)>510:
-            reason = 'Ban reason exceeded 512 characters. Please review the generated report'
+            reason = f'Ban reason exceeded 512 characters. Please review report #{report.report_number}'
         await ctx.message.guild.ban(target, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {target.name}#{target.discriminator} has been banned. Report ID: {report.report_number}')
         reporting_enabled = True if self.config_full[str(ctx.message.guild.id)][
@@ -210,6 +212,8 @@ class Punishment(commands.Cog):
         except Forbidden:
             pass
 
+        if len(reason)>510:
+            reason = f'Ban reason exceeded 512 characters. Please review report #{report.report_number}'
         await ctx.guild.ban(user, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {user.name}#{user.discriminator} has been hackbanned. Report ID: {report.report_number}')
 
