@@ -169,6 +169,8 @@ class Punishment(commands.Cog):
             f'You have been banned from {ctx.message.guild}. The incident report is attached below:',
             embed=receipt
         )
+        if len(reason)>510:
+            reason = 'Ban reason exceeded 512 characters. Please review the generated report'
         await ctx.message.guild.ban(target, reason=reason, delete_message_days=0)
         await ctx.send(f'User: {target.name}#{target.discriminator} has been banned. Report ID: {report.report_number}')
         reporting_enabled = True if self.config_full[str(ctx.message.guild.id)][
