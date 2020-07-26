@@ -19,6 +19,7 @@ import functools
 import os
 import traceback
 
+from _collections import namedtuple
 from datetime import datetime, timedelta
 from io import StringIO
 
@@ -79,29 +80,35 @@ class Admin(commands.Cog):
     async def alert_level(self, ctx, alert_status):
         roles_present = (role.name.lower() for role in ctx.author.roles)
 
-        # seconds to slow, time_delta_to_kick, alert_numeral, new_members_time_range for mute
+        # seconds to slow, time_span_to_kick, alert_numeral, new_members_time_range for mute
         #seconds, minute, cardinal, minute
-        alert_patterns = {'green':[0, None, 0, None],
-                          'alpha':[30, 120, 1, 120],
-                          'beta':[120, 1440, 2, 1440],
-                          'gamma':[300, 10080, 3, 2880],
-                          'turtle':[0, 9999999, '🐢', 0]}
+        Alert_Pattern = namedtuple('Alert_Pattern',
+                                   'seconds to slow',
+                                   'time_span_to_kick',
+                                   'alert_numeral',
+                                   'new_members_time_range for mute')
+
+        alert_patterns = {'green':Alert_Pattern(0, None, 0, None),
+                          'alpha':Alert_Pattern(30, 120, 1, 120),
+                          'beta':Alert_Pattern(120, 1440, 2, 1440),
+                          'gamma':Alert_Pattern(300, 10080, 3, 2880),
+                          'turtle':Alert_Pattern(0, 9999999, '🐢', 0)}
 
         if alert_status not in ['green','alpha','beta','gamma']:
             await ctx.send('given alert status is available')
         elif 'moderator' in roles_present:
             self.bot.alert_level = 'alpha'
             self.bot.alert_pattern = alert_patterns[self.bot.alert_level]
-            self.slow_channels(ctx, self.bot.alert_pattern[0])
+            self.slow_channels(ctx, self.bot.alert_pattern['seconds to slow'])
 
         elif 'spartan mod' in roles_present:
             self.bot.alert_level = 'beta' if alert_status == 'gamma' else alert_status
             self.bot.alert_pattern = alert_patterns[alert_status]
-            self.slow_channels(ctx, self.bot.alert_pattern[0])
+            self.slow_channels(ctx, self.bot.alert_pattern['seconds to slow'])
         else:
             self.bot.alert_level = alert_status
             self.bot.alert_pattern = alert_patterns[alert_status]
-            self.slow_channels(ctx, self.bot.alert_pattern[0])
+            self.slow_channels(ctx, self.bot.alert_pattern['seconds to slow'])
 
         await ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
 
@@ -109,9 +116,9 @@ class Admin(commands.Cog):
     async def on_message(self, message):
         if self.bot.alert_level != 'green':
             minutes_between_join_and_now = (datetime.now() - message.author.joined_at).total_seconds()/60
-            if minutes_between_join_and_now < self.bot.alert_pattern[3]:
+            if minutes_between_join_and_now < self.bot.alert_pattern['new_members_time_range for mute']:
                 try:
-                    await message.author.send(f'Server is currently on alert level {self.bot.alert_pattern[2]} due '
+                    await message.author.send(f"Server is currently on alert level {self.bot.alert_pattern['alert_numeral']} due "
                                       f'to trolls, please try joining later.')
                 except Exception as e:
                     pass
@@ -121,9 +128,9 @@ class Admin(commands.Cog):
     async def on_member_join(self, member):
         if self.bot.alert_level != 'green':
             minutes_between_creation_and_join = (member.joined_at - member.created_at).total_seconds()/60
-            if minutes_between_creation_and_join < self.bot.alert_pattern[1]:
+            if minutes_between_creation_and_join < self.bot.alert_pattern['time_span_to_kick']:
                 try:
-                    await member.send(f'Server is currently on alert level {self.bot.alert_pattern[2]} due '
+                    await member.send(f"Server is currently on alert level {self.bot.alert_pattern['alert_numeral']} due "
                                       f'to trolls, please try joining later.')
                 except Exception as e:
                     pass
