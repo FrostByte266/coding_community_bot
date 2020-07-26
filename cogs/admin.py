@@ -80,18 +80,19 @@ class Admin(commands.Cog):
         roles_present = (role.name.lower() for role in ctx.author.roles)
 
         # seconds to slow, time_span_to_kick, alert_numeral, new_members_time_range for mute
-        #seconds, minute, cardinal, minute
+        #seconds, minute, cardinal, minute, minute
         Alert_Pattern = namedtuple('Alert_Pattern',
                                    'seconds to slow',
                                    'time_span_to_kick',
                                    'alert_numeral',
-                                   'new_members_time_range for mute')
+                                   'new_members_time_range for mute',
+                                   'temp_ban_kick_duration')
 
-        alert_patterns = {'green':Alert_Pattern(0, None, 0, None),
-                          'alpha':Alert_Pattern(30, 120, 1, 120),
-                          'beta':Alert_Pattern(120, 1440, 2, 1440),
-                          'gamma':Alert_Pattern(300, 10080, 3, 2880),
-                          'turtle':Alert_Pattern(0, 9999999, '🐢', 0)}
+        alert_patterns = {'green':Alert_Pattern(0, None, 0, None,None),
+                          'alpha':Alert_Pattern(30, 120, 1, 120, 120),
+                          'beta':Alert_Pattern(120, 1440, 2, 1440, 720),
+                          'gamma':Alert_Pattern(300, 10080, 3, 2880, 86400),
+                          'turtle':Alert_Pattern(0, 9999999, '🐢', 0, 10080)}
 
         if alert_status not in ['green','alpha','beta','gamma']:
             await ctx.send('given alert status is available')
