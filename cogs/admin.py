@@ -23,7 +23,6 @@ from _collections import namedtuple
 from datetime import datetime, timedelta
 from io import StringIO
 
-
 from discord.ext import commands
 from discord import client, Forbidden, Role, Permissions, File, PermissionOverwrite
 
@@ -134,7 +133,7 @@ class Admin(commands.Cog):
                                       f'to trolls, please try joining later.')
                 except Exception as e:
                     pass
-                await member.kick('kicked due to current active alert status')
+                await ('kicked due to current active alert status')
 
     @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
     @commands.has_permissions(administrator=True)

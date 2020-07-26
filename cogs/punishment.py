@@ -127,6 +127,16 @@ class Punishment(commands.Cog):
             for user in users_to_unban:
                 await guild.unban(user, reason='Temporary ban expired')
 
+    async def tempban_core(self, ctx, target, time_to_expire, reason):
+
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=time_to_expire)
+        unix_timestamp = int(expiration_time.timestamp())
+
+        if len(reason) > 510:
+            reason = f'Ban reason exceeded 512 characters.'
+
+        await ctx.guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
+
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def tempban(self, ctx, target: User, *, reason: str):
@@ -149,11 +159,10 @@ class Punishment(commands.Cog):
         except Forbidden:
             pass
 
-        expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
-        unix_timestamp = int(expiration_time.timestamp())
-        if len(reason)>510:
+        if len(reason) > 510:
             reason = f'Ban reason exceeded 512 characters. Please review report #{report.report_number}'
-        await ctx.guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
+
+        await self.tempban_core(ctx, reason, 86400)
         await ctx.send(f'User {target} was temporarily banned. Report ID: {report.report_number}')
 
     @commands.command()
