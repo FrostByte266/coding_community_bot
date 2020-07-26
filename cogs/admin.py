@@ -76,10 +76,13 @@ class Admin(commands.Cog):
     async def alert_level(self, ctx, alert_status):
         roles_present = (role.name.lower() for role in ctx.author.roles)
 
-        alert_patterns = {'green':[0],
-                          'alpha':[30],
-                          'beta':[120],
-                          'gamma':[300]}
+        # seconds to slow, time_delta_to_kick, alert_numeral, new_members_time_range
+        #seconds, minute, cardinal, minute
+        alert_patterns = {'green':[0, None, 0, None],
+                          'alpha':[30, 120, 1, 120],
+                          'beta':[120, 1440, 2, 1440],
+                          'gamma':[300, 10080, 3, 2880],
+                          'turtle':[0, 9999999, '🐢', 0]}
 
         if alert_status not in ['green','alpha','beta','gamma']:
             ctx.send('given alert status is available')
@@ -97,6 +100,31 @@ class Admin(commands.Cog):
             self.bot.alert_pattern = alert_patterns[alert_status]
             self.slow_channels(ctx, self.bot.alert_pattern[0])
 
+        ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
+
+    @commands.cog.listen()
+    async def on_message(self, message):
+        if self.bot.alert_level != 'green':
+            minutes_between_join_and_now = (datetime.now() - message.author.joined_at).total_seconds()/60
+            if minutes_between_join_and_now < self.bot.alert_pattern[3]:
+                try:
+                    await message.author.send(f'Server is currently on alert level {self.bot.alert_pattern[2]} due '
+                                      f'to trolls, please try joining later.')
+                except Exception as e:
+                    pass
+                await message.delete()
+
+    @commands.cog.listen()
+    async def on_member_join(self, member):
+        if self.bot.alert_level != 'green':
+            minutes_between_creation_and_join = (member.joined_at - member.created_at).total_seconds()/60
+            if minutes_between_creation_and_join < self.bot.alert_pattern[1]:
+                try:
+                    await member.send(f'Server is currently on alert level {self.bot.alert_pattern[2]} due '
+                                      f'to trolls, please try joining later.')
+                except Exception as e:
+                    pass
+                await member.kick('kicked due to current active alert status')
 
     @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
     @commands.has_permissions(administrator=True)
