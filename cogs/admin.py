@@ -69,14 +69,17 @@ class Admin(commands.Cog):
 
     def slow_channels(self, ctx, seconds):
         for channel in ctx.guild.channels:
-            channel.slowmode_delay(seconds)
+            try:
+                channel.edit(slowmode_delay=seconds)
+            except Exception as e:
+                continue
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def alert_level(self, ctx, alert_status):
         roles_present = (role.name.lower() for role in ctx.author.roles)
 
-        # seconds to slow, time_delta_to_kick, alert_numeral, new_members_time_range
+        # seconds to slow, time_delta_to_kick, alert_numeral, new_members_time_range for mute
         #seconds, minute, cardinal, minute
         alert_patterns = {'green':[0, None, 0, None],
                           'alpha':[30, 120, 1, 120],
@@ -85,7 +88,7 @@ class Admin(commands.Cog):
                           'turtle':[0, 9999999, '🐢', 0]}
 
         if alert_status not in ['green','alpha','beta','gamma']:
-            ctx.send('given alert status is available')
+            await ctx.send('given alert status is available')
         elif 'moderator' in roles_present:
             self.bot.alert_level = 'alpha'
             self.bot.alert_pattern = alert_patterns[self.bot.alert_level]
@@ -100,7 +103,7 @@ class Admin(commands.Cog):
             self.bot.alert_pattern = alert_patterns[alert_status]
             self.slow_channels(ctx, self.bot.alert_pattern[0])
 
-        ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
+        await ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
 
     @commands.cog.listen()
     async def on_message(self, message):
