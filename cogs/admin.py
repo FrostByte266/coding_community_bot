@@ -43,6 +43,8 @@ class Admin(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.bot.alert_level = 'green'
+        self.bot.alert_pattern = None
 
     @commands.command(hidden=True, description="Sets bot logging level")
     async def logging(self, ctx, level):
@@ -82,16 +84,18 @@ class Admin(commands.Cog):
         if alert_status not in ['green','alpha','beta','gamma']:
             ctx.send('given alert status is available')
         elif 'moderator' in roles_present:
-            alert_level = alert_patterns['alpha']
-            self.slow_channels(ctx,alert_level[0])
+            self.bot.alert_level = 'alpha'
+            self.bot.alert_pattern = alert_patterns[self.bot.alert_level]
+            self.slow_channels(ctx, self.bot.alert_pattern[0])
 
         elif 'spartan mod' in roles_present:
-            alert_status = 'beta' if alert_status == 'gamma' else alert_status
-            alert_level = alert_patterns[alert_status]
-            self.slow_channels(ctx, alert_level[0])
+            self.bot.alert_level = 'beta' if alert_status == 'gamma' else alert_status
+            self.bot.alert_pattern = alert_patterns[alert_status]
+            self.slow_channels(ctx, self.bot.alert_pattern[0])
         else:
-            alert_level = alert_patterns[alert_status]
-            self.slow_channels(ctx, alert_level[0])
+            self.bot.alert_level = alert_status
+            self.bot.alert_pattern = alert_patterns[alert_status]
+            self.slow_channels(ctx, self.bot.alert_pattern[0])
 
 
     @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
