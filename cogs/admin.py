@@ -68,10 +68,10 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Invalid logging level specified.")
 
-    def slow_channels(self, ctx, seconds):
+    async def slow_channels(self, ctx, seconds):
         for channel in ctx.guild.channels:
             try:
-                channel.edit(slowmode_delay=seconds)
+                await channel.edit(slowmode_delay=seconds)
             except Exception as e:
                 continue
 
