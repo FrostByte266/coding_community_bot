@@ -65,6 +65,35 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Invalid logging level specified.")
 
+    def slow_channels(self, ctx, seconds):
+        for channel in ctx.guild.channels:
+            channel.slowmode_delay(seconds)
+
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def alert_level(self, ctx, alert_status):
+        roles_present = (role.name.lower() for role in ctx.author.roles)
+
+        alert_patterns = {'green':[0],
+                          'alpha':[30],
+                          'beta':[120],
+                          'gamma':[300]}
+
+        if alert_status not in ['green','alpha','beta','gamma']:
+            ctx.send('given alert status is available')
+        elif 'moderator' in roles_present:
+            alert_level = alert_patterns['alpha']
+            self.slow_channels(ctx,alert_level[0])
+
+        elif 'spartan mod' in roles_present:
+            alert_status = 'beta' if alert_status == 'gamma' else alert_status
+            alert_level = alert_patterns[alert_status]
+            self.slow_channels(ctx, alert_level[0])
+        else:
+            alert_level = alert_patterns[alert_status]
+            self.slow_channels(ctx, alert_level[0])
+
+
     @commands.command(pass_context=True, hidden=True, description="replaces old pre-patch role with with discord team mute respecting patched role")
     @commands.has_permissions(administrator=True)
     async def role_refresh(self, ctx, role: Role):
@@ -376,6 +405,8 @@ class Admin(commands.Cog):
 
         await self.load_cogs()
         await ctx.send("Reloaded")
+
+
 
     async def load_cogs(self):
         """
