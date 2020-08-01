@@ -105,12 +105,12 @@ class Admin(commands.Cog):
             self.bot.alert_pattern = alert_patterns[self.bot.alert_level]
             self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
         elif 'spartan mod' in roles_present:
-            self.bot.alert_level = 'beta' if alert_status == 'gamma' else alert_status
-            self.bot.alert_pattern = alert_patterns[alert_status]
+            self.bot.alert_level = 'beta' if alert_status == 'gamma' or alert_status == 'turtle' else alert_status
+            self.bot.alert_pattern = alert_patterns.alert_status
             self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
         else:
             self.bot.alert_level = alert_status
-            self.bot.alert_pattern = alert_patterns[alert_status]
+            self.bot.alert_pattern = alert_patterns.alert_status
             self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
 
         await ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
