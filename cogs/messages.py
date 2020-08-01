@@ -153,7 +153,7 @@ class Messages(commands.Cog):
     @move_group.command(name="range", aliases=["between"])
     @commands.has_permissions(manage_messages=True)
     async def range_subcommand(self, ctx, firstMessageID: int, secondMessageID: int, target: TextChannel, copy: bool = False):
-        """Move/copy all messages up to (and including) a message ID"""
+        """Move/copy all messages between (and including) two message IDs"""
         await ctx.message.delete()
         firstMessageFound: int = 0
         secondMessageFound: int = 0
