@@ -4,7 +4,7 @@ import os
 import re
 import traceback
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import asyncio
 
@@ -132,6 +132,28 @@ class CodingBot:
         except Exception as e:
             print("Error", e)
         print("Restarting...")
+
+    def attachments_are_images(self, message):
+        attachments = message.attachments
+        permitted_types = ('png', 'jpg', 'jpeg', 'gif', 'bmp')
+        file_extensions = (file.filename.split('.')[-1] for file in attachments)
+
+        attachments_permissible =  (extension in permitted_types for extension in file_extensions) 
+        return all(attachments_permissible)
+
+    def can_upload_files(self, member):
+        min_age_images = timedelta(days=2)
+        min_age_files = timedelta(days=30)
+
+        member_age = datetime.utcnow() - member.joined_at
+        print(member_age)
+
+        if member_age < min_age_images:
+            return False
+        elif member_age > min_age_images and member_age < min_age_files:
+            return 'IMAGE_ONLY'
+        else:
+            return True
             
     def build_bot(self):
         bot = commands.Bot(
@@ -209,6 +231,18 @@ class CodingBot:
                                           "Beginner, Novice, Advanced, or Professional. You can review earlier introductions in "
                                           "the #if-you-are-new-click-here channel for examples.")
                 await message.delete()
+            elif message.attachments:
+                upload_eligibility = self.can_upload_files(message.author)
+                print(upload_eligibility)
+                print(self.attachments_are_images(message))
+                if upload_eligibility == 'IMAGE_ONLY' and not self.attachments_are_images(message):
+                    await message.delete()
+                    await message.channel.send('Sorry, you do not yet meet the requirements to upload non image file types')
+                elif not upload_eligibility:
+                    await message.delete()
+                    await message.channel.send('Sorry, you do not yet meet the requirements to upload files/images. '
+                                                'If you need to share images, please use an image sharing service such as Imgur')
+                    
             await bot.process_commands(message)
 
         @bot.event
