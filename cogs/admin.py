@@ -95,8 +95,8 @@ class Admin(commands.Cog):
         alert_patterns = {'green': AlertPattern(0, None, 0, None, None),
                           'alpha': AlertPattern(30, 120, 1, 120, 120),
                           'beta': AlertPattern(120, 1440, 2, 1440, 720),
-                          'gamma': AlertPattern(300, 10080, 3, 2880, 86400),
-                          'turtle': AlertPattern(0, float('inf'), '🐢', 0, 10080)}
+                          'gamma': AlertPattern(300, 10080, 3, 2880, 1440),
+                          'turtle': AlertPattern(0, float('inf'), '🐢', 0, 1440)}
 
         if alert_status not in ['green', 'alpha', 'beta', 'gamma']:
             await ctx.send('Given alert status isn\'t available')
