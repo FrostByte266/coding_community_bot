@@ -70,6 +70,15 @@ async def handle_error(ctx, error):
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send('You are missing the required permissions')
 
+async def tempban_core(guild, target, time_to_expire, reason):
+
+    expiration_time = datetime.now(timezone.utc) + timedelta(minutes=time_to_expire)
+    unix_timestamp = int(expiration_time.timestamp())
+
+    if len(reason) > 510:
+        reason = f'Ban reason exceeded 512 characters.'
+
+    await guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
 
 class Punishment(commands.Cog):
 
@@ -149,11 +158,10 @@ class Punishment(commands.Cog):
         except Forbidden:
             pass
 
-        expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
-        unix_timestamp = int(expiration_time.timestamp())
-        if len(reason)>510:
+        if len(reason) > 510:
             reason = f'Ban reason exceeded 512 characters. Please review report #{report.report_number}'
-        await ctx.guild.ban(target, reason=f'tempban {unix_timestamp} | {reason}')
+
+        await tempban_core(ctx.guild, reason, 86400)
         await ctx.send(f'User {target} was temporarily banned. Report ID: {report.report_number}')
 
     @commands.command()
