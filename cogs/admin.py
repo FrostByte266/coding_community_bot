@@ -30,7 +30,7 @@ from discord.utils import get
 from subprocess import Popen, PIPE
 from utils import admin_utils
 
-from punishment import tempban_core as tempban
+from cogs.punishment import tempban_core as tempban
 
 
 def ident_string(discord_object):
@@ -46,9 +46,24 @@ def to_file(contents, filename='message.txt'):
 class Admin(commands.Cog):
 
     def __init__(self, bot):
+        self.AlertPattern = namedtuple('AlertPattern',
+                                       ['slowmode_delay',
+                                        'time_span_to_kick',
+                                        'alert_numeral',
+                                        'unmute_delay_from_join',
+                                        'temp_ban_duration']
+                                       )
+
+        self.alert_patterns = {'green': self.AlertPattern(0, None, 0, None, None),
+                               'alpha': self.AlertPattern(30, 120, 1, 120, 120),
+                               'beta': self.AlertPattern(120, 1440, 2, 1440, 720),
+                               'gamma': self.AlertPattern(300, 10080, 3, 2880, 1440),
+                               'turtle': self.AlertPattern(0, float('inf'), '🐢', 0, 1440)
+                               }
+
         self.bot = bot
         self.bot.alert_level = 'green'
-        self.bot.alert_pattern = None
+        self.bot.alert_pattern = self.alert_patterns['green']
 
     @commands.command(hidden=True, description="Sets bot logging level")
     async def logging(self, ctx, level):
@@ -76,46 +91,31 @@ class Admin(commands.Cog):
             try:
                 await channel.edit(slowmode_delay=seconds)
             except (Forbidden, HTTPException):
-                continue
+                self.bot.logger.exception('Error in slow_channels', exc_info=True)
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def alert_level(self, ctx, alert_status):
         roles_present = (role.name.lower() for role in ctx.author.roles)
 
-        # slowmode_delay, time_span_to_kick, alert_numeral, unmute_delay_from_join
-        #seconds, minute, cardinal, minute, minute
-        AlertPattern = namedtuple('AlertPattern',
-                                  ['slowmode_delay',
-                                   'time_span_to_kick',
-                                   'alert_numeral',
-                                   'unmute_delay_from_join',
-                                   'temp_ban_duration'])
-
-        alert_patterns = {'green': AlertPattern(0, None, 0, None, None),
-                          'alpha': AlertPattern(30, 120, 1, 120, 120),
-                          'beta': AlertPattern(120, 1440, 2, 1440, 720),
-                          'gamma': AlertPattern(300, 10080, 3, 2880, 1440),
-                          'turtle': AlertPattern(0, float('inf'), '🐢', 0, 1440)}
-
-        if alert_status not in ['green', 'alpha', 'beta', 'gamma']:
+        if alert_status not in [*self.alert_patterns.keys()]:
             await ctx.send('Given alert status isn\'t available')
         elif 'moderator' in roles_present:
             self.bot.alert_level = 'alpha'
-            self.bot.alert_pattern = alert_patterns[self.bot.alert_level]
-            self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
+            self.bot.alert_pattern = self.alert_patterns[self.bot.alert_level]
+            await self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
         elif 'spartan mod' in roles_present:
-            self.bot.alert_level = 'beta' if alert_status == 'gamma' or alert_status == 'turtle' else alert_status
-            self.bot.alert_pattern = alert_patterns.alert_status
-            self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
+            self.bot.alert_level = 'beta' if alert_numeral == 'gamma' or alert_numeral == 'turtle' else alert_numeral
+            self.bot.alert_pattern = self.alert_patterns[self.bot.alert_level]
+            await self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
         else:
             self.bot.alert_level = alert_status
-            self.bot.alert_pattern = alert_patterns.alert_status
-            self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
+            self.bot.alert_pattern = self.alert_patterns[self.bot.alert_level]
+            await self.slow_channels(ctx, self.bot.alert_pattern.slowmode_delay)
 
         await ctx.send(f'Alert level {self.bot.alert_level} has been activated.')
 
-    @commands.cog.listener()
+    @commands.Cog.listener()
     async def on_message(self, message):
         if self.bot.alert_level != 'green':
             minutes_between_join_and_now = (
@@ -123,12 +123,12 @@ class Admin(commands.Cog):
             if minutes_between_join_and_now < self.bot.alert_pattern.unmute_delay_from_join:
                 try:
                     await message.author.send(f"Server is currently on alert level {self.bot.alert_pattern.alert_numeral} due "
-                                              f'to trolls, please try joining later.')
+                                              f'to trolls, and you are currently not eligible to send messages at this time.')
                 except (Forbidden, HTTPException):
                     pass
                 await message.delete()
 
-    @commands.cog.listener()
+    @commands.Cog.listener()
     async def on_member_join(self, member):
         if self.bot.alert_level != 'green':
             minutes_between_creation_and_join = (
