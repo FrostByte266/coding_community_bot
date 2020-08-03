@@ -112,7 +112,7 @@ class Messages(commands.Cog):
         """Move/copy specified amount of messages to target channel"""
         await ctx.message.delete()
         async with target.typing():
-            await Messages.move_action(self, ctx, count, target, copy)
+            await self.move_action(self, ctx, count, target, copy)
 
     @last_subcommand.error
     async def last_subcommand_error(self, ctx, error):
@@ -136,7 +136,7 @@ class Messages(commands.Cog):
 
         async with target.typing():
             if found == 1:
-                await Messages.move_action(self, ctx, (count + 20), target, copy)
+                await self.move_action(self, ctx, (count + 20), target, copy)
             else:
                 temp = await ctx.send(f"Error! Unable to find message with ID: {message_id}")
                 await sleep(3)
