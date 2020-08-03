@@ -124,13 +124,13 @@ class Messages(commands.Cog):
 
     @move_group.command(name="from", aliases=["link"])
     @commands.has_permissions(manage_messages=True)
-    async def from_subcommand(self, ctx, messageID: int, target: TextChannel, copy: bool = False):
+    async def from_subcommand(self, ctx, message_id: int, target: TextChannel, copy: bool = False):
         """Move/copy all messages up to (and including) a message ID"""
         await ctx.message.delete()
         count = 0
         async for message in ctx.message.channel.history(limit=100):
             count += 1
-            if message.id == messageID:
+            if message.id == message_id:
                 found = 1
                 break
 
@@ -138,7 +138,7 @@ class Messages(commands.Cog):
             if found == 1:
                 await Messages.move_action(self, ctx, (count + 20), target, copy)
             else:
-                temp = await ctx.send(f"Error! Unable to find message with ID: {messageID}")
+                temp = await ctx.send(f"Error! Unable to find message with ID: {message_id}")
                 await sleep(3)
                 await temp.delete()
 
@@ -146,37 +146,37 @@ class Messages(commands.Cog):
     async def from_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: messageID, target")
+            temp = await ctx.send("Error! Missing one or more of the following arguments: message_id, target")
             await sleep(3)
             await temp.delete()
 
     @move_group.command(name="range", aliases=["between"])
     @commands.has_permissions(manage_messages=True)
-    async def range_subcommand(self, ctx, firstMessageID: int, secondMessageID: int, target: TextChannel, copy: bool = False):
+    async def range_subcommand(self, ctx, first_message_id: int, second_message_id: int, target: TextChannel, copy: bool = False):
         """Move/copy all messages between (and including) two message IDs"""
         await ctx.message.delete()
-        firstMessageFound: int = 0
-        secondMessageFound: int = 0
+        first_message_found: int = 0
+        second_message_found: int = 0
         async for message in ctx.message.channel.history(limit=100):
-            if message.id == firstMessageID:
-                firstMessageFound = 1
-            if message.id == secondMessageID:
-                secondMessageFound = 1
-            if firstMessageFound == secondMessageFound == 1:
+            if message.id == first_message_id:
+                first_message_found = 1
+            if message.id == second_message_id:
+                second_message_found = 1
+            if first_message_found == second_message_found == 1:
                 break
 
         async with target.typing():
             messages = []
             zero_width_space = u'\u200B'
-            firstMessageMoved: int = 0
-            secondMessageMoved: int = 0
-            if firstMessageFound == secondMessageFound == 1:
+            first_message_moved: int = 0
+            second_message_moved: int = 0
+            if first_message_found == second_message_found == 1:
                 async for message in ctx.message.channel.history(limit=100):
-                    if message.id == firstMessageID:
-                        firstMessageMoved = 1
-                    if message.id == secondMessageID:
-                        secondMessageMoved = 1
-                    if firstMessageMoved == 1 or secondMessageMoved == 1:
+                    if message.id == first_message_id:
+                        first_message_moved = 1
+                    if message.id == second_message_id:
+                        second_message_moved = 1
+                    if first_message_moved == 1 or second_message_moved == 1:
                         if message.embeds:
                             messages.extend(message.embeds)
                         else:
@@ -189,7 +189,7 @@ class Messages(commands.Cog):
 
                         if not copy:
                             await message.delete()
-                        if firstMessageMoved == secondMessageMoved == 1:
+                        if first_message_moved == second_message_moved == 1:
                             break
 
                 await target.send(f'Moved from {ctx.message.channel.mention}:')
@@ -198,12 +198,12 @@ class Messages(commands.Cog):
                     await target.send(embed=embed)
                     
             else:
-                if firstMessageFound == 1:
-                    temp = await ctx.send(f"Error! Unable to find message with ID: {messageID2}")
-                elif secondMessageFound == 1:
-                    temp = await ctx.send(f"Error! Unable to find message with ID: {messageID1}")
+                if first_message_found == 1:
+                    temp = await ctx.send(f"Error! Unable to find message with ID: {second_message_id}")
+                elif second_message_found == 1:
+                    temp = await ctx.send(f"Error! Unable to find message with ID: {first_message_id}")
                 else:
-                    temp = await ctx.send(f"Error! Unable to find either message with IDs: {messageID1}, {messageID2}")
+                    temp = await ctx.send(f"Error! Unable to find either message with IDs: {first_message_id}, {second_message_id}")
                 await sleep(3)
                 await temp.delete()
 
@@ -211,7 +211,7 @@ class Messages(commands.Cog):
     async def range_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: messageID, secondMessageID, target")
+            temp = await ctx.send("Error! Missing one or more of the following arguments: message_id, second_message_id, target")
             await sleep(3)
             await temp.delete()
 
