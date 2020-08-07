@@ -50,15 +50,14 @@ class MessageLoader:
                 yield (message_name, absolute_path)
 
 
-
 class Messages(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.messages = MessageLoader('assets/')
         self.message_names = ', '.join(list(self.messages.load_names()))
 
-    async def move_action(self, ctx, count: int, target: TextChannel, copy: bool):
+    async def move_action(self, ctx, count: int, target: TextChannel,
+                          copy: bool):
         messages = []
         zero_width_space = u'\u200B'
         async for message in ctx.message.channel.history(limit=count):
@@ -67,8 +66,9 @@ class Messages(commands.Cog):
             else:
                 embed = Embed(
                     description=f'{zero_width_space}{message.content}')
-                embed.set_author(name=message.author.name,
-                                    icon_url=message.author.avatar_url)
+                embed.set_author(
+                    name=message.author.name,
+                    icon_url=message.author.avatar_url)
                 embed.timestamp = message.created_at
                 messages.append(embed)
 
@@ -80,7 +80,6 @@ class Messages(commands.Cog):
         for embed in reversed(messages):
             await target.send(embed=embed)
 
-
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit: int, target: User = None):
@@ -89,26 +88,35 @@ class Messages(commands.Cog):
         if target is None:
             await ctx.message.channel.purge(limit=limit)
         else:
-            await ctx.message.channel.purge(limit=limit, check=lambda message: message.author == target)
+            await ctx.message.channel.purge(
+                limit=limit, check=lambda message: message.author == target)
 
     @purge.error
     async def purge_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.message.delete()
-            message = await ctx.send("You are missing the manage messages permission!")
+            message = await ctx.send(
+                "You are missing the manage messages permission!")
             await sleep(3)
             await message.delete()
 
-    @commands.group(name="move", invoke_without_command= True, case_insensitive=True)
+    @commands.group(
+        name="move", invoke_without_command=True, case_insensitive=True)
     async def move_group(self, ctx):
         if ctx.invoked_subcommand is None:
-            message = await ctx.send(f"Invalid subcommand passed.  Use {self.bot.command_prefix}help move for available subcommands.")
+            message = await ctx.send(
+                f"Invalid subcommand passed.  Use {self.bot.command_prefix}help move for available subcommands."
+            )
             await sleep(3)
             await message.delete()
 
     @move_group.command(name="last", aliases=["count", "previous"])
     @commands.has_permissions(manage_messages=True)
-    async def last_subcommand(self, ctx, count: int, target: TextChannel, copy: bool = False):
+    async def last_subcommand(self,
+                              ctx,
+                              count: int,
+                              target: TextChannel,
+                              copy: bool = False):
         """Move/copy specified amount of messages to target channel"""
         await ctx.message.delete()
         async with target.typing():
@@ -118,13 +126,19 @@ class Messages(commands.Cog):
     async def last_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: count, target")
+            temp = await ctx.send(
+                "Error! Missing one or more of the following arguments: count, target"
+            )
             await sleep(3)
             await temp.delete()
 
     @move_group.command(name="from", aliases=["link"])
     @commands.has_permissions(manage_messages=True)
-    async def from_subcommand(self, ctx, message_id: int, target: TextChannel, copy: bool = False):
+    async def from_subcommand(self,
+                              ctx,
+                              message_id: int,
+                              target: TextChannel,
+                              copy: bool = False):
         """Move/copy all messages up to (and including) a message ID"""
         await ctx.message.delete()
         count = 0
@@ -138,7 +152,8 @@ class Messages(commands.Cog):
             if found == 1:
                 await self.move_action(self, ctx, (count + 20), target, copy)
             else:
-                temp = await ctx.send(f"Error! Unable to find message with ID: {message_id}")
+                temp = await ctx.send(
+                    f"Error! Unable to find message with ID: {message_id}")
                 await sleep(3)
                 await temp.delete()
 
@@ -146,13 +161,20 @@ class Messages(commands.Cog):
     async def from_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: message_id, target")
+            temp = await ctx.send(
+                "Error! Missing one or more of the following arguments: message_id, target"
+            )
             await sleep(3)
             await temp.delete()
 
     @move_group.command(name="range", aliases=["between"])
     @commands.has_permissions(manage_messages=True)
-    async def range_subcommand(self, ctx, first_message_id: int, second_message_id: int, target: TextChannel, copy: bool = False):
+    async def range_subcommand(self,
+                               ctx,
+                               first_message_id: int,
+                               second_message_id: int,
+                               target: TextChannel,
+                               copy: bool = False):
         """Move/copy all messages between (and including) two message IDs"""
         await ctx.message.delete()
         first_message_found: bool = False
@@ -181,9 +203,11 @@ class Messages(commands.Cog):
                             messages.extend(message.embeds)
                         else:
                             embed = Embed(
-                                description=f'{zero_width_space}{message.content}')
-                            embed.set_author(name=message.author.name,
-                                                icon_url=message.author.avatar_url)
+                                description=
+                                f'{zero_width_space}{message.content}')
+                            embed.set_author(
+                                name=message.author.name,
+                                icon_url=message.author.avatar_url)
                             embed.timestamp = message.created_at
                             messages.append(embed)
 
@@ -196,14 +220,20 @@ class Messages(commands.Cog):
 
                 for embed in reversed(messages):
                     await target.send(embed=embed)
-                    
+
             else:
                 if first_message_found == False:
-                    temp = await ctx.send(f"Error! Unable to find message with ID: {second_message_id}")
+                    temp = await ctx.send(
+                        f"Error! Unable to find message with ID: {second_message_id}"
+                    )
                 elif second_message_found == False:
-                    temp = await ctx.send(f"Error! Unable to find message with ID: {first_message_id}")
+                    temp = await ctx.send(
+                        f"Error! Unable to find message with ID: {first_message_id}"
+                    )
                 else:
-                    temp = await ctx.send(f"Error! Unable to find either message with IDs: {first_message_id}, {second_message_id}")
+                    temp = await ctx.send(
+                        f"Error! Unable to find either message with IDs: {first_message_id}, {second_message_id}"
+                    )
                 await sleep(3)
                 await temp.delete()
 
@@ -211,7 +241,9 @@ class Messages(commands.Cog):
     async def range_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: first_message_id, second_message_id, target")
+            temp = await ctx.send(
+                "Error! Missing one or more of the following arguments: first_message_id, second_message_id, target"
+            )
             await sleep(3)
             await temp.delete()
 
@@ -226,9 +258,13 @@ class Messages(commands.Cog):
     @message.error
     async def message_error(self, ctx, error):
         if type(ctx.args[-1]) is str:
-            await ctx.send(f'Choice `{ctx.args[-1]}` is invalid! Available messages are: {self.message_names}')
+            await ctx.send(
+                f'Choice `{ctx.args[-1]}` is invalid! Available messages are: {self.message_names}'
+            )
         else:
-            await ctx.send(f'No selection specified! Available messages are: {self.message_names}')
+            await ctx.send(
+                f'No selection specified! Available messages are: {self.message_names}'
+            )
 
 
 def setup(bot):
