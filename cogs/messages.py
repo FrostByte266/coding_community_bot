@@ -155,28 +155,28 @@ class Messages(commands.Cog):
     async def range_subcommand(self, ctx, first_message_id: int, second_message_id: int, target: TextChannel, copy: bool = False):
         """Move/copy all messages between (and including) two message IDs"""
         await ctx.message.delete()
-        first_message_found: int = 0
-        second_message_found: int = 0
+        first_message_found: bool = False
+        second_message_found: bool = False
         async for message in ctx.message.channel.history(limit=100):
-            if message.id == first_message_id:
-                first_message_found = 1
-            if message.id == second_message_id:
-                second_message_found = 1
-            if first_message_found == second_message_found == 1:
+            if all([first_message_found, second_message_found]):
                 break
+            if message.id == first_message_id:
+                first_message_found = True
+            if message.id == second_message_id:
+                second_message_found = True
 
         async with target.typing():
             messages = []
             zero_width_space = u'\u200B'
-            first_message_moved: int = 0
-            second_message_moved: int = 0
-            if first_message_found == second_message_found == 1:
+            first_message_moved: bool = False
+            second_message_moved: bool = False
+            if all([first_message_found, second_message_found]):
                 async for message in ctx.message.channel.history(limit=100):
                     if message.id == first_message_id:
-                        first_message_moved = 1
+                        first_message_moved = True
                     if message.id == second_message_id:
-                        second_message_moved = 1
-                    if first_message_moved == 1 or second_message_moved == 1:
+                        second_message_moved = True
+                    if any([first_message_moved, second_message_moved]):
                         if message.embeds:
                             messages.extend(message.embeds)
                         else:
@@ -189,7 +189,7 @@ class Messages(commands.Cog):
 
                         if not copy:
                             await message.delete()
-                        if first_message_moved == second_message_moved == 1:
+                        if all([first_message_moved, second_message_moved]):
                             break
 
                 await target.send(f'Moved from {ctx.message.channel.mention}:')
@@ -198,9 +198,9 @@ class Messages(commands.Cog):
                     await target.send(embed=embed)
                     
             else:
-                if first_message_found == 1:
+                if first_message_found == False:
                     temp = await ctx.send(f"Error! Unable to find message with ID: {second_message_id}")
-                elif second_message_found == 1:
+                elif second_message_found == False:
                     temp = await ctx.send(f"Error! Unable to find message with ID: {first_message_id}")
                 else:
                     temp = await ctx.send(f"Error! Unable to find either message with IDs: {first_message_id}, {second_message_id}")
@@ -211,7 +211,7 @@ class Messages(commands.Cog):
     async def range_subcommand_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.delete()
-            temp = await ctx.send("Error! Missing one or more of the following arguments: message_id, second_message_id, target")
+            temp = await ctx.send("Error! Missing one or more of the following arguments: first_message_id, second_message_id, target")
             await sleep(3)
             await temp.delete()
 
