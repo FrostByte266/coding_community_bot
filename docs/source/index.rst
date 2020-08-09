@@ -6,6 +6,10 @@
 Welcome to Little Fox Familiar's documentation!
 ===============================================
 
+.. automodule:: bot
+   :members:
+
 .. toctree::
    :maxdepth: 2
+
    license
