@@ -201,7 +201,7 @@ class CodingBot:
 
                 current_category = set()
                 categorized_roles = dict()
-                ignored_categories = ('Bot', 'Staff', 'Utilities')
+                desired_categories = ('Experience', 'Languages')
                 for role in roles.values():
                     if not role.name.startswith('-'):
                         # Role is not a category, add it to the current category
@@ -209,7 +209,7 @@ class CodingBot:
                     else:
                         # Role is a category, add all roles under it, and reset
                         role_name = role.name[1:]
-                        if role_name not in ignored_categories:
+                        if role_name in desired_categories:
                             # If the category isn't ignored, add it to the dict, otherwise discard it
                             categorized_roles[role_name] = current_category
                         current_category = set()
