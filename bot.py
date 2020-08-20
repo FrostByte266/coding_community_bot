@@ -199,7 +199,22 @@ class CodingBot:
 
                 roles = {role.name.lower(): role for role in message.guild.roles if role.name not in ignored_roles}
 
-                #some aliases added to catch for spelling errors
+                current_category = set()
+                categorized_roles = dict()
+                ignored_categories = ('Bot', 'Staff', 'Utilities')
+                for role in roles.values():
+                    if not role.name.startswith('-'):
+                        # Role is not a category, add it to the current category
+                        current_category.add(role)
+                    else:
+                        # Role is a category, add all roles under it, and reset
+                        role_name = role.name[1:]
+                        if role_name not in ignored_categories:
+                            # If the category isn't ignored, add it to the dict, otherwise discard it
+                            categorized_roles[role_name] = current_category
+                        current_category = set()
+
+                # Some aliases added to catch for spelling errors
                 alias = (('js', roles['javascript']),
                          ('cpp', roles['c++']),
                          ('c', roles['clang']),
@@ -212,19 +227,24 @@ class CodingBot:
                     roles[element[0]] = element[1]
 
 
-                member_roles = tuple((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
+                new_roles = set((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
 
-                await message.author.add_roles(*member_roles)
-
-                newline = '\n'
-                await message.author.send(
-                    f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                    f'{newline.join(role.name for role in member_roles)}, \n'
-                    '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
-                    'please feel free to contact the moderation team'
-                )
-                if verification_enabled:
-                    await message.author.remove_roles(unverified_role)
+                if all((categorized_roles[category] & new_roles for category in categorized_roles.keys())):
+                    await message.author.add_roles(*new_roles)
+                    newline = '\n'
+                    await message.author.send(
+                        f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
+                        f'{newline.join(role.name for role in new_roles)}, \n'
+                        '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
+                        'please feel free to contact the moderation team'
+                    )
+                    if verification_enabled:
+                        await message.author.remove_roles(unverified_role)
+                else:
+                    await message.author.send(
+                        'You must have at least one experience level role and one skill role in your introduction. '
+                        'Please review the #readme channel for an example of a valid introduction.'
+                    )
             elif all((verification_enabled, str(message.channel) != 'if-you-are-new-click-here', unverified_role in message.author.roles)):
                 await message.author.send("Before you can send messages you need to introduce yourself in #if-you-are-new-click-here."
                                           " Please state any programming languages you have used, as well as whether you are a"
