@@ -189,7 +189,7 @@ class CodingBot:
             unverified_role = get(message.author.guild.roles, name="Unverified")
 
             if all((str(message.channel) == 'if-you-are-new-click-here', message.content is not None)):
-                content = re.sub("[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
+                content = re.sub("^-|[\.\:\;\,]", " ", message.content, flags=re.UNICODE)
                 word_group = content.split()
 
                 ignored_roles = ('@everyone', 'Admin', 'Spartan Mod', 'Moderator', 'Owner', 'Staff',
@@ -227,19 +227,25 @@ class CodingBot:
                     roles[element[0]] = element[1]
 
 
-                new_roles = set((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
+                detected_roles = set((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
 
-                if all((categorized_roles[category] & new_roles for category in categorized_roles.keys())):
-                    await message.author.add_roles(*new_roles)
+                if all((categorized_roles[category] & detected_roles for category in categorized_roles.keys())):
+                    await message.author.add_roles(*detected_roles)
                     newline = '\n'
                     await message.author.send(
                         f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                        f'{newline.join(role.name for role in new_roles)}, \n'
+                        f'{newline.join(role.name for role in detected_roles)}, \n'
                         '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
                         'please feel free to contact the moderation team'
                     )
                     if verification_enabled:
                         await message.author.remove_roles(unverified_role)
+                elif unverified_role not in message.author.roles and message.content.startswith('-'):
+                    roles_after_removal = set(message.author.roles) - detected_roles
+                    meets_minimum_languages =  len(categorized_roles['Languages'] & roles_after_removal) > 2
+                    has_all_categories = all((categorized_roles[category] & roles_after_removal for category in categorized_roles.keys()))
+                    if all((meets_minimum_languages, has_all_categories)):
+                        await message.author.remove_roles(*detected_roles)
                 else:
                     await message.author.send(
                         'You must have at least one experience level role and one skill role in your introduction. '
