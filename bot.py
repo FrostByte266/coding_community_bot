@@ -230,11 +230,12 @@ class CodingBot:
                 detected_roles = set((roles.get(word.lower(), 0) for word in word_group if roles.get(word.lower(), 0) != 0))
 
                 if all((categorized_roles[category] & detected_roles for category in categorized_roles.keys())):
-                    await message.author.add_roles(*detected_roles)
+                    filtered_roles = tuple(x for x in detected_roles if not x.name.startswith('-'))
+                    await message.author.add_roles(*filtered_roles)
                     newline = '\n'
                     await message.author.send(
                         f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                        f'{newline.join(role.name for role in detected_roles)}, \n'
+                        f'{newline.join(role.name for role in filtered_roles)}, \n'
                         '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
                         'please feel free to contact the moderation team'
                     )
