@@ -22,6 +22,7 @@ class Metrics(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @commands.has_permissions(manage_messages=True)
     async def networkplot(self, ctx):
         # Create dict of role names and the number of members in each
         default_role = '@everyone'
@@ -116,6 +117,7 @@ class Metrics(commands.Cog):
         await ctx.message.author.send(f'{ctx.guild.name} roles chart', file=File(image_path))
 
     @commands.command()
+    @commands.has_permissions(manage_messages=True)
     async def plot(self, ctx):
         # Create dict of role names and the number of members in each
         roles_dict = {role.name: [len(role.members)]
@@ -147,6 +149,7 @@ class Metrics(commands.Cog):
         await ctx.message.author.send(f'{ctx.guild.name} roles chart', file=File(image_path))
 
     @commands.command(description="Show uptime")
+    @commands.has_permissions(manage_messages=True)
     async def uptime(self, ctx):
         """
         View bot uptime.
