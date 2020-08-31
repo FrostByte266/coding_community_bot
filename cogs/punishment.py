@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 import json
 
 from discord import Embed, Guild, User
-from discord.utils import get
+from discord.utils import get, find
 from discord.errors import Forbidden
 from discord.ext import commands, tasks
 
