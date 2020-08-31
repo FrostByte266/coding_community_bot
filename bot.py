@@ -180,7 +180,7 @@ class CodingBot:
             is_bot = message.author == bot.user
             is_webhook = message.webhook_id is not None
             not_guild = message.guild is None
-            if any((is_bot, is_webhook, not_guild)):
+            if any((is_bot, is_webhook, not_guild, message.content.startswith('!d bump'))):
                 return None
 
 
