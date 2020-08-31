@@ -122,10 +122,13 @@ class Punishment(commands.Cog):
     def check_expired(self, entry):
         has_tempban_flag = entry.reason.startswith('tempban')
 
-        expiration_date = datetime.fromtimestamp(int(entry.reason.split()[1]), timezone.utc)
-        entry_is_expired = datetime.now(timezone.utc) > expiration_date
-
-        return has_tempban_flag and entry_is_expired  
+        if not has_tempban_flag:
+            return False
+        else:
+            expiration_date = datetime.fromtimestamp(int(entry.reason.split()[1]), timezone.utc)
+            entry_is_expired = datetime.now(timezone.utc) > expiration_date
+    
+            return has_tempban_flag and entry_is_expired
 
     @tasks.loop(hours=1)
     async def tempban_expiration_task(self):
