@@ -150,7 +150,7 @@ class Messages(commands.Cog):
 
         async with target.typing():
             if found == 1:
-                await self.move_action(ctx, (count + 20), target, copy)
+                await self.move_action(ctx, count, target, copy)
             else:
                 temp = await ctx.send(
                     f"Error! Unable to find message with ID: {message_id}")
