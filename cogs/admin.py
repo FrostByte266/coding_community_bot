@@ -355,7 +355,7 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def block_unverified(self, ctx):
-        self.bot.logger.into(
+        self.bot.logger.info(
             f'Blocking unverified in {ident_string(ctx.guild)}, initiated by {ident_string(ctx.author)}')
         ignored_categories = ['getting started', 'purgatory']
         unverfied_role = get(ctx.guild.roles, name="Unverified")
