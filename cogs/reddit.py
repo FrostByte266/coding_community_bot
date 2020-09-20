@@ -197,6 +197,8 @@ class Reddit(commands.Cog):
             collection of the most recent top content from these locations at a set interval.
                 \n\t!reddit: Enable or disable the reddit system
                 \n\t!reddit <channel>: add channel
+                \n\t!reddit status: informs if AutoReddit is on or off for this guild
+                \n\t!reddit list: lists all channels currently serving as curated feeds
                 \n\t!reddit <channel> list: list all current sources for this channel
                 \n\t!reddit <channel> +<subreddit name>: add subreddit as source for this channel
                 \n\t!reddit <channel> -<subreddit name>: remove subrreddit as source for this channel
