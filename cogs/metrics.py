@@ -24,6 +24,10 @@ class Metrics(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def networkplot(self, ctx):
+        """
+        Command to generate a co-occurrence plot of all the currently assigned roles within the guild
+        \nThis plot will be DM'd to the user of the command.
+        """
         # Create dict of role names and the number of members in each
         default_role = '@everyone'
         roles = [str(role.name) for role in ctx.guild.roles if role.name != default_role]
@@ -119,6 +123,10 @@ class Metrics(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def plot(self, ctx):
+        """
+        Command to generate a bar plot of all the currently assigned roles within the guild
+        \nThis plot will be DM'd to the user of the command.
+        """
         # Create dict of role names and the number of members in each
         roles_dict = {role.name: [len(role.members)]
                       for role in ctx.guild.roles}
