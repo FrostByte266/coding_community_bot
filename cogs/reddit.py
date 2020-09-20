@@ -194,8 +194,9 @@ class Reddit(commands.Cog):
         Command to control AutoReddit channel feature.
             \n This feature enables a channel to be a RSS like curation feed for subreddits that have been"""\
         """ added, using the top of <period> from the subs, selecting a random sub collection of the most"""\
-        """ recent top content from these locations at a set interval.
-                \n\t!reddit: Enable or disable the reddit system
+        """ recent top <period> content from these locations at a set interval. 
+                \nNote: The <period> is randomly selected from ('Week','Month') for each subreddit subscribed to.
+                \n\n\t!reddit: Enable or disable the reddit system
                 \n\t!reddit <channel>: add channel
                 \n\t!reddit status: informs if AutoReddit is on or off for this guild
                 \n\t!reddit list: lists all channels currently serving as curated feeds
