@@ -190,28 +190,51 @@ class Reddit(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def reddit(self, ctx, *, parameters: Optional[RedditCommandParser]):
-        """Enable or disable the reddit system"""
+        """
+        Command to control AutoReddit channel feature.
+            \n This feature enables a channel to be a RSS like curation feed for subreddits that
+            have been added, using the top of <period> from the subs, selecting a random sub
+            collection of the most recent top content from these locations at a set interval.
+                \n\t!reddit: Enable or disable the reddit system
+                \n\t!reddit <channel>: add channel
+                \n\t!reddit <channel> list: list all current sources for this channel
+                \n\t!reddit <channel> +<subreddit name>: add subreddit as source for this channel
+                \n\t!reddit <channel> -<subreddit name>: remove subrreddit as source for this channel
+                :param Mode: Channel or Mode String(status, list)
+                :type Mode: #<channel name> or str
+        """
+
         args = parameters[1] if parameters is not None else None
         guild = AutoRedditGuild(ctx.guild, self.config_path)
+
+        mentioned_channel = None
 
         if args is None:
             status = 'on' if guild() is True else 'off'
             await ctx.send(f'Auto reddit is now {status} for {ctx.guild.name}')
             return None
-        else: 
-            mentioned_channel = parameters[0]
-            mode = args[0] if args[0] in ('status','list') else args[0][0]
+
+        else:
+            mentioned_channel = parameters[0] if parameters[0] not in ('status','list') else None
+            mode = parameters[0] if parameters[0] in ('status','list') else args[0][0]
             first_arg = args[0][1:]
             error_message = 'Error: Malformed parameters!'
+
+        if mode == 'list':
+            print(self.config[str(ctx.guild.id)].get('reddit_config',
+                                                     "No channels currrently in AutoReddit Feature")
+                                                    )
+
+        elif mode == 'status':
+            status = 'on' if guild(query_status=True) is True else 'off'
+            await ctx.send(f'Auto reddit is {status} for {ctx.guild.name}')
             
-        if mentioned_channel is not None:
+        elif mentioned_channel is not None:
             # Modifying an existing channel, proceed to managing subreddits
             channel = AutoRedditChannel(mentioned_channel, self.config_path)
 
-            if mode == 'status':
-                status = 'on' if guild(query_status=True) is True else 'off'
-                await ctx.send(f'Auto reddit is {status} for {ctx.guild.name}')
-            elif mode == 'list':
+            mode = args[0] if args[0] == 'list' else args[0][0]
+            if mode == 'list':
                 sub_list = ', '.join(channel.subreddits)
                 await ctx.send(f'{ctx.guild.name} {channel.channel.name} subreddits are:\n'
                                f' {sub_list} ')
