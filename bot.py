@@ -15,7 +15,11 @@ from discord.utils import get
 
 
 class CodingBot:
+    """The main class of the bot
 
+    :param config_file: The path to the config file
+    :type config_file: str
+    """
     def __init__(self, config_file):
         self.config_file_path = config_file
         self.config, self.bot_token = self.load_config_and_fetch_token(
@@ -34,12 +38,25 @@ class CodingBot:
         }
 
     def get_initial_config_value(self, env_key, prompt):
+        """Fetches a value from the environment and prompts if missing
+
+        :param env_key: The key of the environment variable
+        :type env_key: str
+        :param prompt: The prompt to give if the key is missing
+        :type prompt: str
+        :return: The environment variable value or user input
+        :rtype: str
+        """
         env_var = os.environ.get(env_key, None)
         return env_var if env_var is not None else input(f'Please provide the {prompt}: ')
 
     def load_config_and_fetch_token(self, config_file):
-        """
-        Loads bot configuration for use.
+        """Loads the bot config for use
+
+        :param config_file: The path to the bot's config file
+        :type config_file: str
+        :return: Tuple of the initial config as a dict and the bot's token
+        :rtype: Tuple[dict, str]
         """
         token = None
         try:
@@ -81,23 +98,24 @@ class CodingBot:
             return (initial_config, token)
 
     def refresh_config(self, new_config, write=True):
+        """Reloads the config file
+
+        :param new_config: The config to overwrite the current config
+        :type new_config: dict
+        :param write: Defines if the file should be updated on disk, defaults to True
+        :type write: bool, optional
+        """
         self.config = new_config
         if write:
             json.dump(new_config, open(self.config_file_path, 'w'),
                       indent=2, separators=(',', ': '))
             
     def start_logging(self, log="discord.log"):
+        """Sets up the bot log
+
+        :param log: the logfile to use, defaults to "discord.log"
+        :type log: str, optional
         """
-        Sets up the bot log with the following defaults
-
-        Default log level: 50  (CRITICAL)
-        Default log name: discord.log
-
-        bot: discord.ext.commands.Bot()
-        log: string
-            -> None
-        """
-
         # Rotate logs
         old_log_path = f'{log}.old'
         if os.path.exists(old_log_path):
@@ -114,9 +132,11 @@ class CodingBot:
         self.bot.logger.addHandler(self.bot.handler)
     
     def stop_logging(self):
+        """Closes the log file"""
         self.bot.handler.close()
 
     def load_cogs(self):
+        """Loads all cogs in the 'cogs' directory"""
         for file in os.listdir('./cogs'):
             if file.endswith('.py'):
                 try:
@@ -126,6 +146,7 @@ class CodingBot:
                     print(f"Error:\n{e}")
 
     def run_bot(self):
+        """Runs the bot"""
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(self.bot.start(self.bot_token))
@@ -134,6 +155,13 @@ class CodingBot:
         print("Restarting...")
 
     def attachments_are_images(self, message):
+        """Checks if the attachment of a message is an image
+
+        :param message: The message to check
+        :type message: discord.Message
+        :return: A bool representing if the attachment is an image
+        :rtype: bool
+        """
         attachments = message.attachments
         permitted_types = ('png', 'jpg', 'jpeg', 'gif', 'bmp')
         file_extensions = (file.filename.split('.')[-1] for file in attachments)
@@ -142,6 +170,13 @@ class CodingBot:
         return all(attachments_permissible)
 
     def can_upload_files(self, member):
+        """Checks if a member is able to upload a file
+
+        :param member: The member to check
+        :type member: discord.Member
+        :return: A bool representing if the member can attach files
+        :rtype: bool
+        """
         min_age_images = timedelta(days=2)
         min_age_files = timedelta(days=30)
 
@@ -156,6 +191,11 @@ class CodingBot:
             return True
             
     def build_bot(self):
+        """Builds the discord bot object
+
+        :return: The bot to be used
+        :rtype: discord.ext.commands.Bot
+        """
         bot = commands.Bot(
             command_prefix=self.config['prefix'],
             case_insensitive=True)
