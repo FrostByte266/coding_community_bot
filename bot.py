@@ -175,7 +175,7 @@ class CodingBot:
         :param member: The member to check
         :type member: discord.Member
         :return: A bool representing if the member can attach files
-        :rtype: bool
+        :rtype: Union[bool, str]
         """
         min_age_images = timedelta(days=2)
         min_age_files = timedelta(days=30)
