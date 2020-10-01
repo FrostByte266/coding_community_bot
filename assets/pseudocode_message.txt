@@ -1,0 +1,9 @@
+Pseudocode is a detailed yet readable description of what a computer program or algorithm must do, expressed in a formally-styled natural language rather than in a programming language. Pseudocode is often used as a detailed step in the process of developing a program.
+
+An example of a program to add 2 numbers together and display the total:
+```
+Start Program
+Enter two numbers (A, B)
+Add the numbers together
+Print the total
+End Program```
