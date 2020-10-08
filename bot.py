@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 import asyncio
 
-from discord import Embed, Message
+from discord import Embed, Message, Intents
 from discord.ext import commands, tasks
 from discord.errors import Forbidden
 from discord.utils import get
@@ -196,9 +196,13 @@ class CodingBot:
         :return: The bot to be used
         :rtype: discord.ext.commands.Bot
         """
+        intents = Intents.default()
+        intents.members = True
+        
         bot = commands.Bot(
             command_prefix=self.config['prefix'],
-            case_insensitive=True)
+            case_insensitive=True,
+            intents=intents)
 
         def setup_guild_config(guild):
             # Add empty config to JSON for any server that is missing
