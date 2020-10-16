@@ -277,12 +277,16 @@ class CodingBot:
                     filtered_roles = tuple(x for x in detected_roles if not x.name.startswith('-'))
                     await message.author.add_roles(*filtered_roles)
                     newline = '\n'
-                    await message.author.send(
-                        f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
-                        f'{newline.join(role.name for role in filtered_roles)}, \n'
-                        '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
-                        'please feel free to contact the moderation team'
-                    )
+                    try:
+                        await message.author.send(
+                            f'Hello, based on your introduction, you have automatically been assigned the following roles: \n'
+                            f'{newline.join(role.name for role in filtered_roles)}, \n'
+                            '\nIf you believe you are missing some roles or have received roles that do not apply to you, '
+                            'please feel free to contact the moderation team'
+                        )
+                    except Forbidden:
+                        # Avoids unverified not being removed if DM settings block this
+                        pass
                     if verification_enabled:
                         await message.author.remove_roles(unverified_role)
                 elif unverified_role not in message.author.roles and message.content.startswith('-'):
